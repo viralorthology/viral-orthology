@@ -1,0 +1,23 @@
+name: viralorthology
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.12
+  - pip=25.2
+  - blast=2.17.0
+  - clustalw=2.1
+  - entrez-direct=24.0
+  - foldseek=10.941cd33
+  - hhsuite=3.3.0
+  - hmmer=3.4
+  - mafft=7.525
+  - muscle=5.1
+  - proteinortho=6.3.1
+  - pip:
+      - biopython==1.86
+      - tqdm==4.67.1
+      - mypy==2.3.1
+      - pytest==9.1.1
+      - pytest-cov==7.1.0
+      - ruff==0.16.4
