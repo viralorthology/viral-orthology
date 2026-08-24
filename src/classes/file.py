@@ -21,6 +21,7 @@ class File:
 
     @property
     def has_content(self) -> bool:
+        """Return True if the file exists and has content."""
         return self.exists and self.path.stat().st_size > 0
 
     def read_file(self) -> str:
@@ -28,10 +29,13 @@ class File:
         Get the contents of an existing file.
 
         Raises:
-            FileNotFoundError: if the file does not exist or is empty
+            FileNotFoundError: if the file does not exist
+            ValueError: if the file is empty
         """
+        if not self.exists:
+            raise FileNotFoundError(f"{self.path} does not exist")
         if not self.has_content:
-            raise FileNotFoundError(f"{self.path} does not exist or is empty")
+            raise ValueError(f"{self.path} is empty")
 
         return self.path.read_text(encoding="utf-8")
 
@@ -42,6 +46,7 @@ class File:
         Args:
             text: text to append to the file
         """
+        assert text
         with self.path.open("a", encoding="utf-8") as fh:
             fh.write(text)
 
@@ -54,10 +59,16 @@ class File:
 
         Raises:
             FileNotFoundError: if the file does not exist
+            ValueError: if the file is empty
             FileExistsError: if a file with the new name already exists
         """
-        new_path = self.path.with_name(new_filename)
+        assert new_filename
+        if not self.exists:
+            raise FileNotFoundError(f"{self.path} does not exist")
+        if not self.has_content:
+            raise ValueError(f"{self.path} is empty")
 
+        new_path = self.path.with_name(new_filename)
         if new_path.exists():
             raise FileExistsError(f"{new_path} already exists")
 
@@ -72,10 +83,16 @@ class File:
 
         Raises:
             FileNotFoundError: if the file does not exist or the given directory does not exist
+            ValueError: if the file is empty
             FileExistsError: if a file with the same name already exists in the destination directory
         """
-        new_path = directory_path / self.path.name
+        assert directory_path
+        if not self.exists:
+            raise FileNotFoundError(f"{self.path} does not exist")
+        if not self.has_content:
+            raise ValueError(f"{self.path} is empty")
 
+        new_path = directory_path / self.path.name
         if new_path.exists():
             raise FileExistsError(f"{new_path} already exists")
 

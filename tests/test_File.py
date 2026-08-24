@@ -24,6 +24,11 @@ def test_move_nonexistent_file(nonexistent_file, tmp_path):
         nonexistent_file.move_file(tmp_path)
 
 
+def test_move_empty_file(empty_file, tmp_path):
+    with pytest.raises(ValueError):
+        empty_file.move_file(tmp_path)
+
+
 def test_move_file(text_file, tmp_path):
     dir_to = tmp_path / "dir_to"
     dir_to.mkdir()
@@ -53,12 +58,18 @@ def test_rename_nonexistent_file(nonexistent_file):
 def test_rename_file(text_file):
     text_file.rename_file("testfile.txt")
     assert text_file.path.name == "testfile.txt"
+    assert text_file.path.is_file()
+
+
+def test_rename_empty_filename(text_file):
+    with pytest.raises(AssertionError):
+        text_file.rename_file("")
 
 
 def test_rename_file_to_existent_file_path(empty_file, text_file):
-    other_file_name = text_file.path.name
+    other_file_name = empty_file.path.name
     with pytest.raises(FileExistsError):
-        empty_file.rename_file(other_file_name)
+        text_file.rename_file(other_file_name)
 
 
 def test_delete_nonexistent_file(nonexistent_file):
@@ -68,7 +79,7 @@ def test_delete_nonexistent_file(nonexistent_file):
 
 def test_delete_file(text_file):
     text_file.delete_file()
-    assert text_file.exists is False
+    assert text_file.path.is_file() is False
 
 
 def test_read_nonexistent_file(nonexistent_file):
@@ -77,7 +88,7 @@ def test_read_nonexistent_file(nonexistent_file):
 
 
 def test_read_empty_file(empty_file):
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(ValueError):
         empty_file.read_file()
 
 
@@ -91,4 +102,9 @@ def test_write_to_nonexistent_file(nonexistent_file):
     nonexistent_file.write_to_file("test")
     assert nonexistent_file.exists is True
     assert nonexistent_file.has_content is True
-    assert nonexistent_file.read_file() == "test"
+    assert nonexistent_file.path.read_text(encoding="utf-8") == "test"
+
+
+def test_write_no_text(text_file):
+    with pytest.raises(AssertionError):
+        text_file.write_to_file("")
