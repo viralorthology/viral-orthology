@@ -69,6 +69,8 @@ class File:
             raise ValueError(f"{self.path} is empty")
 
         new_path = self.path.with_name(new_filename)
+        if not new_path.suffix:
+            raise ValueError("new filename has to have a suffix")
         if new_path.exists():
             raise FileExistsError(f"{new_path} already exists")
 
