@@ -51,20 +51,12 @@ class OrthologGroup(Fasta):
         self._validate()
 
     def remove_seqs(self, *ids: str) -> None:
-        ids_to_remove = set(ids)
-        fasta_ids = set(self.ids)
-        remaining_seq_ids = fasta_ids - ids_to_remove
+        self._delete_associated_files()
+        remaining_seq_ids = set(self.ids) - set(ids)
 
         if (
             len(remaining_seq_ids) == 1
-        ):  # move remaining seq to the corresponding prot db
-            assert len(ids) == len(ids_to_remove)
-            missing_ids = ids_to_remove - fasta_ids
-            if missing_ids:
-                raise ValueError(
-                    f"Some IDs were not found in {self.path}: {missing_ids}"
-                )
-
+        ):  # move the remaining seq to the corresponding prot DB
             remaining_seq = self.get_seqs(next(iter(remaining_seq_ids)))[0]
             prot_db_path = (
                 self.orffinder_prot_db_path
@@ -73,10 +65,10 @@ class OrthologGroup(Fasta):
             )
             prot_db = Fasta(prot_db_path, FastaType.GENERIC)
             prot_db.add_seqs(remaining_seq)
-            self.delete_file()
+            super().remove_seqs(*ids, remaining_seq.id)  # check ids
+            assert not self.exists
         else:
             super().remove_seqs(*ids)
-            self._delete_associated_files()
             if self.exists:
                 self._validate()
 
