@@ -46,17 +46,20 @@ class OrthologGroup(Fasta):
         ]
 
     def add_seqs(self, *seqs: Seq) -> None:
+        """Add sequences to the ortholog group and revalidate it."""
         super().add_seqs(*seqs)
         self._delete_associated_files()
         self._validate()
 
     def remove_seqs(self, *ids: str) -> None:
+        """Remove sequences from the ortholog group.
+
+        If only one sequence remains, it is moved to the corresponding protein db and the ortholog group FASTA file is deleted.
+        """
         self._delete_associated_files()
         remaining_seq_ids = set(self.ids) - set(ids)
 
-        if (
-            len(remaining_seq_ids) == 1
-        ):  # move the remaining seq to the corresponding prot DB
+        if len(remaining_seq_ids) == 1:
             remaining_seq = self.get_seqs(next(iter(remaining_seq_ids)))[0]
             prot_db_path = (
                 self.orffinder_prot_db_path
@@ -73,10 +76,12 @@ class OrthologGroup(Fasta):
                 self._validate()
 
     def delete_file(self) -> None:
+        """Delete the ortholog group FASTA file and its associated files."""
         self._delete_associated_files()
         super().delete_file()
 
     def rename_file(self, new_filename: str) -> None:
+        """Rename the ortholog group FASTA file and delete its associated files."""
         self._delete_associated_files()  # associated files depend upon self.path, so delete them before renaming the file
         super().rename_file(new_filename)
 
@@ -84,13 +89,13 @@ class OrthologGroup(Fasta):
         """
         Check if the ortholog group is valid.
 
-        It has to have at least 2 sequences, and no 2 sequences from the same genome.
+        It has to have at least two sequences, and no two sequences from the same genome.
         """
         genome_ids = self.genome_ids
         n_seqs = len(genome_ids)
 
         if n_seqs < 2:
-            raise ValueError(f"{self.path} ortholog group has less than 2 sequences")
+            raise ValueError(f"{self.path} ortholog group has fewer than two sequences")
 
         if len(genome_ids) != len(set(genome_ids)):
             raise ValueError(
