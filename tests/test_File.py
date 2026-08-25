@@ -66,6 +66,11 @@ def test_rename_empty_filename(text_file):
         text_file.rename_file("")
 
 
+def test_rename_filename_no_suffix(text_file):
+    with pytest.raises(ValueError):
+        text_file.rename_file("test")
+
+
 def test_rename_empty_file(empty_file, text_file):
     other_file_name = text_file.path.name
     with pytest.raises(ValueError):
