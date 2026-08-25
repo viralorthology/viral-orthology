@@ -105,17 +105,11 @@ class Fasta(File):
         assert ids
         assert len(ids) == len(set(ids))
 
-        ids_to_remove = set()
-        seqs_to_keep = []
-        for seq in self.seqs:
-            if seq.id in ids:
-                ids_to_remove.add(seq.id)
-            else:
-                seqs_to_keep.append(seq)
-
-        missing_ids = set(ids) - ids_to_remove
+        ids_to_remove = set(ids)
+        missing_ids = ids_to_remove - set(self.ids)
         if missing_ids:
             raise ValueError(f"Some IDs were not found in {self.path}: {missing_ids}")
+        seqs_to_keep = [seq for seq in self.seqs if seq.id not in ids_to_remove]
 
         self.delete_file()
         if seqs_to_keep:
