@@ -1,3 +1,4 @@
+import sys
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 
@@ -10,6 +11,11 @@ class UI(ABC):
     @abstractmethod
     def show(self, text: str) -> None:
         """Show text to user"""
+        ...
+
+    @abstractmethod
+    def show_error(self, text: str) -> None:
+        """Show an error message to the user."""
         ...
 
     @abstractmethod
@@ -26,6 +32,10 @@ class UI(ABC):
 class CLI(UI):
     def show(self, text: str) -> None:
         print(text)
+
+    def show_error(self, text: str) -> None:
+        """Print an error message to stderr."""
+        print(f"ERROR: {text}", file=sys.stderr)
 
     def progress_bar[T](self, iterable: Iterable[T]) -> Iterable[T]:
         return tqdm(iterable)  # type: ignore[no-any-return]
