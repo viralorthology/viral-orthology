@@ -8,7 +8,9 @@ class UI(ABC):
     """Interface for interacting with the user."""
 
     @abstractmethod
-    def show(self, text: str) -> None: ...
+    def show(self, text: str) -> None:
+        """Show text to user"""
+        ...
 
     @abstractmethod
     def progress_bar[T](self, iterable: Iterable[T]) -> Iterable[T]:
