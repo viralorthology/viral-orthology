@@ -3,9 +3,9 @@ from pathlib import Path
 
 from Bio import SeqIO
 
-from classes.fasta_type import FastaType
-from classes.file import File
-from classes.seq import Seq
+from models.fasta_type import FastaType
+from models.file import File
+from models.seq import Seq
 
 
 class Fasta(File):

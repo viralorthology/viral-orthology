@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from classes.fasta import Fasta
-from classes.fasta_type import FastaType
-from classes.seq import Seq
+from models.fasta import Fasta
+from models.fasta_type import FastaType
+from models.seq import Seq
 
 
 class OrthologGroup(Fasta):

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from classes.ortholog_group import OrthologGroup
+from models.ortholog_group import OrthologGroup
 
 
 def test_fasta_two_proteins_of_the_same_genome(

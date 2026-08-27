@@ -2,8 +2,8 @@ import pytest
 from Bio.Seq import Seq as BioSeq
 from Bio.SeqRecord import SeqRecord
 
-from classes.fasta_type import FastaType
-from classes.seq import Seq
+from models.fasta_type import FastaType
+from models.seq import Seq
 
 
 def test_fasta_ids(fasta):

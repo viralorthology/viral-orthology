@@ -2,9 +2,9 @@ import pytest
 from Bio.Seq import Seq as BioSeq
 from Bio.SeqRecord import SeqRecord
 
-from classes.fasta import Fasta
-from classes.fasta_type import FastaType
-from classes.file import File
+from models.fasta import Fasta
+from models.fasta_type import FastaType
+from models.file import File
 
 # TEXT FILES
 

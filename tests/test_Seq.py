@@ -1,7 +1,7 @@
 import pytest
 
-from classes.fasta_type import FastaType
-from classes.seq import Seq
+from models.fasta_type import FastaType
+from models.seq import Seq
 
 
 def test_generic_seq(seq_without_genome_id):

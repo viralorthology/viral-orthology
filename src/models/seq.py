@@ -1,6 +1,6 @@
 from Bio.SeqRecord import SeqRecord
 
-from classes.fasta_type import FastaType
+from models.fasta_type import FastaType
 
 
 class Seq(SeqRecord):
