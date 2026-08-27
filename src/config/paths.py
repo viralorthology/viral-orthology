@@ -21,6 +21,10 @@ class Paths:
     ids_txt: Path = field(init=False)
 
     def __post_init__(self) -> None:
+        if not isinstance(self.base, Path):
+            raise TypeError(
+                f"base must be a pathlib.Path, got {type(self.base).__name__}"
+            )
         base = self.base.resolve()
 
         object.__setattr__(self, "base", base)
