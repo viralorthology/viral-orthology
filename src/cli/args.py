@@ -17,6 +17,7 @@ AVAILABLE_TOOLS_BY_PUBLIC_MODULE = {
         "blastp_paralog_search",
         "orffinder",
     },
+    "download_seqs": {},
     "blastp_module": {"blastp"},
     "hmmsearch_module": {"hmmsearch"},
     "synteny": {"blastp"},

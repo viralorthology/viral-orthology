@@ -5,7 +5,7 @@ from cli.args import get_args
 from cli.ui import CLI, UI
 from config.context import Context
 from config.paths import Paths
-from modules import pipeline
+from modules import download_seqs, pipeline
 
 
 def get_selected_module_flag() -> str:
@@ -30,7 +30,7 @@ def print_help(ui: UI) -> None:
     ui.show("help")
 
 
-MODULES = {"-pipeline": pipeline}
+MODULES = {"-pipeline": pipeline, "-download_seqs": download_seqs}
 
 
 def main() -> None:
