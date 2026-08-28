@@ -47,7 +47,6 @@ def main() -> None:
     try:
         args = get_args(selected_module_flag, sys.argv[1:])
         ctx = Context(args, paths, ui)
-        module.validate(ctx)
         module.run(ctx)
 
     except Exception as e:
