@@ -71,9 +71,8 @@ def get_args(selected_public_module_flag: str, argv: list[str]) -> Args:
     # TODO add arg and param validation
 
     # apply default params
-    for tool, default_params in DEFAULT_TOOL_PARAMS[
-        selected_public_module_flag
-    ].items():
+    module_default_params = DEFAULT_TOOL_PARAMS.get(selected_public_module_flag, {})
+    for tool, default_params in module_default_params.items():
         tool_params = tool_args.setdefault(tool, [])
 
         for param, value in default_params.items():
