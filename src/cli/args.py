@@ -1,3 +1,4 @@
+import shlex
 from dataclasses import dataclass
 
 
@@ -5,7 +6,7 @@ from dataclasses import dataclass
 class Args:
     debug: bool
     assume_yes: bool
-    tool_args: dict[str, list[str]]
+    tool_args: dict[str, str]
 
 
 AVAILABLE_TOOLS_BY_PUBLIC_MODULE = {
@@ -82,4 +83,7 @@ def get_args(selected_public_module_flag: str, argv: list[str]) -> Args:
                 else:
                     tool_params.extend([param, value])
 
-    return Args(**global_bool_flags, tool_args=tool_args)
+    return Args(
+        **global_bool_flags,
+        tool_args={tool: shlex.join(params) for tool, params in tool_args.items()},
+    )
