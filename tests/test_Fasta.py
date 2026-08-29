@@ -35,16 +35,16 @@ def test_fasta_no_id(fasta_no_id):
 
 
 def test_get_seqs(fasta):
-    seqs = fasta.get_seqs("seq1", "seq2", "seq3")
+    seqs = fasta.get_seqs("seq2", "seq1", "seq3")
     assert len(seqs) == 3
-    assert seqs[0].id == "seq1"
-    assert seqs[1].id == "seq2"
+    assert seqs[0].id == "seq2"
+    assert seqs[1].id == "seq1"
     assert seqs[2].id == "seq3"
-    assert seqs[0].description == "seq1 seqdescription"
-    assert seqs[1].description == "seq2 seqdescription"
+    assert seqs[0].description == "seq2 seqdescription"
+    assert seqs[1].description == "seq1 seqdescription"
     assert seqs[2].description == "seq3 seqdescription"
-    assert seqs[0].seq == "ATCG"
-    assert seqs[1].seq == "ATGC"
+    assert seqs[0].seq == "ATGC"
+    assert seqs[1].seq == "ATCG"
     assert seqs[2].seq == "CATG"
 
 
