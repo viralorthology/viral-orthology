@@ -40,7 +40,7 @@ def test_delete_associated_files_with_delete_file(valid_ortholog_group):
     for file_ in associated_files:
         assert file_.is_file()
 
-    og.delete_file()
+    og.delete_fasta()
 
     for file_ in associated_files:
         assert not file_.is_file()
@@ -59,7 +59,7 @@ def test_delete_associated_files_with_rename_file(valid_ortholog_group):
     for file_ in associated_files:
         assert file_.is_file()
 
-    og.rename_file("test.fasta")
+    og.rename_fasta("test.fasta")
 
     for file_ in associated_files:
         assert not file_.is_file()
