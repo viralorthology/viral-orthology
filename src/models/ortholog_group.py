@@ -62,7 +62,7 @@ class OrthologGroup(Fasta):
             remaining_seq = self.get_seqs(next(iter(remaining_seq_ids)))[0]
             prot_db_path = (
                 ctx.paths.predicted_prots_db
-                if remaining_seq.id.startswith("ORFFINDER")  # TODO use seq.is_predicted
+                if remaining_seq.is_predicted
                 else ctx.paths.annotated_prots_db
             )
             prot_db = Fasta(prot_db_path, FastaType.GENERIC)

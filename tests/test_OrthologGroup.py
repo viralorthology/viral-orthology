@@ -74,16 +74,16 @@ def test_delete_one_seq_in_two_seqs_fasta_annotated_db(valid_ortholog_group, con
 
 
 def test_delete_one_seq_in_two_seqs_fasta_predicted_db(
-    valid_ortholog_group_with_orffinder_seq, context
+    valid_ortholog_group_with_predicted_seq, context
 ):
-    og = OrthologGroup(valid_ortholog_group_with_orffinder_seq)
+    og = OrthologGroup(valid_ortholog_group_with_predicted_seq)
     og.remove_seqs("seq1", ctx=context)
 
     assert not og.path.is_file()
     assert not context.paths.annotated_prots_db.is_file()
     assert (
         context.paths.predicted_prots_db.read_text(encoding="utf-8")
-        == ">ORFFINDER1 genome2\nATCG\n"
+        == ">PREDICTED_10 genome2\nATCG\n"
     )
 
 

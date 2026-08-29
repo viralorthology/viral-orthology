@@ -138,9 +138,9 @@ def valid_ortholog_group_three_seqs(tmp_path):
 
 
 @pytest.fixture
-def valid_ortholog_group_with_orffinder_seq(tmp_path):
-    path = tmp_path / "valid_ortholog_group_with_orffinder_seq.fasta"
+def valid_ortholog_group_with_predicted_seq(tmp_path):
+    path = tmp_path / "valid_ortholog_group_with_predicted_seq.fasta"
     path.write_text(
-        ">seq1 genome1\nATGC\n>ORFFINDER1 genome2\nATCG\n", encoding="utf-8"
+        ">seq1 genome1\nATGC\n>PREDICTED_10 genome2\nATCG\n", encoding="utf-8"
     )
     return path
