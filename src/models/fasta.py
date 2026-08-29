@@ -34,7 +34,7 @@ class Fasta:
         """
         if not self.path.is_file():
             raise FileNotFoundError(f"{self.path} does not exist")
-        if not self.fasta_has_content:
+        if self.path.stat().st_size == 0:
             raise ValueError(f"{self.path} is empty")
 
         ids = set()
@@ -67,11 +67,6 @@ class Fasta:
         """
         assert self.fasta_type == FastaType.PROTEIN
         return [seq.genome_id for seq in self.seqs]
-
-    @property
-    def fasta_has_content(self) -> bool:
-        """Return True if the file exists and has content."""
-        return self.path.is_file() and self.path.stat().st_size > 0
 
     def get_seqs(self, *ids: str) -> list[Seq]:
         """
@@ -135,7 +130,7 @@ class Fasta:
         assert new_filename
         if not self.path.is_file():
             raise FileNotFoundError(f"{self.path} does not exist")
-        if not self.fasta_has_content:
+        if self.path.stat().st_size == 0:
             raise ValueError(f"{self.path} is empty")
 
         new_path = self.path.with_name(new_filename)
@@ -161,7 +156,7 @@ class Fasta:
         assert directory_path
         if not self.path.is_file():
             raise FileNotFoundError(f"{self.path} does not exist")
-        if not self.fasta_has_content:
+        if self.path.stat().st_size == 0:
             raise ValueError(f"{self.path} is empty")
 
         new_path = directory_path / self.path.name

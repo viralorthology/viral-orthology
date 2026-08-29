@@ -121,15 +121,6 @@ def test_n_seqs(fasta):
 # FILE OPERATIONS
 
 
-@pytest.mark.parametrize(
-    "fasta_fixture,expected",
-    [("nonexistent_fasta", False), ("empty_fasta", False), ("fasta", True)],
-)
-def test_has_content(request, fasta_fixture, expected):
-    fasta = request.getfixturevalue(fasta_fixture)
-    assert fasta.fasta_has_content is expected
-
-
 def test_move_nonexistent_fasta(nonexistent_fasta, tmp_path):
     with pytest.raises(FileNotFoundError):
         nonexistent_fasta.move_fasta(tmp_path)
