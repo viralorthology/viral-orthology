@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from config.context import Context
 from models.fasta import Fasta
 from models.fasta_type import FastaType
 from models.seq import Seq
@@ -12,12 +13,8 @@ class OrthologGroup(Fasta):
     An instance can only be created if the FASTA file contains a valid ortholog group. See _validate() for the validation rules.
     """
 
-    def __init__(
-        self, path: Path, annotated_prot_db_path: Path, orffinder_prot_db_path: Path
-    ):
+    def __init__(self, path: Path):
         super().__init__(path, FastaType.PROTEIN)
-        self.annotated_prot_db_path = annotated_prot_db_path
-        self.orffinder_prot_db_path = orffinder_prot_db_path
         self._validate()
 
     @property
@@ -51,21 +48,22 @@ class OrthologGroup(Fasta):
         self._delete_associated_files()
         self._validate()
 
-    def remove_seqs(self, *ids: str) -> None:
+    def remove_seqs(self, *ids: str, ctx: Context | None = None) -> None:
         """
         Remove sequences from the ortholog group.
 
         If only one sequence remains, it is moved to the corresponding protein db and the ortholog group FASTA file is deleted.
         """
+        assert ctx is not None
         self._delete_associated_files()
         remaining_seq_ids = set(self.ids) - set(ids)
 
         if len(remaining_seq_ids) == 1:
             remaining_seq = self.get_seqs(next(iter(remaining_seq_ids)))[0]
             prot_db_path = (
-                self.orffinder_prot_db_path
-                if remaining_seq.id.startswith("ORFFINDER")
-                else self.annotated_prot_db_path
+                ctx.paths.predicted_prots_db
+                if remaining_seq.id.startswith("ORFFINDER")  # TODO use seq.is_predicted
+                else ctx.paths.annotated_prots_db
             )
             prot_db = Fasta(prot_db_path, FastaType.GENERIC)
             prot_db.add_seqs(remaining_seq)

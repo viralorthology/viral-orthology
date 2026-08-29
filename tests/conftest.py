@@ -1,9 +1,45 @@
+from collections.abc import Iterable
+
 import pytest
 from Bio.Seq import Seq as BioSeq
 from Bio.SeqRecord import SeqRecord
 
+from cli.args import Args
+from cli.ui import UI
+from config.context import Context
+from config.paths import Paths
 from models.fasta import Fasta
 from models.fasta_type import FastaType
+
+# CONTEXT
+
+
+@pytest.fixture
+def ui_always_yes():
+    class UIAlwaysYes(UI):
+        def show(self, text: str) -> None:
+            pass
+
+        def show_error(self, text: str) -> None:
+            pass
+
+        def progress_bar[T](self, iterable: Iterable[T]) -> Iterable[T]:
+            return iterable
+
+        def ask_yes_no(self, question: str) -> bool:
+            return True
+
+    return UIAlwaysYes()
+
+
+@pytest.fixture
+def context(tmp_path, ui_always_yes):
+    return Context(
+        Args(debug=False, assume_yes=False, tool_args={}),
+        Paths(tmp_path),
+        ui_always_yes,
+    )
+
 
 # FASTA FILES
 
