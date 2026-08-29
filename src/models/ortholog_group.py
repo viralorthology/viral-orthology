@@ -52,7 +52,8 @@ class OrthologGroup(Fasta):
         self._validate()
 
     def remove_seqs(self, *ids: str) -> None:
-        """Remove sequences from the ortholog group.
+        """
+        Remove sequences from the ortholog group.
 
         If only one sequence remains, it is moved to the corresponding protein db and the ortholog group FASTA file is deleted.
         """
@@ -68,7 +69,9 @@ class OrthologGroup(Fasta):
             )
             prot_db = Fasta(prot_db_path, FastaType.GENERIC)
             prot_db.add_seqs(remaining_seq)
-            super().remove_seqs(*ids, remaining_seq.id)  # check ids
+            super().remove_seqs(
+                *ids, remaining_seq.id
+            )  # Fasta.remove_seqs will check the ids and delete the file
             assert not self.path.is_file()
         else:
             super().remove_seqs(*ids)

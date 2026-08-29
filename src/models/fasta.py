@@ -124,7 +124,7 @@ class Fasta:
 
         Raises:
             FileNotFoundError: if the file does not exist
-            ValueError: if the file is empty
+            ValueError: if the file is empty or the new filename has no suffix
             FileExistsError: if a file with the new name already exists
         """
         assert new_filename
@@ -151,7 +151,7 @@ class Fasta:
         Raises:
             FileNotFoundError: if the file does not exist or the given directory does not exist
             ValueError: if the file is empty
-            FileExistsError: if a file with the same name already exists in the destination directory
+            FileExistsError: if the destination path already exists
         """
         assert directory_path
         if not self.path.is_file():
