@@ -51,7 +51,7 @@ class Fasta:
 
     @property
     def n_seqs(self) -> int:
-        return len(list(self.seqs))
+        return sum(1 for _ in self.seqs)
 
     @property
     def ids(self) -> list[str]:
