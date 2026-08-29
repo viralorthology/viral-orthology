@@ -5,6 +5,8 @@ from Bio.SeqRecord import SeqRecord
 from models.fasta_type import FastaType
 from models.seq import Seq
 
+# FASTA OPERATIONS
+
 
 def test_fasta_ids(fasta):
     ids = fasta.ids
@@ -114,3 +116,89 @@ def test_add_seq(fasta):
 
 def test_n_seqs(fasta):
     assert fasta.n_seqs == 3
+
+
+# FILE OPERATIONS
+
+
+@pytest.mark.parametrize(
+    "fasta_fixture,expected",
+    [("nonexistent_fasta", False), ("empty_fasta", False), ("fasta", True)],
+)
+def test_has_content(request, fasta_fixture, expected):
+    fasta = request.getfixturevalue(fasta_fixture)
+    assert fasta.fasta_has_content is expected
+
+
+def test_move_nonexistent_fasta(nonexistent_fasta, tmp_path):
+    with pytest.raises(FileNotFoundError):
+        nonexistent_fasta.move_fasta(tmp_path)
+
+
+def test_move_empty_fasta(empty_fasta, tmp_path):
+    with pytest.raises(ValueError):
+        empty_fasta.move_fasta(tmp_path)
+
+
+def test_move_fasta(fasta, tmp_path):
+    dir_to = tmp_path / "dir_to"
+    dir_to.mkdir()
+    original_path = fasta.path
+    fasta.move_fasta(dir_to)
+    assert fasta.path == dir_to / original_path.name
+    assert fasta.path.exists()
+    assert not original_path.exists()
+
+
+def test_move_fasta_to_nonexistent_dir(fasta, tmp_path):
+    dir_to = tmp_path / "dir_to"
+    with pytest.raises(FileNotFoundError):
+        fasta.move_fasta(dir_to)
+
+
+def test_move_fasta_to_existing_file_path(fasta, tmp_path):
+    with pytest.raises(FileExistsError):
+        fasta.move_fasta(tmp_path)
+
+
+def test_rename_nonexistent_fasta(nonexistent_fasta):
+    with pytest.raises(FileNotFoundError):
+        nonexistent_fasta.rename_fasta("testfile.txt")
+
+
+def test_rename_fasta(fasta):
+    fasta.rename_fasta("testfile.txt")
+    assert fasta.path.name == "testfile.txt"
+    assert fasta.path.is_file()
+
+
+def test_rename_empty_filename(fasta):
+    with pytest.raises(AssertionError):
+        fasta.rename_fasta("")
+
+
+def test_rename_filename_no_suffix(fasta):
+    with pytest.raises(ValueError):
+        fasta.rename_fasta("test")
+
+
+def test_rename_empty_fasta(empty_fasta, fasta):
+    other_file_name = fasta.path.name
+    with pytest.raises(ValueError):
+        empty_fasta.rename_fasta(other_file_name)
+
+
+def test_rename_fasta_to_existent_file_path(empty_fasta, fasta):
+    other_file_name = empty_fasta.path.name
+    with pytest.raises(FileExistsError):
+        fasta.rename_fasta(other_file_name)
+
+
+def test_delete_nonexistent_fasta(nonexistent_fasta):
+    with pytest.raises(FileNotFoundError):
+        nonexistent_fasta.delete_fasta()
+
+
+def test_delete_fasta(fasta):
+    fasta.delete_fasta()
+    assert fasta.path.is_file() is False

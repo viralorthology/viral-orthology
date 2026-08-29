@@ -1,14 +1,14 @@
+import shutil
 from collections.abc import Iterator
 from pathlib import Path
 
 from Bio import SeqIO
 
 from models.fasta_type import FastaType
-from models.file import File
 from models.seq import Seq
 
 
-class Fasta(File):
+class Fasta:
     """
     Represents a FASTA file and provides common operations.
 
@@ -20,7 +20,7 @@ class Fasta(File):
     """
 
     def __init__(self, path: Path, fasta_type: FastaType):
-        super().__init__(path)
+        self.path = path
         self.fasta_type = fasta_type
 
     @property
@@ -34,7 +34,7 @@ class Fasta(File):
         """
         if not self.path.is_file():
             raise FileNotFoundError(f"{self.path} does not exist")
-        if not self.has_content:
+        if not self.fasta_has_content:
             raise ValueError(f"{self.path} is empty")
 
         ids = set()
@@ -67,6 +67,11 @@ class Fasta(File):
         """
         assert self.fasta_type == FastaType.PROTEIN
         return [seq.genome_id for seq in self.seqs]
+
+    @property
+    def fasta_has_content(self) -> bool:
+        """Return True if the file exists and has content."""
+        return self.path.is_file() and self.path.stat().st_size > 0
 
     def get_seqs(self, *ids: str) -> list[Seq]:
         """
@@ -111,6 +116,66 @@ class Fasta(File):
             raise ValueError(f"Some IDs were not found in {self.path}: {missing_ids}")
         seqs_to_keep = [seq for seq in self.seqs if seq.id not in ids_to_remove]
 
-        self.delete_file()
+        self.delete_fasta()
         if seqs_to_keep:
             self.add_seqs(*seqs_to_keep)
+
+    def rename_fasta(self, new_filename: str) -> None:
+        """
+        Rename the file.
+
+        Args:
+            new_filename: new name for the file.
+
+        Raises:
+            FileNotFoundError: if the file does not exist
+            ValueError: if the file is empty
+            FileExistsError: if a file with the new name already exists
+        """
+        assert new_filename
+        if not self.path.is_file():
+            raise FileNotFoundError(f"{self.path} does not exist")
+        if not self.fasta_has_content:
+            raise ValueError(f"{self.path} is empty")
+
+        new_path = self.path.with_name(new_filename)
+        if not new_path.suffix:
+            raise ValueError("new filename has to have a suffix")
+        if new_path.exists():
+            raise FileExistsError(f"{new_path} already exists")
+
+        self.path = self.path.rename(new_path)
+
+    def move_fasta(self, directory_path: Path) -> None:
+        """
+        Move the file from its current directory to the given directory.
+
+        Args:
+            directory_path: path to the directory where the file will be moved
+
+        Raises:
+            FileNotFoundError: if the file does not exist or the given directory does not exist
+            ValueError: if the file is empty
+            FileExistsError: if a file with the same name already exists in the destination directory
+        """
+        assert directory_path
+        if not self.path.is_file():
+            raise FileNotFoundError(f"{self.path} does not exist")
+        if not self.fasta_has_content:
+            raise ValueError(f"{self.path} is empty")
+
+        new_path = directory_path / self.path.name
+        if new_path.exists():
+            raise FileExistsError(f"{new_path} already exists")
+
+        shutil.move(self.path, new_path)
+        self.path = new_path
+
+    def delete_fasta(self) -> None:
+        """
+        Delete the file.
+
+        Raises:
+            FileNotFoundError: if the file does not exist
+        """
+        self.path.unlink()

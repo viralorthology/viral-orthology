@@ -78,12 +78,12 @@ class OrthologGroup(Fasta):
     def delete_file(self) -> None:
         """Delete the ortholog group FASTA file and its associated files."""
         self._delete_associated_files()
-        super().delete_file()
+        super().delete_fasta()
 
     def rename_file(self, new_filename: str) -> None:
         """Rename the ortholog group FASTA file and delete its associated files."""
         self._delete_associated_files()  # associated files depend upon self.path, so delete them before renaming the file
-        super().rename_file(new_filename)
+        super().rename_fasta(new_filename)
 
     def _validate(self) -> None:
         """

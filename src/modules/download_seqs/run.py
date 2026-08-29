@@ -7,7 +7,6 @@ from cli.ui import UI
 from config.context import Context
 from models.fasta import Fasta
 from models.fasta_type import FastaType
-from models.file import File
 from models.seq import Seq
 
 
@@ -20,7 +19,7 @@ def run(ctx: Context) -> None:
 
     ##### RUN #####
     genome_ids_to_download = _get_genome_ids_to_download(
-        File(ctx.paths.ids_txt).read_file()
+        ctx.paths.ids_txt.read_text(encoding="utf-8")
     )
 
     # download seqs
@@ -44,7 +43,7 @@ def run(ctx: Context) -> None:
         seq.id, seq.description = _get_seq_id_and_description(seq.description)
         all_protein_seqs.append(seq)
 
-    proteomes_fasta.delete_file()
+    proteomes_fasta.delete_fasta()
     proteomes_fasta.add_seqs(*all_protein_seqs)
 
     ##### MAKE REPORT #####
@@ -60,9 +59,7 @@ def run(ctx: Context) -> None:
 
     genome_ids = [genome.id for genome in genome_seqs]
     dataset_hash = utils.get_dataset_hash(genome_ids)
-    genome_report = File(ctx.paths.output_dir / f"dataset_{dataset_hash}.csv")
-    if genome_report.path.exists():
-        genome_report.delete_file()
+    genome_report_path = ctx.paths.output_dir / f"dataset_{dataset_hash}.csv"
 
     report_content = ["genome_id,genome_length,gc_perc,Ns_in_genome"]
     for genome_id in sorted(genome_ids):
@@ -71,7 +68,7 @@ def run(ctx: Context) -> None:
         ns = genome_n_counts[genome_id]
         report_content.append(f"{genome_id},{length},{gc_perc},{ns}")
 
-    genome_report.write_to_file(("\n").join(report_content))
+    genome_report_path.write_text(("\n").join(report_content))
 
 
 def _get_seq_id_and_description(old_description: str) -> tuple[str, str]:
@@ -176,7 +173,8 @@ def _download_sequences(
             errors.append(f"genome {genome_id} could not be downloaded")
             continue
 
-        genomes_fasta.write_to_file(genome_fasta_str.rstrip("\n") + "\n")
+        with genomes_fasta.path.open("a", encoding="utf-8") as fh:
+            fh.write(genome_fasta_str.rstrip("\n") + "\n")
 
         proteome_fasta_str = _download_fasta(
             f'efetch -db nuccore -id "{genome_id}" -format fasta_cds_aa'
@@ -185,7 +183,8 @@ def _download_sequences(
         # TODO if proteome did not download, annotate with orffinder
 
         if proteome_fasta_str is not None:
-            proteomes_fasta.write_to_file(proteome_fasta_str.rstrip("\n") + "\n")
+            with proteomes_fasta.path.open("a", encoding="utf-8") as fh:
+                fh.write(proteome_fasta_str.rstrip("\n") + "\n")
 
     return errors
 
