@@ -16,13 +16,9 @@ class File:
         self.path = path
 
     @property
-    def exists(self) -> bool:
-        return self.path.is_file()
-
-    @property
     def has_content(self) -> bool:
         """Return True if the file exists and has content."""
-        return self.exists and self.path.stat().st_size > 0
+        return self.path.is_file() and self.path.stat().st_size > 0
 
     def read_file(self) -> str:
         """
@@ -32,7 +28,7 @@ class File:
             FileNotFoundError: if the file does not exist
             ValueError: if the file is empty
         """
-        if not self.exists:
+        if not self.path.is_file():
             raise FileNotFoundError(f"{self.path} does not exist")
         if not self.has_content:
             raise ValueError(f"{self.path} is empty")
@@ -63,7 +59,7 @@ class File:
             FileExistsError: if a file with the new name already exists
         """
         assert new_filename
-        if not self.exists:
+        if not self.path.is_file():
             raise FileNotFoundError(f"{self.path} does not exist")
         if not self.has_content:
             raise ValueError(f"{self.path} is empty")
@@ -89,7 +85,7 @@ class File:
             FileExistsError: if a file with the same name already exists in the destination directory
         """
         assert directory_path
-        if not self.exists:
+        if not self.path.is_file():
             raise FileNotFoundError(f"{self.path} does not exist")
         if not self.has_content:
             raise ValueError(f"{self.path} is empty")

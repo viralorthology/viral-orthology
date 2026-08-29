@@ -3,15 +3,6 @@ import pytest
 
 @pytest.mark.parametrize(
     "file_fixture,expected",
-    [("nonexistent_file", False), ("empty_file", True), ("text_file", True)],
-)
-def test_exists(request, file_fixture, expected):
-    file = request.getfixturevalue(file_fixture)
-    assert file.exists is expected
-
-
-@pytest.mark.parametrize(
-    "file_fixture,expected",
     [("nonexistent_file", False), ("empty_file", False), ("text_file", True)],
 )
 def test_has_content(request, file_fixture, expected):
@@ -109,9 +100,9 @@ def test_read_file(text_file):
 
 
 def test_write_to_nonexistent_file(nonexistent_file):
-    assert nonexistent_file.exists is False
+    assert nonexistent_file.path.exists() is False
     nonexistent_file.write_to_file("test")
-    assert nonexistent_file.exists is True
+    assert nonexistent_file.path.exists() is True
     assert nonexistent_file.has_content is True
     assert nonexistent_file.path.read_text(encoding="utf-8") == "test"
 

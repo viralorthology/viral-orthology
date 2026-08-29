@@ -69,10 +69,10 @@ class OrthologGroup(Fasta):
             prot_db = Fasta(prot_db_path, FastaType.GENERIC)
             prot_db.add_seqs(remaining_seq)
             super().remove_seqs(*ids, remaining_seq.id)  # check ids
-            assert not self.exists
+            assert not self.path.is_file()
         else:
             super().remove_seqs(*ids)
-            if self.exists:
+            if self.path.exists():
                 self._validate()
 
     def delete_file(self) -> None:
@@ -104,5 +104,5 @@ class OrthologGroup(Fasta):
 
     def _delete_associated_files(self) -> None:
         for path in self.associated_files:
-            if path.is_file():
+            if path.exists():
                 path.unlink()

@@ -32,7 +32,7 @@ class Fasta(File):
             FileNotFoundError: if the file does not exist
             ValueError: if the file is empty, or if it contains a malformed record or duplicate ID
         """
-        if not self.exists:
+        if not self.path.is_file():
             raise FileNotFoundError(f"{self.path} does not exist")
         if not self.has_content:
             raise ValueError(f"{self.path} is empty")

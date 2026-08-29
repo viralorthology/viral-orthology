@@ -61,7 +61,7 @@ def run(ctx: Context) -> None:
     genome_ids = [genome.id for genome in genome_seqs]
     dataset_hash = utils.get_dataset_hash(genome_ids)
     genome_report = File(ctx.paths.output_dir / f"dataset_{dataset_hash}.csv")
-    if genome_report.exists:
+    if genome_report.path.exists():
         genome_report.delete_file()
 
     report_content = ["genome_id,genome_length,gc_perc,Ns_in_genome"]
