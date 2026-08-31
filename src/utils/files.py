@@ -1,7 +1,11 @@
+from io import StringIO
 from pathlib import Path
+
+from Bio import SeqIO
 
 from models.fasta import Fasta
 from models.fasta_type import FastaType
+from models.seq import Seq
 
 
 def get_fastas(
@@ -76,3 +80,15 @@ def ensure_files_have_content(*file_paths: Path) -> None:
     for file_path in file_paths:
         if not file_path.stat().st_size > 0:
             raise ValueError(f"{file_path} is empty")
+
+
+def get_seqs_from_fasta_str(
+    fasta_str: str,
+    fasta_type: FastaType,
+) -> list[Seq]:
+    """Parse a FASTA string into a list of Seq objects."""
+    assert fasta_str
+
+    return [
+        Seq(record, fasta_type) for record in SeqIO.parse(StringIO(fasta_str), "fasta")
+    ]

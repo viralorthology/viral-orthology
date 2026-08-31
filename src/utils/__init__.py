@@ -5,6 +5,7 @@ from .files import (
     ensure_files_exist,
     ensure_files_have_content,
     get_fastas,
+    get_seqs_from_fasta_str,
 )
 
 __all__ = [
@@ -14,5 +15,6 @@ __all__ = [
     "ensure_files_have_content",
     "get_dataset_hash",
     "get_fastas",
+    "get_seqs_from_fasta_str",
     "run_cmd",
 ]
