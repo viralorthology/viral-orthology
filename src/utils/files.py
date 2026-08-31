@@ -5,7 +5,7 @@ from models.fasta_type import FastaType
 
 
 def get_fastas(
-    dir_path: Path, fasta_type: FastaType, file_extension: str = ".fasta"
+    dir_path: Path, fasta_type: FastaType, file_extension: str
 ) -> list[Fasta]:
     """
     Get FASTA files from a directory.
