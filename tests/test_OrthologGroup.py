@@ -61,40 +61,42 @@ def test_delete_associated_files_with_rename_file(valid_ortholog_group):
         assert not file_.is_file()
 
 
-def test_delete_one_seq_in_two_seqs_fasta_annotated_db(valid_ortholog_group, context):
+def test_delete_one_seq_in_two_seqs_fasta_annotated_db(
+    valid_ortholog_group, context_always_yes
+):
     og = OrthologGroup(valid_ortholog_group)
-    og.remove_seqs("seq1", ctx=context)
+    og.remove_seqs("seq1", ctx=context_always_yes)
 
     assert not og.path.is_file()
-    assert not context.paths.predicted_prots_db.is_file()
+    assert not context_always_yes.paths.predicted_prots_db.is_file()
     assert (
-        context.paths.annotated_prots_db.read_text(encoding="utf-8")
+        context_always_yes.paths.annotated_prots_db.read_text(encoding="utf-8")
         == ">seq2 genome2\nATCG\n"
     )
 
 
 def test_delete_one_seq_in_two_seqs_fasta_predicted_db(
-    valid_ortholog_group_with_predicted_seq, context
+    valid_ortholog_group_with_predicted_seq, context_always_yes
 ):
     og = OrthologGroup(valid_ortholog_group_with_predicted_seq)
-    og.remove_seqs("seq1", ctx=context)
+    og.remove_seqs("seq1", ctx=context_always_yes)
 
     assert not og.path.is_file()
-    assert not context.paths.annotated_prots_db.is_file()
+    assert not context_always_yes.paths.annotated_prots_db.is_file()
     assert (
-        context.paths.predicted_prots_db.read_text(encoding="utf-8")
+        context_always_yes.paths.predicted_prots_db.read_text(encoding="utf-8")
         == ">PREDICTED_10 genome2\nATCG\n"
     )
 
 
-def test_delete_one_seq(valid_ortholog_group_three_seqs, context):
+def test_delete_one_seq(valid_ortholog_group_three_seqs, context_always_yes):
     og = OrthologGroup(valid_ortholog_group_three_seqs)
-    og.remove_seqs("seq1", ctx=context)
+    og.remove_seqs("seq1", ctx=context_always_yes)
 
     assert og.path.is_file()
 
 
-def test_delete_missing_seq(valid_ortholog_group, context):
+def test_delete_missing_seq(valid_ortholog_group, context_always_yes):
     og = OrthologGroup(valid_ortholog_group)
     with pytest.raises(ValueError):
-        og.remove_seqs("seq1", "seq10", ctx=context)
+        og.remove_seqs("seq1", "seq10", ctx=context_always_yes)

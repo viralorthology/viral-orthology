@@ -33,7 +33,7 @@ def ui_always_yes():
 
 
 @pytest.fixture
-def context(tmp_path, ui_always_yes):
+def context_always_yes(tmp_path, ui_always_yes):
     return Context(
         Args(debug=False, assume_yes=False, tool_args={}),
         Paths(tmp_path),
