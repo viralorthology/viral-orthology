@@ -50,6 +50,15 @@ def test_analyze_genomes():
     ]
 
 
+def test_analyze_genomes_duplicate_genomes():
+    genome_seqs = [
+        Seq(SeqRecord(BioSeq("GGCCATNN"), id="genome_1"), fasta_type=FastaType.GENERIC),
+        Seq(SeqRecord(BioSeq("GGCCATNN"), id="genome_1"), fasta_type=FastaType.GENERIC),
+    ]
+    with pytest.raises(AssertionError):
+        _ = _analyze_genomes(genome_seqs)
+
+
 @pytest.mark.parametrize(
     "old_description, expected_seq_id, expected_description",
     [

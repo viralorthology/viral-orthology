@@ -138,6 +138,7 @@ def _analyze_genomes(
         - A mapping of genome IDs to the number of ``N`` nucleotides.
         - A list of pairs of genome IDs with identical sequences.
     """
+    assert len([seq.id for seq in genome_seqs]) == len({seq.id for seq in genome_seqs})
     genome_n_counts = {}
     genome_lens = {}
     genome_gc_perc = {}
