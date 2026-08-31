@@ -39,6 +39,8 @@ class Fasta:
 
         ids = set()
         for seq in SeqIO.parse(self.path, "fasta"):
+            if not seq.seq:
+                raise ValueError(f"{self.path} contains and empty sequence")
             if not seq.id:
                 raise ValueError(f"{self.path} contains a malformed FASTA record")
             if seq.id in ids:
