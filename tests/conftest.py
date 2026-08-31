@@ -1,8 +1,6 @@
 from collections.abc import Iterable
 
 import pytest
-from Bio.Seq import Seq as BioSeq
-from Bio.SeqRecord import SeqRecord
 
 from cli.args import Args
 from cli.ui import UI
@@ -88,19 +86,6 @@ def protein_fasta(tmp_path):
     path = tmp_path / "protein_fasta.fasta"
     path.write_text(">seq1 genome1\nATGC\n>seq2 genome2\nATCG\n", encoding="utf-8")
     return Fasta(path, FastaType.PROTEIN)
-
-
-# SEQ
-
-
-@pytest.fixture
-def seq_with_genome_id():
-    return SeqRecord(BioSeq("ATGC"), id="seq1", description="seq1 genome1")
-
-
-@pytest.fixture
-def seq_without_genome_id():
-    return SeqRecord(BioSeq("ATGC"), id="seq1", description="seq1")
 
 
 # ORTHOLOG GROUP
