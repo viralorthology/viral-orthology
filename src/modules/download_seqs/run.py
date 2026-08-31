@@ -40,7 +40,9 @@ def run(ctx: Context) -> None:
     # format sequence descriptions
     all_protein_seqs = []
     for seq in proteomes_fasta.seqs:
-        seq.id, seq.description = _get_seq_id_and_description(seq.description)
+        seq.id, seq.description = _get_seq_id_and_description_protein_seqs(
+            seq.description
+        )
         all_protein_seqs.append(seq)
 
     proteomes_fasta.delete_fasta()
@@ -71,80 +73,6 @@ def run(ctx: Context) -> None:
     genome_report_path.write_text(("\n").join(report_content))
 
 
-def _get_seq_id_and_description(old_description: str) -> tuple[str, str]:
-    """
-    Extract the protein sequence ID and reconstruct its description.
-
-    The input description is expected to contain a [protein_id=...]
-    field and a genome identifier in the format <genome_id>_prot_...
-
-    Args:
-        old_description: Original GenBank sequence description.
-
-    Returns:
-        A tuple containing the protein sequence ID and the reconstructed
-        description prefixed with the genome ID.
-    """
-    assert "_prot_" in old_description
-    assert "[protein_id=" in old_description
-
-    seq_id = old_description.split("[protein_id=")[1].split("]")[0]
-    genome_id = old_description.split("|")[1].split("_prot_")[0]
-    remaining_description = (" ").join(old_description.split()[1:])
-    return seq_id, f"{genome_id} {remaining_description}"
-
-
-def _download_fasta(cmd_str: str) -> str | None:
-    """
-    Run a command to download sequences from GenBank, retrying on failure.
-
-    The command is attempted up to three times. A successful response is
-    identified by content starting with >. Failed attempts are retried
-    with an increasing delay between attempts.
-
-    Args:
-        cmd_str: Command used to download the FASTA.
-
-    Returns:
-        The downloaded FASTA content if successful, otherwise None.
-    """
-    sleep_time = 3
-
-    for n_attempt in range(3):
-        fasta_str = utils.run_cmd(cmd_str)
-
-        if fasta_str.startswith(">"):
-            return fasta_str
-
-        if n_attempt < 2:
-            time.sleep((n_attempt + 1) * sleep_time)
-
-    return None
-
-
-def _get_genome_ids_to_download(ids_file_content: str) -> set[str]:
-    """
-    Extract unique genome IDs from file content.
-
-    Version numbers are removed from genome IDs before duplicates are
-    discarded.
-
-    Args:
-        ids_file_content: Contents of the IDs file.
-
-    Returns:
-        A set of unique genome IDs without version numbers.
-    """
-    genome_ids_to_download = set()
-    for line in ids_file_content.splitlines():
-        if not line.strip():
-            continue
-        genome_id = line.split(".")[0]
-        genome_ids_to_download.add(genome_id)
-
-    return genome_ids_to_download
-
-
 def _download_sequences(
     ui: UI, genome_ids: set[str], genomes_fasta: Fasta, proteomes_fasta: Fasta
 ) -> list[str]:
@@ -164,6 +92,8 @@ def _download_sequences(
     Returns:
         A list of error messages for genomes that could not be downloaded.
     """
+    assert genome_ids
+
     errors = []
     for genome_id in ui.progress_bar(genome_ids):
         genome_fasta_str = _download_fasta(
@@ -223,3 +153,82 @@ def _analyze_genomes(
                 identical_genomes.append((genome1.id, genome2.id))
 
     return genome_lens, genome_gc_perc, genome_n_counts, identical_genomes
+
+
+def _get_seq_id_and_description_protein_seqs(old_description: str) -> tuple[str, str]:
+    """
+    Extract the protein sequence ID and reconstruct its description.
+
+    The input description is expected to contain a [protein_id=...]
+    field and a genome identifier in the format <genome_id>_prot_...
+
+    Args:
+        old_description: Original GenBank sequence description.
+
+    Returns:
+        A tuple containing the protein sequence ID and the reconstructed
+        description prefixed with the genome ID.
+    """
+    assert old_description
+    assert "_prot_" in old_description
+    assert "[protein_id=" in old_description
+
+    seq_id = old_description.split("[protein_id=")[1].split("]")[0]
+    genome_id = old_description.split("|")[1].split("_prot_")[0]
+    remaining_description = (" ").join(old_description.split()[1:])
+    return seq_id, f"{genome_id} {remaining_description}"
+
+
+def _download_fasta(cmd_str: str) -> str | None:
+    """
+    Run a command to download sequences from GenBank, retrying on failure.
+
+    The command is attempted up to three times. A successful response is
+    identified by content starting with >. Failed attempts are retried
+    with an increasing delay between attempts.
+
+    Args:
+        cmd_str: Command used to download the FASTA.
+
+    Returns:
+        The downloaded FASTA content if successful, otherwise None.
+    """
+    assert cmd_str
+
+    sleep_time = 3
+
+    for n_attempt in range(3):
+        fasta_str = utils.run_cmd(cmd_str)
+
+        if fasta_str.startswith(">"):
+            return fasta_str
+
+        if n_attempt < 2:
+            time.sleep((n_attempt + 1) * sleep_time)
+
+    return None
+
+
+def _get_genome_ids_to_download(ids_file_content: str) -> set[str]:
+    """
+    Extract unique genome IDs from file content.
+
+    Version numbers are removed from genome IDs before duplicates are
+    discarded.
+
+    Args:
+        ids_file_content: Contents of the IDs file.
+
+    Returns:
+        A set of unique genome IDs without version numbers.
+    """
+    assert ids_file_content
+
+    genome_ids_to_download = set()
+    for line in ids_file_content.splitlines():
+        if not line.strip():
+            continue
+        genome_id = line.split(".")[0]
+        genome_ids_to_download.add(genome_id)
+
+    return genome_ids_to_download

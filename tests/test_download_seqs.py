@@ -10,7 +10,7 @@ from modules.download_seqs.run import (
     _analyze_genomes,
     _download_fasta,
     _get_genome_ids_to_download,
-    _get_seq_id_and_description,
+    _get_seq_id_and_description_protein_seqs,
 )
 
 
@@ -85,7 +85,7 @@ def test_get_seq_id_and_description(
     expected_seq_id,
     expected_description,
 ):
-    seq_id, description = _get_seq_id_and_description(old_description)
+    seq_id, description = _get_seq_id_and_description_protein_seqs(old_description)
 
     assert seq_id == expected_seq_id
     assert description == expected_description
@@ -102,7 +102,7 @@ def test_get_seq_id_and_description(
 )
 def test_get_seq_id_and_description_invalid_description(old_description):
     with pytest.raises(AssertionError):
-        _get_seq_id_and_description(old_description)
+        _get_seq_id_and_description_protein_seqs(old_description)
 
 
 def test_download_fasta_success():
