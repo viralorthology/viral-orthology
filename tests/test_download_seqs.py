@@ -2,7 +2,6 @@ from unittest.mock import call, patch
 
 import pytest
 from Bio.Seq import Seq as BioSeq
-from Bio.SeqRecord import SeqRecord
 
 from models.fasta_type import FastaType
 from models.seq import Seq
@@ -21,9 +20,9 @@ def test_get_genome_ids_to_download():
 
 def test_analyze_genomes():
     genome_seqs = [
-        Seq(SeqRecord(BioSeq("GGCCATNN"), id="genome_1"), fasta_type=FastaType.GENERIC),
-        Seq(SeqRecord(BioSeq("GGCCATNN"), id="genome_2"), fasta_type=FastaType.GENERIC),
-        Seq(SeqRecord(BioSeq("ATATATAT"), id="genome_3"), fasta_type=FastaType.GENERIC),
+        Seq(BioSeq("GGCCATNN"), "genome_1", "", FastaType.GENERIC),
+        Seq(BioSeq("GGCCATNN"), "genome_2", "", FastaType.GENERIC),
+        Seq(BioSeq("ATATATAT"), "genome_3", "", FastaType.GENERIC),
     ]
 
     genome_lens, genome_gc_perc, genome_n_counts, identical_genomes = _analyze_genomes(
@@ -52,8 +51,8 @@ def test_analyze_genomes():
 
 def test_analyze_genomes_duplicate_genomes():
     genome_seqs = [
-        Seq(SeqRecord(BioSeq("GGCCATNN"), id="genome_1"), fasta_type=FastaType.GENERIC),
-        Seq(SeqRecord(BioSeq("GGCCATNN"), id="genome_1"), fasta_type=FastaType.GENERIC),
+        Seq(BioSeq("GGCCATNN"), "genome1", "genome1", FastaType.GENERIC),
+        Seq(BioSeq("GGCCATNN"), "genome1", "genome1", FastaType.GENERIC),
     ]
     with pytest.raises(AssertionError):
         _ = _analyze_genomes(genome_seqs)

@@ -1,6 +1,5 @@
 import pytest
 from Bio.Seq import Seq as BioSeq
-from Bio.SeqRecord import SeqRecord
 
 from models.fasta_type import FastaType
 from models.seq import Seq
@@ -107,7 +106,12 @@ def test_genome_ids(protein_fasta):
 
 
 def test_add_seq(fasta):
-    seq = Seq(SeqRecord(BioSeq("AT"), id="seq4"), FastaType.GENERIC)
+    seq = Seq(
+        seq=BioSeq("AT"),
+        seq_id="seq4",
+        seq_description="",
+        fasta_type=FastaType.GENERIC,
+    )
     fasta.add_seqs(seq)
     seqs = list(fasta.seqs)
     assert seqs[3].id == "seq4"

@@ -90,5 +90,11 @@ def get_seqs_from_fasta_str(
     assert fasta_str
 
     return [
-        Seq(record, fasta_type) for record in SeqIO.parse(StringIO(fasta_str), "fasta")
+        Seq(
+            seq=record.seq,
+            seq_id=record.id,
+            seq_description=record.description,
+            fasta_type=fasta_type,
+        )
+        for record in SeqIO.parse(StringIO(fasta_str), "fasta")
     ]

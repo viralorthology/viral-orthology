@@ -1,21 +1,18 @@
-from Bio.SeqRecord import SeqRecord
+from Bio.Seq import Seq as BioSeq
 
 from models.constants import PREDICTED_PROTEINS_PREFIX
 from models.fasta_type import FastaType
 
 
-class Seq(SeqRecord):
-    id: str
+class Seq:
     genome_id: str
-    description: str
-    is_predicted: bool
 
-    def __init__(self, seq_record: SeqRecord, fasta_type: FastaType):
-        super().__init__(
-            seq=seq_record.seq,
-            id=seq_record.id,
-            description=seq_record.description,
-        )
+    def __init__(
+        self, seq: BioSeq, seq_id: str, seq_description: str, fasta_type: FastaType
+    ):
+        self.seq = seq
+        self.id = seq_id
+        self.description = seq_description
         self.is_predicted = self.id.startswith(PREDICTED_PROTEINS_PREFIX)
         self._add_data(fasta_type)
 

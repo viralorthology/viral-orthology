@@ -3,6 +3,7 @@ from collections.abc import Iterator
 from pathlib import Path
 
 from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
 
 from models.fasta_type import FastaType
 from models.seq import Seq
@@ -49,7 +50,12 @@ class Fasta:
                 )
 
             ids.add(seq.id)
-            yield Seq(seq, self.fasta_type)
+            yield Seq(
+                seq=seq.seq,
+                seq_id=seq.id,
+                seq_description=seq.description,
+                fasta_type=self.fasta_type,
+            )
 
     @property
     def n_seqs(self) -> int:
@@ -93,9 +99,17 @@ class Fasta:
         Append the given sequences to the FASTA file.
         """
         assert seqs
+        seq_records = [
+            SeqRecord(
+                seq=seq.seq,
+                id=seq.id,
+                description=seq.description,
+            )
+            for seq in seqs
+        ]
 
         with self.path.open("a", encoding="utf-8") as fh:
-            SeqIO.write(seqs, fh, "fasta")
+            SeqIO.write(seq_records, fh, "fasta")
 
     def remove_seqs(self, *ids: str) -> None:
         """
