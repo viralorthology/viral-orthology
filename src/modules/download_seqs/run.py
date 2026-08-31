@@ -37,7 +37,7 @@ def run(ctx: Context) -> None:
     if len(errors) == len(genome_ids_to_download):
         raise ValueError("No genome could be downloaded")
 
-    # format sequence descriptions
+    # format protein sequence descriptions
     all_protein_seqs = []
     for seq in proteomes_fasta.seqs:
         seq.id, seq.description = _get_seq_id_and_description_protein_seqs(
