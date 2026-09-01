@@ -62,19 +62,29 @@ class Fasta:
     def genome_ids(self) -> list[str]:
         """
         Return the genome IDs of all protein sequences.
+
+        Raises:
+            ValueError: if used on a non-protein FASTA
         """
-        assert self.fasta_type == FastaType.PROTEIN
+        if self.fasta_type != FastaType.PROTEIN:
+            raise ValueError(
+                f"genome_ids is only available for protein FASTAs: {self.path}"
+            )
+
         return [seq.genome_id for seq in self.seqs]
 
     def get_seqs(self, *ids: str) -> list[Seq]:
         """
-        Return the sequences with the given IDs.
+        Return the sequences in the same order as the provided IDs.
 
         Raises:
-            ValueError: if any of the requested sequences was not found
+            ValueError: If no IDs are provided, if the IDs are not unique, or if
+                any of the requested sequences is not found in the FASTA file.
         """
-        assert ids
-        assert len(ids) == len(set(ids))
+        if not ids:
+            raise ValueError("At least one sequence ID must be provided")
+        if len(ids) != len(set(ids)):
+            raise ValueError("Sequence IDs must be unique")
 
         seqs = [seq for seq in self.seqs if seq.id in ids]
 
@@ -87,8 +97,13 @@ class Fasta:
     def add_seqs(self, *seqs: Seq) -> None:
         """
         Append the given sequences to the FASTA file.
+
+        Raises:
+            ValueError: If no sequences are provided.
         """
-        assert seqs
+        if not seqs:
+            raise ValueError("At least one sequence must be provided")
+
         seq_records = [get_seqrecord_from_seq(seq) for seq in seqs]
 
         with self.path.open("a", encoding="utf-8") as fh:
@@ -99,10 +114,13 @@ class Fasta:
         Remove the sequences with the given IDs from the FASTA file.
 
         Raises:
-            ValueError: if any of the sequences was not found
+            ValueError: If no IDs are provided, if the IDs are not unique, or if
+                any of the requested sequences is not found in the FASTA file.
         """
-        assert ids
-        assert len(ids) == len(set(ids))
+        if not ids:
+            raise ValueError("At least one sequence ID must be provided")
+        if len(ids) != len(set(ids)):
+            raise ValueError("Sequence IDs must be unique")
 
         ids_to_remove = set(ids)
         missing_ids = ids_to_remove - set(self.ids)
@@ -116,17 +134,16 @@ class Fasta:
 
     def rename_fasta(self, new_filename: str) -> None:
         """
-        Rename the file.
-
-        Args:
-            new_filename: new name for the file.
+        Rename the FASTA file.
 
         Raises:
-            FileNotFoundError: if the file does not exist
-            ValueError: if the file is empty or the new filename has no suffix
-            FileExistsError: if a file with the new name already exists
+            FileNotFoundError: If the FASTA file does not exist.
+            ValueError: If no filename is provided, if the FASTA file is empty,
+                or if the new filename has no suffix.
+            FileExistsError: If a file with the new name already exists.
         """
-        assert new_filename
+        if not new_filename:
+            raise ValueError("A new filename must be provided")
         if not self.path.is_file():
             raise FileNotFoundError(f"{self.path} does not exist")
         if self.path.stat().st_size == 0:
@@ -144,15 +161,11 @@ class Fasta:
         """
         Move the file from its current directory to the given directory.
 
-        Args:
-            directory_path: path to the directory where the file will be moved
-
         Raises:
             FileNotFoundError: if the file does not exist or the given directory does not exist
             ValueError: if the file is empty
             FileExistsError: if the destination path already exists
         """
-        assert directory_path
         if not self.path.is_file():
             raise FileNotFoundError(f"{self.path} does not exist")
         if self.path.stat().st_size == 0:

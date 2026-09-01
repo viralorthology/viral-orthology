@@ -47,12 +47,12 @@ def test_get_seqs(fasta):
 
 
 def test_get_seqs_no_ids(fasta):
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         _ = fasta.get_seqs()
 
 
 def test_get_seqs_duplicate_ids(fasta):
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         _ = fasta.get_seqs("seq1", "seq1")
 
 
@@ -62,12 +62,12 @@ def test_get_seqs_sequence_not_found(fasta):
 
 
 def test_add_no_sequences(fasta):
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         fasta.add_seqs()
 
 
 def test_remove_no_sequences(fasta):
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         fasta.remove_seqs()
 
 
@@ -89,12 +89,12 @@ def test_remove_seqs_not_found(fasta):
 
 
 def test_remove_duplicate_seq_id(fasta):
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         fasta.remove_seqs("seq1", "seq1")
 
 
 def test_genome_ids_in_generic_fasta(fasta):
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         _ = fasta.genome_ids()
 
 
@@ -166,7 +166,7 @@ def test_rename_fasta(fasta):
 
 
 def test_rename_empty_filename(fasta):
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         fasta.rename_fasta("")
 
 
