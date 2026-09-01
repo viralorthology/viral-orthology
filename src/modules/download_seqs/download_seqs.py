@@ -96,6 +96,9 @@ def _download_sequences(
     genome_ids_failed = []
     genome_ids_without_proteome = []
 
+    genome_fastas_to_write = []
+    proteome_fastas_to_write = []
+
     for genome_id in ui.progress_bar(genome_ids):
         genome_fasta_str = _download_fasta(
             f'efetch -db nuccore -id "{genome_id}" -format fasta'
@@ -104,10 +107,7 @@ def _download_sequences(
             genome_ids_failed.append(genome_id)
             continue
 
-        with genomes_fasta.path.open("a", encoding="utf-8") as fh:
-            fh.write(
-                genome_fasta_str.rstrip("\n") + "\n"
-            )  # TODO dont write on every iteration
+        genome_fastas_to_write.append(genome_fasta_str.rstrip("\n") + "\n")
 
         proteome_fasta_str = _download_fasta(
             f'efetch -db nuccore -id "{genome_id}" -format fasta_cds_aa'
@@ -117,8 +117,15 @@ def _download_sequences(
             genome_ids_without_proteome.append(genome_id)
             continue
 
+        proteome_fastas_to_write.append(proteome_fasta_str.rstrip("\n") + "\n")
+
+    if genome_fastas_to_write:
+        with genomes_fasta.path.open("a", encoding="utf-8") as fh:
+            fh.write(("").join(genome_fastas_to_write))
+
+    if proteome_fastas_to_write:
         with proteomes_fasta.path.open("a", encoding="utf-8") as fh:
-            fh.write(proteome_fasta_str.rstrip("\n") + "\n")
+            fh.write(("").join(proteome_fastas_to_write))
 
     return genome_ids_failed, genome_ids_without_proteome
 
