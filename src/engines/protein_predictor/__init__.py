@@ -1,3 +1,3 @@
-from .run import run
+from .protein_predictor import run
 
 __all__ = ["run"]

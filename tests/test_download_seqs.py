@@ -4,11 +4,11 @@ import pytest
 from Bio.Seq import Seq as BioSeq
 
 from models.seq import Seq
-from modules.download_seqs.run import (
+from modules.download_seqs.download_seqs import (
     _analyze_genomes,
     _download_fasta,
     _get_genome_ids_to_download,
-    _get_seq_id_and_description_protein_seqs,
+    _get_seq_id_description_from_gb_description,
 )
 
 
@@ -92,7 +92,7 @@ def test_get_seq_id_and_description(
     expected_seq_id,
     expected_description,
 ):
-    seq_id, description = _get_seq_id_and_description_protein_seqs(old_description)
+    seq_id, description = _get_seq_id_description_from_gb_description(old_description)
 
     assert seq_id == expected_seq_id
     assert description == expected_description
@@ -108,12 +108,12 @@ def test_get_seq_id_and_description(
 )
 def test_get_seq_id_and_description_invalid_description(old_description):
     with pytest.raises(ValueError):
-        _get_seq_id_and_description_protein_seqs(old_description)
+        _get_seq_id_description_from_gb_description(old_description)
 
 
 def test_download_fasta_success():
     with patch(
-        "modules.download_seqs.run.utils.run_cmd",
+        "modules.download_seqs.download_seqs.utils.run_cmd",
         return_value=">seq1\nATGC\n",
     ) as mock_run_cmd:
         result = _download_fasta("efetch command")
@@ -125,10 +125,10 @@ def test_download_fasta_success():
 def test_download_fasta_retry_then_success():
     with (
         patch(
-            "modules.download_seqs.run.utils.run_cmd",
+            "modules.download_seqs.download_seqs.utils.run_cmd",
             side_effect=["error", ">seq1\nATGC\n"],
         ) as mock_run_cmd,
-        patch("modules.download_seqs.run.time.sleep") as mock_sleep,
+        patch("modules.download_seqs.download_seqs.time.sleep") as mock_sleep,
     ):
         result = _download_fasta("efetch command")
 
@@ -140,10 +140,10 @@ def test_download_fasta_retry_then_success():
 def test_download_fasta_fails_three_times():
     with (
         patch(
-            "modules.download_seqs.run.utils.run_cmd",
+            "modules.download_seqs.download_seqs.utils.run_cmd",
             side_effect=["error", "error", "error"],
         ) as mock_run_cmd,
-        patch("modules.download_seqs.run.time.sleep") as mock_sleep,
+        patch("modules.download_seqs.download_seqs.time.sleep") as mock_sleep,
     ):
         result = _download_fasta("efetch command")
 

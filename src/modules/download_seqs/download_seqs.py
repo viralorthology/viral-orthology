@@ -40,7 +40,7 @@ def run(ctx: Context) -> None:
     # format protein sequence descriptions
     all_protein_seqs = []
     for seq in proteomes_fasta.seqs:
-        seq.id, seq.description = _get_seq_id_and_description_protein_seqs(
+        seq.id, seq.description = _get_seq_id_description_from_gb_description(
             seq.description
         )
         all_protein_seqs.append(seq)
@@ -150,7 +150,9 @@ def _analyze_genomes(
     return genome_lens, genome_gc_perc, genome_n_counts, identical_genomes
 
 
-def _get_seq_id_and_description_protein_seqs(old_description: str) -> tuple[str, str]:
+def _get_seq_id_description_from_gb_description(
+    old_description: str,
+) -> tuple[str, str]:
     """
     Extract the protein sequence ID and reconstruct its description.
 

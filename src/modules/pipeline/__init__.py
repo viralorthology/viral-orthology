@@ -1,3 +1,3 @@
-from .run import run
+from .pipeline import run
 
 __all__ = ["run"]
