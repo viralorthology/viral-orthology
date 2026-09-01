@@ -1,6 +1,13 @@
 import pytest
+from Bio.Seq import Seq as BioSeq
 
 from models.ortholog_group import OrthologGroup
+from models.seq import Seq
+
+
+def test_empty_fasta(empty_fasta):
+    with pytest.raises(ValueError):
+        _ = OrthologGroup(empty_fasta)
 
 
 def test_fasta_two_proteins_of_the_same_genome(
@@ -15,15 +22,53 @@ def test_fasta_one_seq(fasta_one_seq):
         _ = OrthologGroup(fasta_one_seq)
 
 
-def test_associated_files(valid_ortholog_group):
+def test_delete_associated_files_with_add_seqs(valid_ortholog_group):
     og = OrthologGroup(valid_ortholog_group)
-    assert og.alignment_path == og.path.with_suffix(".muscle")
-    assert og.hmm_hmmer_path == og.path.with_suffix(".hmm")
-    assert og.hmm_hhsuite_path == og.path.with_suffix(".hhm")
-    assert og.a2m_path == og.path.with_suffix(".a2m")
+    associated_files = og.associated_files
+
+    for file_ in associated_files:
+        assert not file_.is_file()
+
+    for file_ in associated_files:
+        file_.touch()
+
+    for file_ in associated_files:
+        assert file_.is_file()
+
+    og.add_seqs(
+        Seq(
+            BioSeq("ATGC"),
+            "seq10",
+            "seq10 genome10",
+        )
+    )
+
+    for file_ in associated_files:
+        assert not file_.is_file()
 
 
-def test_delete_associated_files_with_delete_file(valid_ortholog_group):
+def test_delete_associated_files_with_remove_seqs(
+    valid_ortholog_group, context_always_yes
+):
+    og = OrthologGroup(valid_ortholog_group)
+    associated_files = og.associated_files
+
+    for file_ in associated_files:
+        assert not file_.is_file()
+
+    for file_ in associated_files:
+        file_.touch()
+
+    for file_ in associated_files:
+        assert file_.is_file()
+
+    og.remove_seqs("seq1", ctx=context_always_yes)
+
+    for file_ in associated_files:
+        assert not file_.is_file()
+
+
+def test_delete_associated_files_with_delete_fasta(valid_ortholog_group):
     og = OrthologGroup(valid_ortholog_group)
     associated_files = og.associated_files
 
@@ -42,7 +87,7 @@ def test_delete_associated_files_with_delete_file(valid_ortholog_group):
         assert not file_.is_file()
 
 
-def test_delete_associated_files_with_rename_file(valid_ortholog_group):
+def test_delete_associated_files_with_rename_fasta(valid_ortholog_group):
     og = OrthologGroup(valid_ortholog_group)
     associated_files = og.associated_files
 
