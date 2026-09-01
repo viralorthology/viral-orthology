@@ -53,8 +53,13 @@ class OrthologGroup(Fasta):
         Remove sequences from the ortholog group.
 
         If only one sequence remains, it is moved to the corresponding protein db and the ortholog group FASTA file is deleted.
+
+        Raises:
+            ValueError: If ctx is not provided.
         """
-        assert ctx is not None
+        if ctx is None:
+            raise ValueError("ctx cannot be None in OrthologGroup.remove_seqs")
+
         self._delete_associated_files()
         remaining_seq_ids = set(self.ids) - set(ids)
 

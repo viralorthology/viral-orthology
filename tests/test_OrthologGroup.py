@@ -104,5 +104,5 @@ def test_delete_missing_seq(valid_ortholog_group, context_always_yes):
 
 def test_remove_seqs_context_none(valid_ortholog_group):
     og = OrthologGroup(valid_ortholog_group)
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         og.remove_seqs("seq1", "seq10")
