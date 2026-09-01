@@ -84,7 +84,6 @@ def ensure_files_have_content(*file_paths: Path) -> None:
 
 def get_seqs_from_fasta_str(
     fasta_str: str,
-    fasta_type: FastaType,
 ) -> list[Seq]:
     """Parse a FASTA string into a list of Seq objects."""
     assert fasta_str
@@ -94,7 +93,6 @@ def get_seqs_from_fasta_str(
             seq=record.seq,
             seq_id=record.id,
             seq_description=record.description,
-            fasta_type=fasta_type,
         )
         for record in SeqIO.parse(StringIO(fasta_str), "fasta")
     ]

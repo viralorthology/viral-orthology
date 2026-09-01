@@ -3,10 +3,9 @@ from collections.abc import Iterator
 from pathlib import Path
 
 from Bio import SeqIO
-from Bio.SeqRecord import SeqRecord
 
 from models.fasta_type import FastaType
-from models.seq import Seq
+from models.seq import Seq, get_seq_from_seqrecord, get_seqrecord_from_seq
 
 
 class Fasta:
@@ -40,22 +39,13 @@ class Fasta:
 
         ids = set()
         for seq in SeqIO.parse(self.path, "fasta"):
-            if not seq.seq:
-                raise ValueError(f"{self.path} contains and empty sequence")
-            if not seq.id:
-                raise ValueError(f"{self.path} contains a malformed FASTA record")
             if seq.id in ids:
                 raise ValueError(
                     f"{self.path} contains duplicate sequence ID: {seq.id}"
                 )
 
             ids.add(seq.id)
-            yield Seq(
-                seq=seq.seq,
-                seq_id=seq.id,
-                seq_description=seq.description,
-                fasta_type=self.fasta_type,
-            )
+            yield get_seq_from_seqrecord(seq, self.fasta_type, self.path)
 
     @property
     def n_seqs(self) -> int:
@@ -99,14 +89,7 @@ class Fasta:
         Append the given sequences to the FASTA file.
         """
         assert seqs
-        seq_records = [
-            SeqRecord(
-                seq=seq.seq,
-                id=seq.id,
-                description=seq.description,
-            )
-            for seq in seqs
-        ]
+        seq_records = [get_seqrecord_from_seq(seq) for seq in seqs]
 
         with self.path.open("a", encoding="utf-8") as fh:
             SeqIO.write(seq_records, fh, "fasta")

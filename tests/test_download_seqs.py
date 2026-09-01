@@ -20,9 +20,9 @@ def test_get_genome_ids_to_download():
 
 def test_analyze_genomes():
     genome_seqs = [
-        Seq(BioSeq("GGCCATNN"), "genome_1", "", FastaType.GENERIC),
-        Seq(BioSeq("GGCCATNN"), "genome_2", "", FastaType.GENERIC),
-        Seq(BioSeq("ATATATAT"), "genome_3", "", FastaType.GENERIC),
+        Seq(BioSeq("GGCCATNN"), "genome_1", ""),
+        Seq(BioSeq("GGCCATNN"), "genome_2", ""),
+        Seq(BioSeq("ATATATAT"), "genome_3", ""),
     ]
 
     genome_lens, genome_gc_perc, genome_n_counts, identical_genomes = _analyze_genomes(
@@ -51,8 +51,8 @@ def test_analyze_genomes():
 
 def test_analyze_genomes_duplicate_genomes():
     genome_seqs = [
-        Seq(BioSeq("GGCCATNN"), "genome1", "genome1", FastaType.GENERIC),
-        Seq(BioSeq("GGCCATNN"), "genome1", "genome1", FastaType.GENERIC),
+        Seq(BioSeq("GGCCATNN"), "genome1", "genome1"),
+        Seq(BioSeq("GGCCATNN"), "genome1", "genome1"),
     ]
     with pytest.raises(AssertionError):
         _ = _analyze_genomes(genome_seqs)

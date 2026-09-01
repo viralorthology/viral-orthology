@@ -1,7 +1,6 @@
 import pytest
 from Bio.Seq import Seq as BioSeq
 
-from models.fasta_type import FastaType
 from models.seq import Seq
 
 # FASTA OPERATIONS
@@ -110,7 +109,6 @@ def test_add_seq(fasta):
         seq=BioSeq("AT"),
         seq_id="seq4",
         seq_description="",
-        fasta_type=FastaType.GENERIC,
     )
     fasta.add_seqs(seq)
     seqs = list(fasta.seqs)

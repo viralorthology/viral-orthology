@@ -1,7 +1,6 @@
 import utils
 from models.constants import PREDICTED_PROTEINS_PREFIX
 from models.fasta import Fasta
-from models.fasta_type import FastaType
 from models.seq import Seq
 
 
@@ -40,9 +39,7 @@ def run(
 
     # predict proteins
     predicted_prots_fasta_str = _run_orffinder(genome_fasta, params)
-    predicted_prot_seqs = utils.get_seqs_from_fasta_str(
-        predicted_prots_fasta_str, FastaType.GENERIC
-    )
+    predicted_prot_seqs = utils.get_seqs_from_fasta_str(predicted_prots_fasta_str)
 
     # remove annotated prots from predicted proteome
     if annotated_proteome_fasta is not None:
