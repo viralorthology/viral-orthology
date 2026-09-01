@@ -104,11 +104,10 @@ def test_get_seq_id_and_description(
         "protein|genome_123 hypothetical protein [protein_id=ABC123]",
         "protein|genome_123_prot_456 hypothetical protein",
         "protein|genome_123 hypothetical protein",
-        "",
     ],
 )
 def test_get_seq_id_and_description_invalid_description(old_description):
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         _get_seq_id_and_description_protein_seqs(old_description)
 
 

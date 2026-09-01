@@ -83,12 +83,6 @@ def _download_sequences(
     Genome download failures are recorded as errors, while proteome download
     failures are skipped.
 
-    Args:
-        ui: UI instance used to display download progress.
-        genome_ids: Set of genome IDs to download.
-        genomes_fasta: Fasta object used to write downloaded genome sequences.
-        proteomes_fasta: Fasta object used to write downloaded protein sequences.
-
     Returns:
         A list of error messages for genomes that could not be downloaded.
     """
@@ -171,8 +165,10 @@ def _get_seq_id_and_description_protein_seqs(old_description: str) -> tuple[str,
         description prefixed with the genome ID.
     """
     assert old_description
-    assert "_prot_" in old_description
-    assert "[protein_id=" in old_description
+    if not "_prot_" in old_description or not "[protein_id=" in old_description:
+        raise ValueError(
+            f"Protein description does not contain the required data: {old_description}"
+        )
 
     seq_id = old_description.split("[protein_id=")[1].split("]")[0]
     genome_id = old_description.split("|")[1].split("_prot_")[0]
