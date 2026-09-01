@@ -173,10 +173,9 @@ def _get_seq_id_description_from_gb_description(
         old_description: Original GenBank sequence description.
 
     Returns:
-        A tuple containing the protein sequence ID and the reconstructed
-        description prefixed with the genome ID.
+        - The protein sequence ID
+        - The reconstructed description prefixed with the genome ID.
     """
-    assert old_description
     if "_prot_" not in old_description or "[protein_id=" not in old_description:
         raise ValueError(
             f"Protein description does not contain the required data: {old_description}"

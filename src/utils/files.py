@@ -15,13 +15,15 @@ def get_fastas(
     Get FASTA files from a directory.
 
     Args:
-        dir_path: directory containing the FASTA files
-        fasta_type: type of the FASTA files
-        file_extension: file extension to filter by
+        dir_path: Directory containing the FASTA files
+        fasta_type: Type of the FASTA files
+        file_extension: File extension to filter by (it must start with .)
+
+    Raises:
+        ValueError: If the file extension is not valid
     """
-    assert isinstance(dir_path, Path)
-    assert dir_path.is_dir()
-    assert file_extension.startswith(".") and len(file_extension) > 1
+    if not file_extension.startswith("."):
+        raise ValueError(f"{file_extension} is not a valid file extension")
 
     fastas = [
         Fasta(p, fasta_type)
@@ -42,9 +44,11 @@ def ensure_files_exist(*file_paths: Path) -> None:
         *file_paths: Paths to files that must exist.
 
     Raises:
-        FileNotFoundError: If any of the files does not exist.
+        ValueError: If no file path is provided.
+        FileNotFoundError: If any of the files do not exist.
     """
-    assert file_paths
+    if not file_paths:
+        raise ValueError("At least one file path must be provided.")
 
     for file_path in file_paths:
         if not file_path.is_file():
@@ -59,9 +63,11 @@ def ensure_files_do_not_exist(*file_paths: Path) -> None:
         *file_paths: Paths to files that must not exist.
 
     Raises:
-        FileExistsError: If any of the files already exists.
+        ValueError: If no file paths are provided.
+        FileExistsError: If any of the files already exist.
     """
-    assert file_paths
+    if not file_paths:
+        raise ValueError("At least one file path must be provided")
 
     for file_path in file_paths:
         if file_path.is_file():
@@ -72,9 +78,12 @@ def ensure_files_have_content(*file_paths: Path) -> None:
     """
     Ensure that all given files exist and have content.
 
+    Args:
+        *file_paths: Paths to files that must exist and contain content.
+
     Raises:
-        FileNotFoundError: if any of the files does not exist
-        ValueError: if any of the files is empty
+        FileNotFoundError: If no file path is provided or any of the files do not exist
+        ValueError: If any of the files is empty
     """
     ensure_files_exist(*file_paths)
     for file_path in file_paths:
@@ -85,8 +94,14 @@ def ensure_files_have_content(*file_paths: Path) -> None:
 def get_seqs_from_fasta_str(
     fasta_str: str,
 ) -> list[Seq]:
-    """Parse a FASTA string into a list of Seq objects."""
-    assert fasta_str
+    """
+    Parse a FASTA string into a list of Seq objects.
+
+    Raises:
+        ValueError: If fasta_str is empty.
+    """
+    if not fasta_str:
+        raise ValueError("fasta_str cannot be empty")
 
     return [
         Seq(
