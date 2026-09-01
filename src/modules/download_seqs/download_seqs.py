@@ -28,13 +28,15 @@ def run(ctx: Context) -> None:
     genomes_fasta = Fasta(ctx.paths.genomes_fasta, FastaType.GENERIC)
     proteomes_fasta = Fasta(ctx.paths.proteomes_fasta, FastaType.GENERIC)
 
-    errors = _download_sequences(
-        ctx.ui, genome_ids_to_download, genomes_fasta, proteomes_fasta
+    genome_ids_failed, _ = (
+        _download_sequences(  # TODO predict proteins if no proteome could be downloaded
+            ctx.ui, genome_ids_to_download, genomes_fasta, proteomes_fasta
+        )
     )
 
-    for error_msg in errors:
-        ctx.ui.show_error(error_msg)
-    if len(errors) == len(genome_ids_to_download):
+    for genome_id in genome_ids_failed:
+        ctx.ui.show_error(f"{genome_id} could not be downloaded")
+    if len(genome_ids_failed) == len(genome_ids_to_download):
         raise ValueError("No genome could be downloaded")
 
     # format protein sequence descriptions
@@ -75,42 +77,50 @@ def run(ctx: Context) -> None:
 
 def _download_sequences(
     ui: UI, genome_ids: set[str], genomes_fasta: Fasta, proteomes_fasta: Fasta
-) -> list[str]:
+) -> tuple[list[str], list[str]]:
     """
     Download genome and proteome sequences for a set of genome IDs.
 
-    Genome and proteome sequences are downloaded from GenBank using efetch.
-    Genome download failures are recorded as errors, while proteome download
-    failures are skipped.
+    Genome and proteome sequences are downloaded from GenBank using
+    ``efetch``. Genome download failures are recorded and the corresponding
+    genome is skipped. Proteome download failures are also recorded, but do
+    not prevent the successfully downloaded genome sequence from being saved.
 
     Returns:
-        A list of error messages for genomes that could not be downloaded.
+        - A list of genome ids for genomes that could not be
+            downloaded.
+        - A list of genome IDs for which no proteome could be downloaded.
     """
     assert genome_ids
 
-    errors = []
+    genome_ids_failed = []
+    genome_ids_without_proteome = []
+
     for genome_id in ui.progress_bar(genome_ids):
         genome_fasta_str = _download_fasta(
             f'efetch -db nuccore -id "{genome_id}" -format fasta'
         )
         if genome_fasta_str is None:
-            errors.append(f"genome {genome_id} could not be downloaded")
+            genome_ids_failed.append(genome_id)
             continue
 
         with genomes_fasta.path.open("a", encoding="utf-8") as fh:
-            fh.write(genome_fasta_str.rstrip("\n") + "\n")
+            fh.write(
+                genome_fasta_str.rstrip("\n") + "\n"
+            )  # TODO dont write on every iteration
 
         proteome_fasta_str = _download_fasta(
             f'efetch -db nuccore -id "{genome_id}" -format fasta_cds_aa'
         )
 
-        # TODO if proteome did not download, annotate with orffinder
+        if proteome_fasta_str is None:
+            genome_ids_without_proteome.append(genome_id)
+            continue
 
-        if proteome_fasta_str is not None:
-            with proteomes_fasta.path.open("a", encoding="utf-8") as fh:
-                fh.write(proteome_fasta_str.rstrip("\n") + "\n")
+        with proteomes_fasta.path.open("a", encoding="utf-8") as fh:
+            fh.write(proteome_fasta_str.rstrip("\n") + "\n")
 
-    return errors
+    return genome_ids_failed, genome_ids_without_proteome
 
 
 def _analyze_genomes(
@@ -167,7 +177,7 @@ def _get_seq_id_description_from_gb_description(
         description prefixed with the genome ID.
     """
     assert old_description
-    if not "_prot_" in old_description or not "[protein_id=" in old_description:
+    if "_prot_" not in old_description or "[protein_id=" not in old_description:
         raise ValueError(
             f"Protein description does not contain the required data: {old_description}"
         )
