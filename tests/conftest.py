@@ -6,8 +6,6 @@ from cli.args import Args
 from cli.ui import UI
 from config.context import Context
 from config.paths import Paths
-from models.fasta import Fasta
-from models.fasta_type import FastaType
 
 # CONTEXT
 
@@ -49,20 +47,20 @@ def fasta(tmp_path):
         ">seq1 seqdescription\nATCG\n>seq2 seqdescription\nATGC\n>seq3 seqdescription\nCATG\n",
         encoding="utf-8",
     )
-    return Fasta(path, FastaType.GENERIC)
+    return path
 
 
 @pytest.fixture
 def nonexistent_fasta(tmp_path):
     path = tmp_path / "nonexistent_fasta.fasta"
-    return Fasta(path, FastaType.GENERIC)
+    return path
 
 
 @pytest.fixture
 def empty_fasta(tmp_path):
     path = tmp_path / "empty_fasta.fasta"
     path.write_text("", encoding="utf-8")
-    return Fasta(path, FastaType.GENERIC)
+    return path
 
 
 @pytest.fixture
@@ -71,24 +69,31 @@ def fasta_duplicate_id(tmp_path):
     path.write_text(
         ">seqid seqdescription\nATCG\n>seqid seqdescription\nATCG\n", encoding="utf-8"
     )
-    return Fasta(path, FastaType.GENERIC)
+    return path
 
 
 @pytest.fixture
 def fasta_no_id(tmp_path):
     path = tmp_path / "fasta_no_id.fasta"
     path.write_text(">\nATCG\n", encoding="utf-8")
-    return Fasta(path, FastaType.GENERIC)
+    return path
+
+
+@pytest.fixture
+def fasta_no_seqs(tmp_path):
+    path = tmp_path / "fasta_no_id.fasta"
+    path.write_text(">seq1\n", encoding="utf-8")
+    return path
 
 
 @pytest.fixture
 def protein_fasta(tmp_path):
     path = tmp_path / "protein_fasta.fasta"
     path.write_text(">seq1 genome1\nATGC\n>seq2 genome2\nATCG\n", encoding="utf-8")
-    return Fasta(path, FastaType.PROTEIN)
+    return path
 
 
-# ORTHOLOG GROUP
+# ORTHOLOG GROUP FASTA FILES
 
 
 @pytest.fixture
