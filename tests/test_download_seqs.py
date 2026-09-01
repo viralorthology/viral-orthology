@@ -3,7 +3,6 @@ from unittest.mock import call, patch
 import pytest
 from Bio.Seq import Seq as BioSeq
 
-from models.fasta_type import FastaType
 from models.seq import Seq
 from modules.download_seqs.run import (
     _analyze_genomes,
