@@ -63,27 +63,27 @@ def test_analyze_genomes_duplicate_genomes():
         (
             "protein|GCF_000001405.40_prot_1 DNA-directed RNA polymerase subunit beta [protein_id=NP_000001.2]",
             "NP_000001.2",
-            "GCF_000001405.40 DNA-directed RNA polymerase subunit beta [protein_id=NP_000001.2]",
+            "NP_000001.2 GCF_000001405.40 DNA-directed RNA polymerase subunit beta [protein_id=NP_000001.2]",
         ),
         (
             "protein|GCF_000002315.6_prot_42 hypothetical protein [protein_id=WP_012345678.1]",
             "WP_012345678.1",
-            "GCF_000002315.6 hypothetical protein [protein_id=WP_012345678.1]",
+            "WP_012345678.1 GCF_000002315.6 hypothetical protein [protein_id=WP_012345678.1]",
         ),
         (
             "protein|GCF_000005845.3_prot_108 ATP synthase subunit beta [protein_id=YP_009724390.1]",
             "YP_009724390.1",
-            "GCF_000005845.3 ATP synthase subunit beta [protein_id=YP_009724390.1]",
+            "YP_009724390.1 GCF_000005845.3 ATP synthase subunit beta [protein_id=YP_009724390.1]",
         ),
         (
             "protein|GCF_000006765.12_prot_256 putative membrane protein [protein_id=WP_098765432.2]",
             "WP_098765432.2",
-            "GCF_000006765.12 putative membrane protein [protein_id=WP_098765432.2]",
+            "WP_098765432.2 GCF_000006765.12 putative membrane protein [protein_id=WP_098765432.2]",
         ),
         (
             "protein|GCF_000009999.1_prot_731 elongation factor Tu [protein_id=NP_414543.1]",
             "NP_414543.1",
-            "GCF_000009999.1 elongation factor Tu [protein_id=NP_414543.1]",
+            "NP_414543.1 GCF_000009999.1 elongation factor Tu [protein_id=NP_414543.1]",
         ),
     ],
 )
@@ -104,6 +104,7 @@ def test_get_seq_id_and_description(
         "protein|genome_123 hypothetical protein [protein_id=ABC123]",
         "protein|genome_123_prot_456 hypothetical protein",
         "protein|genome_123 hypothetical protein",
+        "",
     ],
 )
 def test_get_seq_id_and_description_invalid_description(old_description):

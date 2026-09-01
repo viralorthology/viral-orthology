@@ -191,7 +191,7 @@ def _get_seq_id_description_from_gb_description(
     seq_id = old_description.split("[protein_id=")[1].split("]")[0]
     genome_id = old_description.split("|")[1].split("_prot_")[0]
     remaining_description = (" ").join(old_description.split()[1:])
-    return seq_id, f"{genome_id} {remaining_description}"
+    return seq_id, f"{seq_id} {genome_id} {remaining_description}"
 
 
 def _download_fasta(cmd_str: str) -> str | None:
