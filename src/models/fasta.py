@@ -49,6 +49,9 @@ class Fasta:
 
     @property
     def n_seqs(self) -> int:
+        """
+        Return the number of sequences in a FASTA file
+        """
         return sum(1 for _ in self.seqs)
 
     @property
