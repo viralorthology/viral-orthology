@@ -153,6 +153,12 @@ def test_remove_seqs(fasta):
     assert len(list(fasta.seqs)) == 2
 
 
+def test_remove_all_seqs(fasta):
+    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta.remove_seqs("seq1", "seq2", "seq3")
+    assert not fasta.path.exists()
+
+
 def test_remove_no_sequences(fasta):
     fasta = Fasta(fasta, FastaType.GENERIC)
     with pytest.raises(ValueError):
