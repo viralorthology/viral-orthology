@@ -101,6 +101,7 @@ def _predicted_prot_is_annotated(
 def _get_predicted_prot_location(seq_id: str) -> str:
     """Extract the genomic location from a predicted sequence ID."""
     start, end = map(int, seq_id.split(":")[-2:])
+    assert start != end
     position_str = ("..").join(map(str, sorted((start, end))))
 
     if start > end:
