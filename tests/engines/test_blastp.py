@@ -2,12 +2,12 @@ from unittest.mock import patch
 
 import pytest
 
-from engines.blastp.blastp import BlastResult, make_blastp_db, run_blastp, search
+from engines.blastp.blastp import BlastHit, make_blastp_db, run_blastp, search
 from models.fasta import Fasta, FastaType
 
 
 def test_blast_result_parses_result():
-    result = BlastResult("query1@subject1@95@87.5@1e-20")
+    result = BlastHit("query1@subject1@95@87.5@1e-20")
 
     assert result.query_id == "query1"
     assert result.subject_id == "subject1"
@@ -18,7 +18,7 @@ def test_blast_result_parses_result():
 
 def test_blast_result_rejects_invalid_result():
     with pytest.raises(AssertionError):
-        BlastResult("query1@subject1@95")
+        BlastHit("query1@subject1@95")
 
 
 @patch("engines.blastp.blastp.utils.run_cmd")

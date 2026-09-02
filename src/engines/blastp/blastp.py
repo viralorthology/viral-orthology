@@ -6,7 +6,7 @@ import utils
 from models.fasta import Fasta
 
 
-class BlastResult:
+class BlastHit:
     """Represents a single BLASTP hit."""
 
     def __init__(self, results_string: str):
@@ -19,9 +19,7 @@ class BlastResult:
         self.evalue = float(results_split[4])
 
 
-def search(
-    query_fasta: Fasta, params: str, *subject_fastas: Fasta
-) -> list[BlastResult]:
+def search(query_fasta: Fasta, params: str, *subject_fastas: Fasta) -> list[BlastHit]:
     """
     Search query proteins against one or more subject FASTA files and
     get the hits sorted by evalue.
@@ -70,7 +68,7 @@ def make_blastp_db(fasta: Fasta) -> None:
     utils.run_cmd(f"makeblastdb -dbtype prot -in {fasta.path}")
 
 
-def run_blastp(query_fasta: Fasta, db_fasta: Fasta, params: str) -> list[BlastResult]:
+def run_blastp(query_fasta: Fasta, db_fasta: Fasta, params: str) -> list[BlastHit]:
     """
     Run BLASTP against a protein database and return the hits sorted by evalue.
 
@@ -89,6 +87,6 @@ def run_blastp(query_fasta: Fasta, db_fasta: Fasta, params: str) -> list[BlastRe
         return []
 
     return sorted(
-        [BlastResult(line) for line in output.split("\n") if line.strip()],
+        [BlastHit(line) for line in output.split("\n") if line.strip()],
         key=lambda hit: hit.evalue,
     )
