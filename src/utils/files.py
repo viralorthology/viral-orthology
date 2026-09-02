@@ -70,7 +70,7 @@ def ensure_files_do_not_exist(*file_paths: Path) -> None:
         raise ValueError("At least one file path must be provided")
 
     for file_path in file_paths:
-        if file_path.is_file():
+        if file_path.exists():
             raise FileExistsError(f"{file_path} already exists")
 
 
