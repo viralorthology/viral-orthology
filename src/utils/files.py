@@ -111,3 +111,30 @@ def get_seqs_from_fasta_str(
         )
         for record in SeqIO.parse(StringIO(fasta_str), "fasta")
     ]
+
+
+def get_combined_fasta(
+    combined_fasta_path: Path, *fastas: Fasta, fasta_type: FastaType = FastaType.GENERIC
+) -> Fasta:
+    """
+    Combine the sequences from multiple FASTA files into a single FASTA file.
+
+    Args:
+        combined_fasta_path: Path where the combined FASTA file will be created.
+        *fastas: FASTA files whose sequences will be combined.
+        fasta_type: Type of the resulting FASTA file.
+
+    Raises:
+        ValueError: If no FASTA files are provided or the output path already
+            exists.
+    """
+    if not fastas:
+        raise ValueError("At least one Fasta must be provided")
+    if combined_fasta_path.exists():
+        raise ValueError(f"Output FASTA path already exists: {combined_fasta_path}")
+
+    all_seqs = [seq for fasta in fastas for seq in fasta.seqs]
+
+    new_fasta = Fasta(combined_fasta_path, fasta_type)
+    new_fasta.add_seqs(*all_seqs)
+    return new_fasta
