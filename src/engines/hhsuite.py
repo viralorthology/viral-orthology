@@ -1,9 +1,11 @@
 import utils
-from engines.hmm.muscle import _align_with_muscle
+from engines.muscle import muscle_align
 from models.ortholog_group import OrthologGroup
 
 
-def compare_groups(group1_fasta: OrthologGroup, group2_fasta: OrthologGroup) -> float:
+def hmm_compare_groups(
+    group1_fasta: OrthologGroup, group2_fasta: OrthologGroup
+) -> float:
     """
     Compare two ortholog groups using HHsuite profile-profile alignment.
 
@@ -16,9 +18,9 @@ def compare_groups(group1_fasta: OrthologGroup, group2_fasta: OrthologGroup) -> 
         The HHalign probability score between the two HMM profiles.
     """
     if not group1_fasta.alignment_path.is_file():
-        _align_with_muscle(group1_fasta)
+        muscle_align(group1_fasta)
     if not group2_fasta.alignment_path.is_file():
-        _align_with_muscle(group2_fasta)
+        muscle_align(group2_fasta)
 
     _convert_aligned_fasta_to_a2m(group1_fasta)
     _convert_aligned_fasta_to_a2m(group2_fasta)

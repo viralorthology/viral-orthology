@@ -1,6 +1,6 @@
 import pytest
 
-from engines.protein_predictor.protein_predictor import (
+from engines.orffinder import (
     _get_predicted_prot_location,
     _predicted_prot_is_annotated,
 )

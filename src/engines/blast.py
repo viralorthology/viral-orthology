@@ -19,7 +19,9 @@ class BlastHit:
         self.evalue = float(results_split[4])
 
 
-def search(query_fasta: Fasta, params: str, *subject_fastas: Fasta) -> list[BlastHit]:
+def blastp_search(
+    query_fasta: Fasta, params: str, *subject_fastas: Fasta
+) -> list[BlastHit]:
     """
     Search query proteins against one or more subject FASTA files and
     get the hits sorted by evalue.

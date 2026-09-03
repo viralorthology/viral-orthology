@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 import utils
-from engines.hmm.muscle import _align_with_muscle
+from engines.muscle import muscle_align
 from models.fasta import Fasta
 from models.ortholog_group import OrthologGroup
 
@@ -13,7 +13,9 @@ class HMMHit:
     genome_id: str
 
 
-def search(query_fasta: OrthologGroup, db_fasta: Fasta, params: str) -> list[HMMHit]:
+def hmm_search(
+    query_fasta: OrthologGroup, db_fasta: Fasta, params: str
+) -> list[HMMHit]:
     """
     Search a protein database using an HMM built from an ortholog group.
 
@@ -30,10 +32,10 @@ def search(query_fasta: OrthologGroup, db_fasta: Fasta, params: str) -> list[HMM
         A list of HMMER hits sorted by E-value.
     """
     if not query_fasta.alignment_path.is_file():
-        _align_with_muscle(query_fasta)
+        muscle_align(query_fasta)
 
     if not query_fasta.hmm_hmmer_path.is_file():
-        _build_hmm_hmmer(query_fasta)
+        muscle_align(query_fasta)
 
     hits = _search_hmm_hmmer(query_fasta, db_fasta, params)
 

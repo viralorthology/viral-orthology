@@ -4,7 +4,7 @@ from models.fasta import Fasta
 from models.seq import Seq
 
 
-def run(
+def predict_proteome(
     genome_fasta: Fasta,
     params: str,
     predicted_prots_n: int,

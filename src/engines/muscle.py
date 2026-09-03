@@ -2,7 +2,7 @@ import utils
 from models.ortholog_group import OrthologGroup
 
 
-def _align_with_muscle(fasta: OrthologGroup) -> None:
+def muscle_align(fasta: OrthologGroup) -> None:
     """
     Create a multiple sequence alignment using MUSCLE.
 
