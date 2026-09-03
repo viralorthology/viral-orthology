@@ -3,5 +3,6 @@ Viral Orthology is currently undergoing a rewrite focused on improving code qual
 ## TODO
 
 - [x] Core objects
+- [ ] Core engines
 - [ ] Core pipeline
 - [ ] Enrichment modules
