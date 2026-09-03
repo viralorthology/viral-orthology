@@ -19,6 +19,18 @@ jobs:
           environment-file: environment.yml
           auto-activate-base: false
 
-      - name: Run tests
+      - name: Check format
         shell: bash -l {0}
-        run: ./run_tests.sh
+        run: ruff format --check src
+
+      - name: Lint
+        shell: bash -l {0}
+        run: ruff check src
+
+      - name: Type check
+        shell: bash -l {0}
+        run: mypy --strict --disable-error-code=no-untyped-call src
+
+      - name: Tests
+        shell: bash -l {0}
+        run: PYTHONPATH=src pytest
