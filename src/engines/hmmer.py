@@ -35,7 +35,7 @@ def hmm_search(
         muscle_align(query_fasta)
 
     if not query_fasta.hmm_hmmer_path.is_file():
-        muscle_align(query_fasta)
+        _build_hmm_hmmer(query_fasta)
 
     hits = _search_hmm_hmmer(query_fasta, db_fasta, params)
 
