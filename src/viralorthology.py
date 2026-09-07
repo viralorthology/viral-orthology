@@ -36,7 +36,7 @@ MODULES = {"-pipeline": pipeline, "-download_seqs": download_seqs}
 def main() -> None:
     ui = CLI()
 
-    if "-help" in sys.argv:
+    if "-help" in sys.argv or "-h" in sys.argv:
         print_help(ui)
         return
 
