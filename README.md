@@ -38,6 +38,8 @@ Enrichment modules are designed to operate independently from the core orthology
 
 The analysis begins with the automated core workflow, which processes the input sequences and generates orthologous groups. Independent downstream modules can then be applied to enrich or assess the resulting groups.
 
+![Viral Orthology pipeline](workflow.png)
+
 ## Installation
 
 ### Requirements
