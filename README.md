@@ -16,21 +16,21 @@ A modular bioinformatics pipeline for automated orthology inference across viral
 
 ## Key Features
 
-* Automated orthology inference across viral genomes
-* Iterative refinement of orthologous groups
-* Support for large viral genome datasets
-* Configurable parameters for integrated bioinformatics tools
-* Independent enrichment and assessment modules
-* Synteny detection based on gene-order conservation
-* Amino acid composition analysis
-* Protein secondary and tertiary structure analysis
+- Automated orthology inference across viral genomes
+- Iterative refinement of orthologous groups
+- Support for large viral genome datasets
+- Configurable parameters for integrated bioinformatics tools
+- Independent enrichment and assessment modules
+- Synteny detection based on gene-order conservation
+- Amino acid composition analysis
+- Protein secondary and tertiary structure analysis
 
 ## Architecture
 
 The pipeline is organized into two major components:
 
-* **Core pipeline** — generates and iteratively refines orthologous groups.
-* **Enrichment modules** — independently analyze the resulting groups using synteny, amino acid composition, and protein structure.
+- **Core pipeline** — generates and iteratively refines orthologous groups.
+- **Enrichment modules** — independently analyze the resulting groups using synteny, amino acid composition, and protein structure.
 
 Enrichment modules are designed to operate independently from the core orthology inference workflow.
 
@@ -42,13 +42,13 @@ The analysis begins with the automated core workflow, which processes the input 
 
 ### Requirements
 
-* Linux
-* Conda (or Miniconda)
+- Linux
+- Conda (or Miniconda)
 
 ### Install
 
 ```bash
-# Installation instructions will be added here
+curl -fsSL https://raw.githubusercontent.com/viralorthology/viral-orthology/refs/heads/main/setup.sh | bash
 ```
 
 The required dependencies are installed automatically through the Conda environment.
