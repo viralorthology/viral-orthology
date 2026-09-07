@@ -13,6 +13,7 @@ A modular bioinformatics pipeline for automated orthology inference across viral
 - [x] Core engines
 - [ ] Core pipeline
 - [ ] Enrichment modules
+- [ ] Analysis modules
 
 ## Key Features
 
@@ -20,23 +21,17 @@ A modular bioinformatics pipeline for automated orthology inference across viral
 - Iterative refinement of orthologous groups
 - Support for large viral genome datasets
 - Configurable parameters for integrated bioinformatics tools
-- Independent enrichment and assessment modules
+- Independent enrichment and analysis modules
 - Synteny detection based on gene-order conservation
 - Amino acid composition analysis
 - Protein secondary and tertiary structure analysis
 
-## Architecture
-
-The pipeline is organized into two major components:
-
-- **Core pipeline** — generates and iteratively refines orthologous groups.
-- **Enrichment modules** — independently analyze the resulting groups using synteny, amino acid composition, and protein structure.
-
-Enrichment modules are designed to operate independently from the core orthology inference workflow.
-
 ## Workflow
 
-The analysis begins with the automated core workflow, which processes the input sequences and generates orthologous groups. Independent downstream modules can then be applied to enrich or assess the resulting groups.
+ViralOrthology consists of a core orthology inference pipeline followed by optional enrichment and analysis modules.
+The core pipeline processes the input sequences, generates initial orthologous groups, and iteratively refines them.
+The resulting orthologous groups can then be processed by enrichment modules, which use complementary evidence such as synteny conservation, amino acid composition, and protein structural information.
+Finally, analysis modules can be used to examine the resulting groups, evaluate their quality, and extract additional information from the inferred relationships.
 
 ![Viral Orthology pipeline](workflow.png)
 
@@ -92,9 +87,9 @@ viralorthology -pipeline
 
 The core workflow performs the initial orthology inference and iterative refinement of the resulting orthologous groups.
 
-### 4. Run downstream modules
+### 4. Run enrichment and analysis modules
 
-Once the orthologous groups have been generated, independent downstream modules can be executed according to the desired analysis.
+Once the orthologous groups have been generated, independent enrichment and analysis modules can be executed as needed.
 
 For example:
 
