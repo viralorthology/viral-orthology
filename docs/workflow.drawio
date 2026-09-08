@@ -1,0 +1,49 @@
+<mxfile host="Electron">
+  <diagram name="Page-1" id="n0qaS-JE8eFAOadXTZgb">
+    <mxGraphModel dx="1414" dy="876" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="llLjm_pUc9lWiMXUzdw_-7" edge="1" parent="1" source="llLjm_pUc9lWiMXUzdw_-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;strokeColor=#000000;fillColor=#1ba1e2;" target="llLjm_pUc9lWiMXUzdw_-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="llLjm_pUc9lWiMXUzdw_-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#000000;strokeWidth=2;" value="&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;Preparation Stage&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Predict proteomes&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Find paralogs&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Identify redundant genomes&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="220" x="290" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="llLjm_pUc9lWiMXUzdw_-8" edge="1" parent="1" source="llLjm_pUc9lWiMXUzdw_-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;strokeColor=#000000;fillColor=#1ba1e2;" target="llLjm_pUc9lWiMXUzdw_-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="llLjm_pUc9lWiMXUzdw_-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#000000;strokeWidth=2;" value="&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;Initial Stage&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Create initial ortholog groups&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Clean ortholog groups&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="220" x="290" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="llLjm_pUc9lWiMXUzdw_-9" edge="1" parent="1" source="llLjm_pUc9lWiMXUzdw_-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;strokeColor=#000000;fillColor=#1ba1e2;" target="llLjm_pUc9lWiMXUzdw_-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="llLjm_pUc9lWiMXUzdw_-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#000000;strokeWidth=2;" value="&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;Enrichment Stage&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Merge groups by annotation&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Merge groups by HMM comparison&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- HMM profile search&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- BLASTP search&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="220" x="290" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="llLjm_pUc9lWiMXUzdw_-11" edge="1" parent="1" source="llLjm_pUc9lWiMXUzdw_-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;strokeColor=#000000;" target="llLjm_pUc9lWiMXUzdw_-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="llLjm_pUc9lWiMXUzdw_-12" edge="1" parent="1" source="llLjm_pUc9lWiMXUzdw_-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;strokeWidth=2;strokeColor=#000000;" target="llLjm_pUc9lWiMXUzdw_-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="llLjm_pUc9lWiMXUzdw_-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#000000;strokeWidth=2;fillStyle=solid;" value="&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;Final Stage&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Merge groups by HMM comparison&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- HMM profile search on paralogs&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Merge groups by annotation&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="220" x="290" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="llLjm_pUc9lWiMXUzdw_-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#000000;strokeWidth=2;fillStyle=solid;" value="&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;Enrichment Modules&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Synteny analysis&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Amino acid composition analysis&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Secondary structure analysis&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Tertiary structure analysis&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- HMM profile search&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- BLASTP search&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="150" width="220" x="140" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="llLjm_pUc9lWiMXUzdw_-6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#000000;strokeWidth=2;fillStyle=solid;" value="&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;Analysis Modules&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Z-score analysis&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Kimura 2-parameter analysis&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Protein domain search&lt;/div&gt;" vertex="1">
+          <mxGeometry height="150" width="220" x="440" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="llLjm_pUc9lWiMXUzdw_-14" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=#dae8fc;align=center;verticalAlign=middle;rounded=0;textDirection=vertical-lr;fillStyle=solid;" value="&lt;b&gt;&lt;font style=&quot;font-size: 21px;&quot;&gt;CORE PIPELINE&lt;/font&gt;&lt;/b&gt;" vertex="1">
+          <mxGeometry height="510" width="60" x="720" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="llLjm_pUc9lWiMXUzdw_-15" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=#d5e8d4;align=center;verticalAlign=middle;rounded=0;textDirection=vertical-rl;fontStyle=1;fillStyle=solid;" value="&lt;font style=&quot;font-size: 21px;&quot;&gt;INDEPENDENT MODULES&lt;/font&gt;" vertex="1">
+          <mxGeometry height="170" width="60" x="720" y="569" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
