@@ -50,6 +50,7 @@ fi
 
 # download InterProScan
 if [[ ! -f "$HOME/.interproscan/interproscan.sh" ]]; then
+    rm -rf "$HOME/.interproscan"
     wget https://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.78-109.0/interproscan-5.78-109.0-64-bit.tar.gz -O "$tmp_dir/interproscan.tar.gz"
     tar -xzf "$tmp_dir/interproscan.tar.gz" -C "$tmp_dir"
     mv "$tmp_dir/interproscan-5.78-109.0" "$HOME/.interproscan"
