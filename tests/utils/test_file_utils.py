@@ -5,9 +5,9 @@ from models.fasta import Fasta
 from models.fasta_type import FastaType
 from models.seq import Seq
 from utils import (
-    ensure_files_do_not_exist,
     ensure_files_exist,
     ensure_files_have_content,
+    ensure_paths_do_not_exist,
     get_combined_fasta,
     get_fastas,
     get_seqs_from_fasta_str,
@@ -51,7 +51,7 @@ def test_ensure_files_exist_missing_file(tmp_path):
 
 
 def test_ensure_files_do_not_exist_missing_files(tmp_path):
-    ensure_files_do_not_exist(
+    ensure_paths_do_not_exist(
         tmp_path / "missing_1.txt",
         tmp_path / "missing_2.txt",
     )
@@ -62,7 +62,7 @@ def test_ensure_files_do_not_exist_existing_file(tmp_path):
     existing_file.touch()
 
     with pytest.raises(FileExistsError):
-        ensure_files_do_not_exist(existing_file)
+        ensure_paths_do_not_exist(existing_file)
 
 
 def test_ensure_files_have_content_non_empty_files(tmp_path):

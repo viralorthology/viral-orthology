@@ -55,7 +55,7 @@ def ensure_files_exist(*file_paths: Path) -> None:
             raise FileNotFoundError(f"{file_path} does not exist")
 
 
-def ensure_files_do_not_exist(*file_paths: Path) -> None:
+def ensure_paths_do_not_exist(*paths: Path) -> None:
     """
     Ensure that none of the given files exist.
 
@@ -66,12 +66,12 @@ def ensure_files_do_not_exist(*file_paths: Path) -> None:
         ValueError: If no file paths are provided.
         FileExistsError: If any of the files already exist.
     """
-    if not file_paths:
+    if not paths:
         raise ValueError("At least one file path must be provided")
 
-    for file_path in file_paths:
-        if file_path.exists():
-            raise FileExistsError(f"{file_path} already exists")
+    for path in paths:
+        if path.exists():
+            raise FileExistsError(f"{path} already exists")
 
 
 def ensure_files_have_content(*file_paths: Path) -> None:

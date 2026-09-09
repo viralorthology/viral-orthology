@@ -14,7 +14,7 @@ def run(ctx: Context) -> None:
     ##### VALIDATION #####
     utils.check_dependencies("efetch")
     utils.ensure_files_have_content(ctx.paths.ids_txt)
-    utils.ensure_files_do_not_exist(ctx.paths.genomes_fasta, ctx.paths.proteomes_fasta)
+    utils.ensure_paths_do_not_exist(ctx.paths.genomes_fasta, ctx.paths.proteomes_fasta)
     ctx.paths.output_dir.mkdir(parents=True, exist_ok=True)
 
     ##### RUN #####
