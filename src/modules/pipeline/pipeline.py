@@ -1,6 +1,8 @@
 import utils
 from config.context import Context
 from models.fasta import Fasta
+from modules.pipeline.find_paralogs import find_paralogs
+from modules.pipeline.find_redundant_genomes import find_redundant_genomes
 from modules.pipeline.predict_proteomes import predict_proteomes
 from modules.pipeline.split_fastas import split_fastas
 
@@ -57,5 +59,5 @@ def run(ctx: Context) -> None:
 def _preparation_stage(ctx: Context) -> None:
     split_fastas(ctx)
     predict_proteomes(ctx)
-    # find paralogs
-    # find redundant genomes
+    find_paralogs(ctx)
+    find_redundant_genomes(ctx)
