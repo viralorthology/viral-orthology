@@ -2,7 +2,6 @@ import pytest
 from Bio.Seq import Seq as BioSeq
 
 from models.fasta import Fasta
-from models.fasta_type import FastaType
 from models.seq import Seq
 
 # SEQUENCE OPERATIONS
@@ -11,7 +10,7 @@ from models.seq import Seq
 
 
 def test_fasta(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     seqs = list(fasta.seqs)
     assert len(seqs) == 3
     assert seqs[0].id == "seq1"
@@ -26,31 +25,31 @@ def test_fasta(fasta):
 
 
 def test_fasta_duplicate_id(fasta_duplicate_id):
-    fasta = Fasta(fasta_duplicate_id, FastaType.GENERIC)
+    fasta = Fasta(fasta_duplicate_id)
     with pytest.raises(ValueError):
         _ = list(fasta.seqs)
 
 
 def test_read_nonexistent_fasta(nonexistent_fasta):
-    fasta = Fasta(nonexistent_fasta, FastaType.GENERIC)
+    fasta = Fasta(nonexistent_fasta)
     with pytest.raises(FileNotFoundError):
         _ = list(fasta.seqs)
 
 
 def test_read_empty_fasta(empty_fasta):
-    fasta = Fasta(empty_fasta, FastaType.GENERIC)
+    fasta = Fasta(empty_fasta)
     with pytest.raises(ValueError):
         _ = list(fasta.seqs)
 
 
 def test_fasta_no_id(fasta_no_id):
-    fasta = Fasta(fasta_no_id, FastaType.GENERIC)
+    fasta = Fasta(fasta_no_id)
     with pytest.raises(ValueError):
         _ = list(fasta.seqs)
 
 
 def test_fasta_no_seq(fasta_no_seqs):
-    fasta = Fasta(fasta_no_seqs, FastaType.GENERIC)
+    fasta = Fasta(fasta_no_seqs)
     with pytest.raises(ValueError):
         _ = list(fasta.seqs)
 
@@ -59,15 +58,15 @@ def test_fasta_no_seq(fasta_no_seqs):
 
 
 def test_genome_ids(protein_fasta):
-    fasta = Fasta(protein_fasta, FastaType.PROTEIN)
+    fasta = Fasta(protein_fasta)
     genome_ids = fasta.genome_ids
     assert genome_ids[0] == "genome1"
     assert genome_ids[1] == "genome2"
 
 
 def test_genome_ids_in_generic_fasta(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
-    with pytest.raises(ValueError):
+    fasta = Fasta(fasta)
+    with pytest.raises(AttributeError):
         _ = fasta.genome_ids
 
 
@@ -75,7 +74,7 @@ def test_genome_ids_in_generic_fasta(fasta):
 
 
 def test_n_seqs(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     assert fasta.n_seqs == 3
 
 
@@ -83,7 +82,7 @@ def test_n_seqs(fasta):
 
 
 def test_get_seqs_right_order(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     seqs = fasta.get_seqs("seq2", "seq1", "seq3")
     assert len(seqs) == 3
     assert seqs[0].id == "seq2"
@@ -98,19 +97,19 @@ def test_get_seqs_right_order(fasta):
 
 
 def test_get_seqs_no_ids(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     with pytest.raises(ValueError):
         _ = fasta.get_seqs()
 
 
 def test_get_seqs_duplicate_ids(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     with pytest.raises(ValueError):
         _ = fasta.get_seqs("seq1", "seq1")
 
 
 def test_get_seqs_sequence_not_found(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     with pytest.raises(ValueError):
         _ = fasta.get_seqs("seq10")
 
@@ -119,7 +118,7 @@ def test_get_seqs_sequence_not_found(fasta):
 
 
 def test_add_seq(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     seq = Seq(
         seq=BioSeq("AT"),
         seq_id="seq4",
@@ -132,7 +131,7 @@ def test_add_seq(fasta):
 
 
 def test_add_no_sequences(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     with pytest.raises(ValueError):
         fasta.add_seqs()
 
@@ -141,7 +140,7 @@ def test_add_no_sequences(fasta):
 
 
 def test_remove_seqs(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     assert len(list(fasta.seqs)) == 3
     ids = fasta.ids
     assert "seq1" in ids
@@ -154,25 +153,25 @@ def test_remove_seqs(fasta):
 
 
 def test_remove_all_seqs(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     fasta.remove_seqs("seq1", "seq2", "seq3")
     assert not fasta.path.exists()
 
 
 def test_remove_no_sequences(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     with pytest.raises(ValueError):
         fasta.remove_seqs()
 
 
 def test_remove_seqs_not_found(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     with pytest.raises(ValueError):
         fasta.remove_seqs("seq10")
 
 
 def test_remove_duplicate_seq_id(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     with pytest.raises(ValueError):
         fasta.remove_seqs("seq1", "seq1")
 
@@ -183,7 +182,7 @@ def test_remove_duplicate_seq_id(fasta):
 
 
 def test_move_fasta(fasta, tmp_path):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     dir_to = tmp_path / "dir_to"
     dir_to.mkdir()
     original_path = fasta.path
@@ -194,26 +193,26 @@ def test_move_fasta(fasta, tmp_path):
 
 
 def test_move_nonexistent_fasta(nonexistent_fasta, tmp_path):
-    fasta = Fasta(nonexistent_fasta, FastaType.GENERIC)
+    fasta = Fasta(nonexistent_fasta)
     with pytest.raises(FileNotFoundError):
         fasta.move_fasta(tmp_path)
 
 
 def test_move_empty_fasta(empty_fasta, tmp_path):
-    fasta = Fasta(empty_fasta, FastaType.GENERIC)
+    fasta = Fasta(empty_fasta)
     with pytest.raises(ValueError):
         fasta.move_fasta(tmp_path)
 
 
 def test_move_fasta_to_nonexistent_dir(fasta, tmp_path):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     dir_to = tmp_path / "dir_to"
     with pytest.raises(FileNotFoundError):
         fasta.move_fasta(dir_to)
 
 
 def test_move_fasta_to_existing_file_path(fasta, tmp_path):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     with pytest.raises(FileExistsError):
         fasta.move_fasta(tmp_path)
 
@@ -222,38 +221,38 @@ def test_move_fasta_to_existing_file_path(fasta, tmp_path):
 
 
 def test_rename_fasta(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     fasta.rename_fasta("testfile.txt")
     assert fasta.path.name == "testfile.txt"
     assert fasta.path.is_file()
 
 
 def test_rename_nonexistent_fasta(nonexistent_fasta):
-    fasta = Fasta(nonexistent_fasta, FastaType.GENERIC)
+    fasta = Fasta(nonexistent_fasta)
     with pytest.raises(FileNotFoundError):
         fasta.rename_fasta("testfile.txt")
 
 
 def test_rename_empty_filename(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     with pytest.raises(ValueError):
         fasta.rename_fasta("")
 
 
 def test_rename_filename_no_suffix(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     with pytest.raises(ValueError):
         fasta.rename_fasta("test")
 
 
 def test_rename_empty_fasta(empty_fasta):
-    fasta = Fasta(empty_fasta, FastaType.GENERIC)
+    fasta = Fasta(empty_fasta)
     with pytest.raises(ValueError):
         fasta.rename_fasta("test")
 
 
 def test_rename_fasta_to_existent_file_path(empty_fasta, fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     other_file_name = empty_fasta.name
     with pytest.raises(FileExistsError):
         fasta.rename_fasta(other_file_name)
@@ -263,12 +262,12 @@ def test_rename_fasta_to_existent_file_path(empty_fasta, fasta):
 
 
 def test_delete_fasta(fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     fasta.delete_fasta()
     assert fasta.path.is_file() is False
 
 
 def test_delete_nonexistent_fasta(nonexistent_fasta):
-    fasta = Fasta(nonexistent_fasta, FastaType.GENERIC)
+    fasta = Fasta(nonexistent_fasta)
     with pytest.raises(FileNotFoundError):
         fasta.delete_fasta()

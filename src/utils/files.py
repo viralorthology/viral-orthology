@@ -4,19 +4,15 @@ from pathlib import Path
 from Bio import SeqIO
 
 from models.fasta import Fasta
-from models.fasta_type import FastaType
 from models.seq import Seq
 
 
-def get_fastas(
-    dir_path: Path, fasta_type: FastaType, file_extension: str
-) -> list[Fasta]:
+def get_fastas(dir_path: Path, file_extension: str) -> list[Fasta]:
     """
     Get FASTA files from a directory.
 
     Args:
         dir_path: Directory containing the FASTA files
-        fasta_type: Type of the FASTA files
         file_extension: File extension to filter by (it must start with .)
 
     Raises:
@@ -26,7 +22,7 @@ def get_fastas(
         raise ValueError(f"{file_extension} is not a valid file extension")
 
     fastas = [
-        Fasta(p, fasta_type)
+        Fasta(p)
         for p in dir_path.iterdir()
         if p.is_file() and p.suffix == file_extension
     ]
@@ -114,7 +110,8 @@ def get_seqs_from_fasta_str(
 
 
 def get_combined_fasta(
-    combined_fasta_path: Path, *fastas: Fasta, fasta_type: FastaType = FastaType.GENERIC
+    combined_fasta_path: Path,
+    *fastas: Fasta,
 ) -> Fasta:
     """
     Combine the sequences from multiple FASTA files into a single FASTA file.
@@ -122,7 +119,6 @@ def get_combined_fasta(
     Args:
         combined_fasta_path: Path where the combined FASTA file will be created.
         *fastas: FASTA files whose sequences will be combined.
-        fasta_type: Type of the resulting FASTA file.
 
     Raises:
         ValueError: If no FASTA files are provided or the output path already
@@ -135,6 +131,6 @@ def get_combined_fasta(
 
     all_seqs = [seq for fasta in fastas for seq in fasta.seqs]
 
-    new_fasta = Fasta(combined_fasta_path, fasta_type)
+    new_fasta = Fasta(combined_fasta_path)
     new_fasta.add_seqs(*all_seqs)
     return new_fasta

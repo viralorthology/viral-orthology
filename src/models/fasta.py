@@ -4,7 +4,6 @@ from pathlib import Path
 
 from Bio import SeqIO
 
-from models.fasta_type import FastaType
 from models.seq import Seq, get_seq_from_seqrecord, get_seqrecord_from_seq
 
 
@@ -16,12 +15,10 @@ class Fasta:
 
     Attributes:
         path: Path of the file
-        fasta_type: type of sequences in the file
     """
 
-    def __init__(self, path: Path, fasta_type: FastaType):
+    def __init__(self, path: Path):
         self.path = path
-        self.fasta_type = fasta_type
 
     @property
     def seqs(self) -> Iterator[Seq]:
@@ -45,7 +42,7 @@ class Fasta:
                 )
 
             ids.add(seq.id)
-            yield get_seq_from_seqrecord(seq, self.fasta_type, self.path)
+            yield get_seq_from_seqrecord(seq, self.path)
 
     @property
     def n_seqs(self) -> int:
@@ -67,13 +64,9 @@ class Fasta:
         Return the genome IDs of all protein sequences.
 
         Raises:
-            ValueError: if used on a non-protein FASTA
+            AttributeError: If called on a non-protein FASTA.
         """
-        if self.fasta_type != FastaType.PROTEIN:
-            raise ValueError(
-                f"genome_ids is only available for protein FASTAs: {self.path}"
-            )
-
+        # TODO check if all sequences are protein sequences
         return [seq.genome_id for seq in self.seqs]
 
     def get_seqs(self, *ids: str) -> list[Seq]:

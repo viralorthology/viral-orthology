@@ -67,7 +67,9 @@ def predict_proteome(
     for n, seq in enumerate(predicted_prot_seqs):
         seq_location_str = _get_predicted_prot_location(seq.id)
         seq.id = f"{PREDICTED_PROTEINS_PREFIX}_{predicted_prots_n + n + 1}"
-        seq.description = f"{seq.id} {genome_id} {seq_location_str}"
+        seq.description = (
+            f"{seq.id} {genome_id} {seq_location_str} [protein_id={seq.id}]"
+        )
         seqs_with_description_format.append(seq)
 
     return seqs_with_description_format

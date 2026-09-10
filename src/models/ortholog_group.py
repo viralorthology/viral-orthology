@@ -2,7 +2,6 @@ from pathlib import Path
 
 from config.context import Context
 from models.fasta import Fasta
-from models.fasta_type import FastaType
 from models.seq import Seq
 
 
@@ -14,7 +13,7 @@ class OrthologGroup(Fasta):
     """
 
     def __init__(self, path: Path):
-        super().__init__(path, FastaType.PROTEIN)
+        super().__init__(path)
         self._validate()
 
     @property
@@ -70,7 +69,7 @@ class OrthologGroup(Fasta):
                 if remaining_seq.is_predicted
                 else ctx.paths.annotated_prots_db
             )
-            prot_db = Fasta(prot_db_path, FastaType.GENERIC)
+            prot_db = Fasta(prot_db_path)
             prot_db.add_seqs(remaining_seq)
             super().remove_seqs(
                 *ids, remaining_seq.id

@@ -1,7 +1,6 @@
 import utils
 from config.context import Context
 from models.fasta import Fasta
-from models.fasta_type import FastaType
 from modules.pipeline.predict_proteomes import predict_proteomes
 from modules.pipeline.split_fastas import split_fastas
 
@@ -29,10 +28,8 @@ def run(ctx: Context) -> None:
         ctx.paths.paralogs_dir,
     )
 
-    genome_ids = Fasta(ctx.paths.genomes_fasta, FastaType.GENERIC).ids
-    genome_ids_from_proteomes = Fasta(
-        ctx.paths.proteomes_fasta, FastaType.PROTEIN
-    ).genome_ids
+    genome_ids = Fasta(ctx.paths.genomes_fasta).ids
+    genome_ids_from_proteomes = Fasta(ctx.paths.proteomes_fasta).genome_ids
 
     if len(genome_ids) < 2:
         raise ValueError(

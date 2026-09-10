@@ -3,7 +3,7 @@ from unittest.mock import patch
 import pytest
 
 from engines.blast import BlastHit, blastp_search, make_blastp_db, run_blastp
-from models.fasta import Fasta, FastaType
+from models.fasta import Fasta
 
 
 def test_blast_result_parses_result():
@@ -23,7 +23,7 @@ def test_blast_result_rejects_invalid_result():
 
 @patch("engines.blast.utils.run_cmd")
 def test_make_blastp_db(run_cmd, fasta):
-    fasta = Fasta(fasta, FastaType.GENERIC)
+    fasta = Fasta(fasta)
     make_blastp_db(fasta)
 
     run_cmd.assert_called_once_with(f"makeblastdb -dbtype prot -in {fasta.path}")
@@ -31,8 +31,8 @@ def test_make_blastp_db(run_cmd, fasta):
 
 @patch("engines.blast.utils.run_cmd")
 def test_run_blastp_returns_sorted_hits(run_cmd, tmp_path):
-    query = Fasta(tmp_path / "query.fasta", FastaType.GENERIC)
-    db = Fasta(tmp_path / "db.fasta", FastaType.GENERIC)
+    query = Fasta(tmp_path / "query.fasta")
+    db = Fasta(tmp_path / "db.fasta")
 
     run_cmd.return_value = (
         "query2@subject2@80@90.0@1e-5\nquery1@subject1@95@95.0@1e-20\n"
@@ -45,8 +45,8 @@ def test_run_blastp_returns_sorted_hits(run_cmd, tmp_path):
 
 @patch("engines.blast.utils.run_cmd")
 def test_run_blastp_returns_empty_list(run_cmd, tmp_path):
-    query = Fasta(tmp_path / "query.fasta", FastaType.GENERIC)
-    db = Fasta(tmp_path / "db.fasta", FastaType.GENERIC)
+    query = Fasta(tmp_path / "query.fasta")
+    db = Fasta(tmp_path / "db.fasta")
 
     run_cmd.return_value = " "
 
@@ -54,7 +54,7 @@ def test_run_blastp_returns_empty_list(run_cmd, tmp_path):
 
 
 def test_search_requires_subject_fasta(tmp_path):
-    query = Fasta(tmp_path / "query.fasta", FastaType.GENERIC)
+    query = Fasta(tmp_path / "query.fasta")
 
     with pytest.raises(ValueError):
         blastp_search(query, "")

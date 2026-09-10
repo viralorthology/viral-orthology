@@ -39,7 +39,7 @@ def test_delete_associated_files_with_add_seqs(valid_ortholog_group):
         Seq(
             BioSeq("ATGC"),
             "seq10",
-            "seq10 genome10",
+            "seq10 genome10 [protein_id=123]",
         )
     )
 
@@ -116,7 +116,7 @@ def test_delete_one_seq_in_two_seqs_fasta_annotated_db(
     assert not context_always_yes.paths.predicted_prots_db.is_file()
     assert (
         context_always_yes.paths.annotated_prots_db.read_text(encoding="utf-8")
-        == ">seq2 genome2\nATCG\n"
+        == ">seq2 genome2 [protein_id=234]\nATCG\n"
     )
 
 
@@ -130,7 +130,7 @@ def test_delete_one_seq_in_two_seqs_fasta_predicted_db(
     assert not context_always_yes.paths.annotated_prots_db.is_file()
     assert (
         context_always_yes.paths.predicted_prots_db.read_text(encoding="utf-8")
-        == ">PREDICTED_10 genome2\nATCG\n"
+        == ">PREDICTED_10 genome2 [protein_id=234]\nATCG\n"
     )
 
 

@@ -2,7 +2,6 @@ import pytest
 from Bio.Seq import Seq as BioSeq
 
 from models.fasta import Fasta
-from models.fasta_type import FastaType
 from models.seq import Seq
 from utils import (
     ensure_files_exist,
@@ -23,14 +22,14 @@ def test_get_fastas_returns_files_with_matching_extension(tmp_path):
     fasta_2.touch()
     other_file.touch()
 
-    result = get_fastas(tmp_path, FastaType.GENERIC, ".fasta")
+    result = get_fastas(tmp_path, ".fasta")
 
     assert {f.path for f in result} == {fasta_1, fasta_2}
 
 
 def test_get_fastas_invalid_extension(tmp_path):
     with pytest.raises(ValueError):
-        get_fastas(tmp_path, FastaType.GENERIC, "fasta")
+        get_fastas(tmp_path, "fasta")
 
 
 def test_ensure_files_exist_existing_files(tmp_path):
@@ -116,7 +115,7 @@ def test_get_seqs_from_fasta_str_empty_string():
 
 
 def test_get_combined_fasta(tmp_path):
-    fasta_1 = Fasta(tmp_path / "a.fasta", FastaType.GENERIC)
+    fasta_1 = Fasta(tmp_path / "a.fasta")
     fasta_1.add_seqs(
         Seq(
             seq=BioSeq("ATGC"),
@@ -125,7 +124,7 @@ def test_get_combined_fasta(tmp_path):
         )
     )
 
-    fasta_2 = Fasta(tmp_path / "b.fasta", FastaType.GENERIC)
+    fasta_2 = Fasta(tmp_path / "b.fasta")
     fasta_2.add_seqs(
         Seq(
             seq=BioSeq("GGTA"),
@@ -139,7 +138,6 @@ def test_get_combined_fasta(tmp_path):
     result = get_combined_fasta(output_path, fasta_1, fasta_2)
 
     assert result.path == output_path
-    assert result.fasta_type == FastaType.GENERIC
     assert result.n_seqs == 2
 
     result_seqs = list(result.seqs)
@@ -162,7 +160,7 @@ def test_get_combined_fasta_existing_output(tmp_path):
     output_path = tmp_path / "combined.fasta"
     output_path.touch()
 
-    fasta = Fasta(tmp_path / "input.fasta", FastaType.GENERIC)
+    fasta = Fasta(tmp_path / "input.fasta")
 
     with pytest.raises(ValueError):
         get_combined_fasta(output_path, fasta)

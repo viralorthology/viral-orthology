@@ -89,7 +89,10 @@ def fasta_no_seqs(tmp_path):
 @pytest.fixture
 def protein_fasta(tmp_path):
     path = tmp_path / "protein_fasta.fasta"
-    path.write_text(">seq1 genome1\nATGC\n>seq2 genome2\nATCG\n", encoding="utf-8")
+    path.write_text(
+        ">seq1 genome1 [protein_id=123]\nATGC\n>seq2 genome2 [protein_id=234]\nATCG\n",
+        encoding="utf-8",
+    )
     return path
 
 
@@ -99,21 +102,27 @@ def protein_fasta(tmp_path):
 @pytest.fixture
 def fasta_two_prots_from_the_same_genome(tmp_path):
     path = tmp_path / "fasta_two_prots_from_the_same_genome.fasta"
-    path.write_text(">seq1 genome1\nATGC\n>seq2 genome1\nATCG\n", encoding="utf-8")
+    path.write_text(
+        ">seq1 genome1 [protein_id=123]\nATGC\n>seq2 genome1 [protein_id=234]\nATCG\n",
+        encoding="utf-8",
+    )
     return path
 
 
 @pytest.fixture
 def fasta_one_seq(tmp_path):
     path = tmp_path / "fasta_one_seq.fasta"
-    path.write_text(">seq1 genome1\nATGC\n", encoding="utf-8")
+    path.write_text(">seq1 genome1 [protein_id=123]\nATGC\n", encoding="utf-8")
     return path
 
 
 @pytest.fixture
 def valid_ortholog_group(tmp_path):
     path = tmp_path / "valid_ortholog_group.fasta"
-    path.write_text(">seq1 genome1\nATGC\n>seq2 genome2\nATCG\n", encoding="utf-8")
+    path.write_text(
+        ">seq1 genome1 [protein_id=123]\nATGC\n>seq2 genome2 [protein_id=234]\nATCG\n",
+        encoding="utf-8",
+    )
     return path
 
 
@@ -121,7 +130,7 @@ def valid_ortholog_group(tmp_path):
 def valid_ortholog_group_three_seqs(tmp_path):
     path = tmp_path / "valid_ortholog_group.fasta"
     path.write_text(
-        ">seq1 genome1\nATGC\n>seq2 genome2\nATCG\n>seq3 genome3\nATGG\n",
+        ">seq1 genome1 [protein_id=123]\nATGC\n>seq2 genome2 [protein_id=234]\nATCG\n>seq3 genome3 [protein_id=345]\nATGG\n",
         encoding="utf-8",
     )
     return path
@@ -131,6 +140,7 @@ def valid_ortholog_group_three_seqs(tmp_path):
 def valid_ortholog_group_with_predicted_seq(tmp_path):
     path = tmp_path / "valid_ortholog_group_with_predicted_seq.fasta"
     path.write_text(
-        ">seq1 genome1\nATGC\n>PREDICTED_10 genome2\nATCG\n", encoding="utf-8"
+        ">seq1 genome1 [protein_id=123]\nATGC\n>PREDICTED_10 genome2 [protein_id=234]\nATCG\n",
+        encoding="utf-8",
     )
     return path

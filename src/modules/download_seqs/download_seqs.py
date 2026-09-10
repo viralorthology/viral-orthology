@@ -6,7 +6,6 @@ import utils
 from cli.ui import UI
 from config.context import Context
 from models.fasta import Fasta
-from models.fasta_type import FastaType
 from models.seq import Seq
 
 
@@ -25,8 +24,8 @@ def run(ctx: Context) -> None:
     # download seqs
     ctx.ui.show("Downloading sequences from GenBank...")
 
-    genomes_fasta = Fasta(ctx.paths.genomes_fasta, FastaType.GENERIC)
-    proteomes_fasta = Fasta(ctx.paths.proteomes_fasta, FastaType.GENERIC)
+    genomes_fasta = Fasta(ctx.paths.genomes_fasta)
+    proteomes_fasta = Fasta(ctx.paths.proteomes_fasta)
 
     genome_ids_failed, _ = (
         _download_sequences(  # TODO predict proteins if no proteome could be downloaded
