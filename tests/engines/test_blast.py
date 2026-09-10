@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from engines.blast import BlastHit, blastp_search, make_blastp_db, run_blastp
+from engines.blast import BlastHit, blastp_search, make_blast_db, run_blastp
 from models.fasta import Fasta
 
 
@@ -24,7 +24,7 @@ def test_blast_result_rejects_invalid_result():
 @patch("engines.blast.utils.run_cmd")
 def test_make_blastp_db(run_cmd, fasta):
     fasta = Fasta(fasta)
-    make_blastp_db(fasta)
+    make_blast_db(fasta, "prot")
 
     run_cmd.assert_called_once_with(f"makeblastdb -dbtype prot -in {fasta.path}")
 
