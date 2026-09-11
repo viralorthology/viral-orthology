@@ -22,8 +22,10 @@ def test_blast_result_rejects_invalid_result():
 
 
 @patch("engines.blast.utils.run_cmd")
-def test_make_blastp_db(run_cmd, fasta):
-    fasta = Fasta(fasta)
+def test_make_blastp_db(run_cmd, tmp_path):
+    fasta_path = tmp_path / "fasta.fasta"
+    fasta_path.write_text(">seq1 description\nMKMMKMKMKMMMKMKMK\n")
+    fasta = Fasta(fasta_path)
     make_blast_db(fasta, "prot")
 
     run_cmd.assert_called_once_with(f"makeblastdb -dbtype prot -in {fasta.path}")

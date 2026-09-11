@@ -5,21 +5,39 @@ from models.ortholog_group import OrthologGroup
 from models.seq import Seq
 
 
-def test_empty_fasta(empty_fasta):
+@pytest.fixture
+def valid_ortholog_group(tmp_path):
+    path = tmp_path / "valid_ortholog_group.fasta"
+    path.write_text(
+        ">seq1 genome1 [protein_id=123]\nATGC\n>seq2 genome2 [protein_id=234]\nATCG\n",
+        encoding="utf-8",
+    )
+    return path
+
+
+def test_empty_fasta(tmp_path):
+    fasta_path = tmp_path / "fasta.fasta"
+    fasta_path.touch()
     with pytest.raises(ValueError):
-        _ = OrthologGroup(empty_fasta)
+        _ = OrthologGroup(fasta_path)
 
 
-def test_fasta_two_proteins_of_the_same_genome(
-    fasta_two_prots_from_the_same_genome,
-):
+def test_fasta_two_proteins_of_the_same_genome(tmp_path):
+    path = tmp_path / "fasta_two_prots_from_the_same_genome.fasta"
+    path.write_text(
+        ">seq1 genome1 [protein_id=123]\nATGC\n>seq2 genome1 [protein_id=234]\nATCG\n",
+        encoding="utf-8",
+    )
     with pytest.raises(ValueError):
-        _ = OrthologGroup(fasta_two_prots_from_the_same_genome)
+        _ = OrthologGroup(path)
 
 
-def test_fasta_one_seq(fasta_one_seq):
+def test_fasta_one_seq(tmp_path):
+    path = tmp_path / "fasta_one_seq.fasta"
+    path.write_text(">seq1 genome1 [protein_id=123]\nATGC\n", encoding="utf-8")
+
     with pytest.raises(ValueError):
-        _ = OrthologGroup(fasta_one_seq)
+        _ = OrthologGroup(path)
 
 
 def test_delete_associated_files_with_add_seqs(valid_ortholog_group):
@@ -120,10 +138,14 @@ def test_delete_one_seq_in_two_seqs_fasta_annotated_db(
     )
 
 
-def test_delete_one_seq_in_two_seqs_fasta_predicted_db(
-    valid_ortholog_group_with_predicted_seq, context_always_yes
-):
-    og = OrthologGroup(valid_ortholog_group_with_predicted_seq)
+def test_delete_one_seq_in_two_seqs_fasta_predicted_db(tmp_path, context_always_yes):
+    path = tmp_path / "valid_ortholog_group_with_predicted_seq.fasta"
+    path.write_text(
+        ">seq1 genome1 [protein_id=123]\nATGC\n>PREDICTED_10 genome2 [protein_id=234]\nATCG\n",
+        encoding="utf-8",
+    )
+
+    og = OrthologGroup(path)
     og.remove_seqs("seq1", ctx=context_always_yes)
 
     assert not og.path.is_file()
@@ -134,8 +156,13 @@ def test_delete_one_seq_in_two_seqs_fasta_predicted_db(
     )
 
 
-def test_delete_one_seq(valid_ortholog_group_three_seqs, context_always_yes):
-    og = OrthologGroup(valid_ortholog_group_three_seqs)
+def test_delete_one_seq(tmp_path, context_always_yes):
+    path = tmp_path / "valid_ortholog_group.fasta"
+    path.write_text(
+        ">seq1 genome1 [protein_id=123]\nATGC\n>seq2 genome2 [protein_id=234]\nATCG\n>seq3 genome3 [protein_id=345]\nATGG\n",
+        encoding="utf-8",
+    )
+    og = OrthologGroup(path)
     og.remove_seqs("seq1", ctx=context_always_yes)
 
     assert og.path.is_file()
