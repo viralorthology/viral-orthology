@@ -23,18 +23,7 @@ class Seq:
 
 
 def get_seq_from_seqrecord(seqrecord: SeqRecord, seq_id: str) -> Seq:
-    """
-    Convert a Biopython SeqRecord into a Seq model.
-
-    Args:
-        seqrecord: The Biopython record containing the sequence and metadata.
-        fasta_path: Path to the FASTA file, used to provide context in error
-            messages.
-
-    Raises:
-        ValueError: If the sequence is empty, the record ID is missing, or
-            the protein sequence description is malformed.
-    """
+    """Convert a Biopython SeqRecord into a Seq model."""
 
     seq = Seq(
         seq=BioSeq(seqrecord.seq),
