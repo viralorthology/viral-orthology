@@ -36,13 +36,17 @@ class Fasta:
 
         ids = set()
         for seq in SeqIO.parse(self.path, "fasta"):
+            if not seq.seq:
+                raise ValueError(f"{self.path} contains an empty sequence")
+            if not seq.id:
+                raise ValueError(f"{self.path} contains a malformed FASTA record")
             if seq.id in ids:
                 raise ValueError(
                     f"{self.path} contains duplicate sequence ID: {seq.id}"
                 )
 
             ids.add(seq.id)
-            yield get_seq_from_seqrecord(seq, self.path)
+            yield get_seq_from_seqrecord(seq, seq.id)
 
     @property
     def n_seqs(self) -> int:

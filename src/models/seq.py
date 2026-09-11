@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from Bio.Seq import Seq as BioSeq
 from Bio.SeqRecord import SeqRecord
 
@@ -24,7 +22,7 @@ class Seq:
         self.is_predicted = self.id.startswith(PREDICTED_PROTEINS_PREFIX)
 
 
-def get_seq_from_seqrecord(seqrecord: SeqRecord, fasta_path: Path) -> Seq:
+def get_seq_from_seqrecord(seqrecord: SeqRecord, seq_id: str) -> Seq:
     """
     Convert a Biopython SeqRecord into a Seq model.
 
@@ -37,18 +35,14 @@ def get_seq_from_seqrecord(seqrecord: SeqRecord, fasta_path: Path) -> Seq:
         ValueError: If the sequence is empty, the record ID is missing, or
             the protein sequence description is malformed.
     """
-    if not seqrecord.seq:
-        raise ValueError(f"{fasta_path} contains and empty sequence")
-    if not seqrecord.id:
-        raise ValueError(f"{fasta_path} contains a malformed FASTA record")
 
     seq = Seq(
         seq=BioSeq(seqrecord.seq),
-        seq_id=seqrecord.id,
+        seq_id=seq_id,
         seq_description=seqrecord.description,
     )
 
-    if "[protein_id=" in seq.description:
+    if is_protein_seq(seq):
         seq.genome_id = seq.description.split()[1]
 
     return seq
@@ -60,3 +54,7 @@ def get_seqrecord_from_seq(seq: Seq) -> SeqRecord:
         id=seq.id,
         description=seq.description,
     )
+
+
+def is_protein_seq(seq: Seq) -> bool:
+    return "[protein_id=" in seq.description
