@@ -4,7 +4,12 @@ from pathlib import Path
 
 from Bio import SeqIO
 
-from models.seq import Seq, get_seq_from_seqrecord, get_seqrecord_from_seq
+from models.seq import (
+    Seq,
+    get_seq_from_seqrecord,
+    get_seqrecord_from_seq,
+    is_protein_seq,
+)
 
 
 class Fasta:
@@ -19,6 +24,7 @@ class Fasta:
 
     def __init__(self, path: Path):
         self.path = path
+        self._validate_fasta()
 
     @property
     def seqs(self) -> Iterator[Seq]:
@@ -34,18 +40,7 @@ class Fasta:
         if self.path.stat().st_size == 0:
             raise ValueError(f"{self.path} is empty")
 
-        ids = set()
         for seq in SeqIO.parse(self.path, "fasta"):
-            if not seq.seq:
-                raise ValueError(f"{self.path} contains an empty sequence")
-            if not seq.id:
-                raise ValueError(f"{self.path} contains a malformed FASTA record")
-            if seq.id in ids:
-                raise ValueError(
-                    f"{self.path} contains duplicate sequence ID: {seq.id}"
-                )
-
-            ids.add(seq.id)
             yield get_seq_from_seqrecord(seq, seq.id)
 
     @property
@@ -108,6 +103,8 @@ class Fasta:
 
         with self.path.open("a", encoding="utf-8") as fh:
             SeqIO.write(seq_records, fh, "fasta")
+
+        self._validate_fasta()
 
     def remove_seqs(self, *ids: str) -> None:
         """
@@ -186,3 +183,26 @@ class Fasta:
             FileNotFoundError: if the file does not exist
         """
         self.path.unlink()
+
+    def _validate_fasta(self) -> None:
+        """Validate the FASTA file and its sequence records."""
+        if not self.path.exists() or self.path.stat().st_size == 0:
+            return
+
+        ids = set()
+        seq_types = set()
+        for seqrecord in SeqIO.parse(self.path, "fasta"):
+            if len(seqrecord.seq) == 0:
+                raise ValueError(f"{self.path} contains an empty sequence")
+            if not seqrecord.id:
+                raise ValueError(f"{self.path} contains a malformed FASTA record")
+            if seqrecord.id in ids:
+                raise ValueError(
+                    f"{self.path} contains duplicate sequence ID: {seqrecord.id}"
+                )
+
+            ids.add(seqrecord.id)
+            seq_types.add(is_protein_seq(seqrecord.description))
+
+        if len(seq_types) > 1:
+            raise ValueError(f"{self.path} is not a valid FASTA")

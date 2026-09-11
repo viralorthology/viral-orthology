@@ -25,9 +25,8 @@ def test_fasta(fasta):
 
 
 def test_fasta_duplicate_id(fasta_duplicate_id):
-    fasta = Fasta(fasta_duplicate_id)
     with pytest.raises(ValueError):
-        _ = list(fasta.seqs)
+        _ = Fasta(fasta_duplicate_id)
 
 
 def test_read_nonexistent_fasta(nonexistent_fasta):
@@ -43,15 +42,13 @@ def test_read_empty_fasta(empty_fasta):
 
 
 def test_fasta_no_id(fasta_no_id):
-    fasta = Fasta(fasta_no_id)
     with pytest.raises(ValueError):
-        _ = list(fasta.seqs)
+        _ = Fasta(fasta_no_id)
 
 
 def test_fasta_no_seq(fasta_no_seqs):
-    fasta = Fasta(fasta_no_seqs)
     with pytest.raises(ValueError):
-        _ = list(fasta.seqs)
+        _ = Fasta(fasta_no_seqs)
 
 
 # Fasta.genome_ids
