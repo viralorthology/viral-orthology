@@ -42,7 +42,7 @@ def get_seq_from_seqrecord(seqrecord: SeqRecord, seq_id: str) -> Seq:
         seq_description=seqrecord.description,
     )
 
-    if is_protein_seq(seq):
+    if is_protein_seq(seq.description):
         seq.genome_id = seq.description.split()[1]
 
     return seq
@@ -56,5 +56,5 @@ def get_seqrecord_from_seq(seq: Seq) -> SeqRecord:
     )
 
 
-def is_protein_seq(seq: Seq) -> bool:
-    return "[protein_id=" in seq.description
+def is_protein_seq(seq_description: str) -> bool:
+    return "[protein_id=" in seq_description
