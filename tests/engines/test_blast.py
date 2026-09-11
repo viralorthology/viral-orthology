@@ -1,8 +1,8 @@
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
-from engines.blast import BlastHit, blastp_search, make_blast_db, run_blastp
+from engines.blast import BlastDB, BlastHit, blastp_search, make_blast_db
 from models.fasta import Fasta
 
 
@@ -32,13 +32,14 @@ def test_make_blastp_db(run_cmd, fasta):
 @patch("engines.blast.utils.run_cmd")
 def test_run_blastp_returns_sorted_hits(run_cmd, tmp_path):
     query = Fasta(tmp_path / "query.fasta")
-    db = Fasta(tmp_path / "db.fasta")
+    blast_db = MagicMock()
+    blast_db.path = tmp_path / "blast_db"
 
     run_cmd.return_value = (
         "query2@subject2@80@90.0@1e-5\nquery1@subject1@95@95.0@1e-20\n"
     )
 
-    hits = run_blastp(query, db, "-evalue 1e-5")
+    hits = blastp_search(query, blast_db, "-evalue 1e-5")
 
     assert [hit.query_id for hit in hits] == ["query1", "query2"]
 
@@ -46,15 +47,31 @@ def test_run_blastp_returns_sorted_hits(run_cmd, tmp_path):
 @patch("engines.blast.utils.run_cmd")
 def test_run_blastp_returns_empty_list(run_cmd, tmp_path):
     query = Fasta(tmp_path / "query.fasta")
-    db = Fasta(tmp_path / "db.fasta")
+    blast_db = MagicMock()
+    blast_db.path = tmp_path / "blast_db"
 
     run_cmd.return_value = " "
 
-    assert run_blastp(query, db, "") == []
+    assert blastp_search(query, blast_db, "") == []
 
 
-def test_search_requires_subject_fasta(tmp_path):
-    query = Fasta(tmp_path / "query.fasta")
+@patch("engines.blast.make_blast_db")
+def test_blast_db_creates_database(make_blast_db, tmp_path):
+    fasta = Fasta(tmp_path / "db.fasta")
+    fasta.path.touch()
 
-    with pytest.raises(ValueError):
-        blastp_search(query, "")
+    with BlastDB("prot", fasta) as blast_db:
+        assert blast_db.path.exists()
+        make_blast_db.assert_called_once()
+
+
+@patch("engines.blast.make_blast_db")
+def test_blast_db_cleans_up_after_context(make_blast_db, tmp_path):
+    fasta = Fasta(tmp_path / "db.fasta")
+    fasta.path.touch()
+
+    with BlastDB("prot", fasta) as blast_db:
+        db_path = blast_db.path
+        assert db_path.exists()
+
+    assert not db_path.exists()

@@ -21,9 +21,10 @@ def find_paralogs(ctx: Context) -> None:
     proteomes = utils.get_fastas(ctx.paths.sequences_dir, ".proteome")
 
     for proteome in ctx.ui.progress_bar(proteomes):
-        blastp_hits = engines.blastp_search(
-            proteome, ctx.args.tool_args["blastp_paralog_search"], proteome
-        )
+        with engines.BlastDB("prot", proteome) as db:
+            blastp_hits = engines.blastp_search(
+                proteome, db, ctx.args.tool_args["blastp_paralog_search"]
+            )
 
         # find reciprocal hits
         reciprocal_hits = _find_reciprocal_hits(blastp_hits)

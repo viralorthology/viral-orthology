@@ -1,9 +1,61 @@
 import multiprocessing
+import shutil
 import tempfile
 from pathlib import Path
+from types import TracebackType
+from typing import Literal
+
+from typing_extensions import Self
 
 import utils
 from models.fasta import Fasta
+
+
+class BlastDB:
+    """
+    Context manager for creating a temporary BLAST database.
+
+    If a single subject FASTA is provided, it is copied directly to the
+    temporary directory. If multiple subject FASTAs are provided, they
+    are combined into a single FASTA file. The BLAST database is created
+    from the resulting FASTA file and is automatically removed when
+    leaving the context manager.
+
+    Args:
+        db_type: BLAST database type, e.g. "prot" or "nucl".
+        *subject_fastas: One or more FASTA objects to use as BLAST
+            database subjects.
+
+    Example:
+        with BlastDB("prot", fasta1, fasta2) as blast_db:
+            run_blast(query, blast_db)
+    """
+
+    def __init__(self, db_type: str, *subject_fastas: Fasta):
+        self.db_type = db_type
+        self.subject_fastas = subject_fastas
+        self.tmp_dir = tempfile.TemporaryDirectory()
+        self.path = Path(self.tmp_dir.name) / "blast_db.fasta"
+
+    def __enter__(self) -> Self:
+        if len(self.subject_fastas) == 1:
+            shutil.copy(self.subject_fastas[0].path, self.path)
+        else:
+            utils.get_combined_fasta(self.path, *self.subject_fastas)
+
+        db_fasta = Fasta(self.path)
+        make_blast_db(db_fasta, self.db_type)
+
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> Literal[False]:
+        self.tmp_dir.cleanup()
+        return False
 
 
 class BlastHit:
@@ -19,42 +71,6 @@ class BlastHit:
         self.evalue = float(results_split[4])
 
 
-def blastp_search(
-    query_fasta: Fasta, params: str, *subject_fastas: Fasta
-) -> list[BlastHit]:
-    """
-    Search query proteins against one or more subject FASTA files and
-    get the hits sorted by evalue.
-
-    The subject FASTA files are combined into a temporary protein BLAST
-    database. The database and all associated files are automatically
-    removed after the search completes.
-
-    Args:
-        query_fasta: FASTA file containing the query protein sequences.
-        params: Additional command-line parameters to pass to BLASTP.
-        *subject_fastas: FASTA files containing the subject protein sequences.
-
-    Raises:
-        ValueError: If no subject FASTA files are provided.
-    """
-
-    if not subject_fastas:
-        raise ValueError("At least one subject fasta must be provided")
-
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        tmp_dir_path = Path(tmp_dir)
-
-        blastp_db_fasta = utils.get_combined_fasta(
-            tmp_dir_path / "blastp_db.fasta", *subject_fastas
-        )
-        make_blast_db(blastp_db_fasta, "prot")
-
-        blastp_hits = run_blastp(query_fasta, blastp_db_fasta, params)
-
-        return blastp_hits
-
-
 def make_blast_db(fasta: Fasta, db_type: str) -> None:
     """
     Create a BLAST database from a FASTA file.
@@ -66,19 +82,24 @@ def make_blast_db(fasta: Fasta, db_type: str) -> None:
     utils.run_cmd(f"makeblastdb -dbtype {db_type} -in {fasta.path}")
 
 
-def run_blastp(query_fasta: Fasta, db_fasta: Fasta, params: str) -> list[BlastHit]:
+def blastp_search(query_fasta: Fasta, blast_db: BlastDB, params: str) -> list[BlastHit]:
     """
-    Run BLASTP against a protein database and return the hits sorted by evalue.
+    Run BLASTP against a protein database and return the hits sorted by
+    E-value in ascending order (from best to worst).
 
     Args:
         query_fasta: FASTA file containing the query protein sequences.
-        db_fasta: FASTA file containing the protein BLAST database.
+        blast_db: BLAST database to search against.
         params: Additional command-line parameters to pass to BLASTP.
+
+    Returns:
+        A list of BLAST hits sorted by E-value. Returns an empty list if
+        BLAST produces no output.
     """
     num_threads = max(1, multiprocessing.cpu_count() - 1)
 
     output = utils.run_cmd(
-        f"blastp -query {query_fasta.path} -db {db_fasta.path} {params} -max_hsps 1 -num_threads {num_threads} -outfmt '6 delim=@ qseqid sseqid qcovs pident evalue'"
+        f"blastp -query {query_fasta.path} -db {blast_db.path} {params} -max_hsps 1 -num_threads {num_threads} -outfmt '6 delim=@ qseqid sseqid qcovs pident evalue'"
     )
 
     if not output.strip():
