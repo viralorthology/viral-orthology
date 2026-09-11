@@ -14,7 +14,7 @@ class OrthologGroup(Fasta):
 
     def __init__(self, path: Path):
         super().__init__(path)
-        self._validate()
+        self._validate_ortholog_group()
 
     @property
     def alignment_path(self) -> Path:
@@ -45,7 +45,7 @@ class OrthologGroup(Fasta):
         """Add sequences to the ortholog group and revalidate it."""
         super().add_seqs(*seqs)
         self._delete_associated_files()
-        self._validate()
+        self._validate_ortholog_group()
 
     def remove_seqs(self, *ids: str, ctx: Context | None = None) -> None:
         """
@@ -78,7 +78,7 @@ class OrthologGroup(Fasta):
         else:
             super().remove_seqs(*ids)
             if self.path.exists():
-                self._validate()
+                self._validate_ortholog_group()
 
     def delete_fasta(self) -> None:
         """Delete the ortholog group FASTA file and its associated files."""
@@ -90,7 +90,7 @@ class OrthologGroup(Fasta):
         self._delete_associated_files()  # associated files depend upon self.path, so delete them before renaming the file
         super().rename_fasta(new_filename)
 
-    def _validate(self) -> None:
+    def _validate_ortholog_group(self) -> None:
         """
         Check if the ortholog group is valid.
 
