@@ -65,7 +65,6 @@ class Fasta:
         Raises:
             AttributeError: If called on a non-protein FASTA.
         """
-        # TODO check if all sequences are protein sequences
         return [seq.genome_id for seq in self.seqs]
 
     def get_seqs(self, *ids: str) -> list[Seq]:
