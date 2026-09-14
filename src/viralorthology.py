@@ -5,6 +5,7 @@ from cli.args import get_args
 from cli.ui import CLI, UI
 from config.context import Context
 from config.paths import Paths
+from config.runtime import Runtime
 from modules import download_seqs, pipeline
 
 
@@ -46,7 +47,7 @@ def main() -> None:
 
     try:
         args = get_args(selected_module_flag, sys.argv[1:])
-        ctx = Context(args, paths, ui)
+        ctx = Context(args, paths, ui, Runtime())
         module.run(ctx)
 
     except Exception as e:

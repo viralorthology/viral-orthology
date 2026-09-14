@@ -6,6 +6,7 @@ from cli.args import Args
 from cli.ui import UI
 from config.context import Context
 from config.paths import Paths
+from config.runtime import Runtime
 
 
 @pytest.fixture
@@ -32,4 +33,5 @@ def context_always_yes(tmp_path, ui_always_yes):
         Args(debug=False, assume_yes=False, tool_args={}),
         Paths(tmp_path),
         ui_always_yes,
+        Runtime(),
     )
