@@ -19,7 +19,9 @@ class UI(ABC):
         ...
 
     @abstractmethod
-    def progress_bar[T](self, iterable: Iterable[T]) -> Iterable[T]:
+    def progress_bar[T](
+        self, iterable: Iterable[T], total: int | None = None
+    ) -> Iterable[T]:
         """Provide progress feedback while iterating."""
         ...
 
@@ -37,7 +39,11 @@ class CLI(UI):
         """Print an error message to stderr."""
         print(f"ERROR: {text}", file=sys.stderr)
 
-    def progress_bar[T](self, iterable: Iterable[T]) -> Iterable[T]:
+    def progress_bar[T](
+        self, iterable: Iterable[T], total: int | None = None
+    ) -> Iterable[T]:
+        if total is not None:
+            return tqdm(iterable, total=total)  # type: ignore[no-any-return]
         return tqdm(iterable)  # type: ignore[no-any-return]
 
     def ask_yes_no(self, question: str) -> bool:
