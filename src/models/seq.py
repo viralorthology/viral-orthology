@@ -40,11 +40,16 @@ class Seq:
             self.is_predicted = self.id.startswith(PREDICTED_PROTEINS_PREFIX)
 
 
-def get_seq_from_seqrecord(seqrecord: SeqRecord, seq_id: str) -> Seq:
+def get_seq_from_seqrecord(seqrecord: SeqRecord) -> Seq:
     """Convert a Biopython SeqRecord into a Seq model."""
+    if not seqrecord.seq:
+        raise ValueError("Empty sequence found.")
+    if not seqrecord.id:
+        raise ValueError("Malformed record found.")
+
     return Seq(
         seq=BioSeq(seqrecord.seq),
-        seq_id=seq_id,
+        seq_id=seqrecord.id,
         seq_description=seqrecord.description,
     )
 

@@ -32,7 +32,7 @@ class Fasta:
 
         Raises:
             FileNotFoundError: if the file does not exist
-            ValueError: if the file is empty, or if it contains a malformed record or duplicate ID
+            ValueError: if the file is empty
         """
         if not self.path.is_file():
             raise FileNotFoundError(f"{self.path} does not exist")
@@ -40,7 +40,7 @@ class Fasta:
             raise ValueError(f"{self.path} is empty")
 
         for seq in SeqIO.parse(self.path, "fasta"):
-            yield get_seq_from_seqrecord(seq, seq.id)
+            yield get_seq_from_seqrecord(seq)
 
     @property
     def n_seqs(self) -> int:
@@ -183,23 +183,28 @@ class Fasta:
         self.path.unlink()
 
     def _validate_fasta(self) -> None:
-        """Validate the FASTA file and its sequence records."""
+        """
+        Validate the FASTA file and its sequence records.
+
+        Raises:
+            ValueError: if the file contains a malformed record, an empty sequence, or a duplicate ID
+        """
         if not self.path.exists() or self.path.stat().st_size == 0:
             return
 
         ids = set()
         seq_types = set()
         for seqrecord in SeqIO.parse(self.path, "fasta"):
-            if len(seqrecord.seq) == 0:
-                raise ValueError(f"{self.path} contains an empty sequence")
-            if not seqrecord.id:
-                raise ValueError(f"{self.path} contains a malformed FASTA record")
-            if seqrecord.id in ids:
+            try:
+                seq = get_seq_from_seqrecord(seqrecord)
+            except ValueError as e:
+                raise ValueError(f"An error occurred while reading {self.path}: {e}")
+
+            if seq.id in ids:
                 raise ValueError(
                     f"{self.path} contains duplicate sequence ID: {seqrecord.id}"
                 )
 
-            seq = get_seq_from_seqrecord(seqrecord, seqrecord.id)
             ids.add(seq.id)
             seq_types.add(seq.seq_type)
 
