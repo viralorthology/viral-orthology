@@ -29,6 +29,7 @@ def find_redundant_genomes(ctx: Context) -> None:
         n_genomes_for_first_round >= 2 and redundant_genomes
     ):
         # move redundant genomes and proteomes
+        ctx.runtime.redundant_genomes = True  # TODO use runtime.active_genomes
         ctx.paths.redundant_seqs_dir.mkdir()
         for genome_fasta in redundant_genomes:
             proteome_fasta = Fasta(

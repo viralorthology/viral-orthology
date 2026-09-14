@@ -9,7 +9,7 @@ def predict_proteomes(ctx: Context) -> None:
     ctx.ui.show("Predicting proteomes...")
 
     genome_fastas = utils.get_fastas(ctx.paths.sequences_dir, ".genome")
-    n_predicted_proteins = 0
+    n_predicted_proteins = ctx.runtime.predicted_proteins_count
     for genome_fasta in ctx.ui.progress_bar(genome_fastas):
         genome_id = genome_fasta.ids[0]
         proteome_fasta = Fasta(ctx.paths.sequences_dir / f"{genome_id}.proteome")
@@ -21,4 +21,4 @@ def predict_proteomes(ctx: Context) -> None:
         )
         predicted_fasta = Fasta(ctx.paths.sequences_dir / f"{genome_id}.predicted")
         predicted_fasta.add_seqs(*predicted_proteins)
-        n_predicted_proteins += len(predicted_proteins)
+        ctx.runtime.predicted_proteins_count += len(predicted_proteins)
