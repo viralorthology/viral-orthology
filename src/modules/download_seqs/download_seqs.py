@@ -27,16 +27,17 @@ def run(ctx: Context) -> None:
     genomes_fasta = Fasta(ctx.paths.genomes_fasta)
     proteomes_fasta = Fasta(ctx.paths.proteomes_fasta)
 
-    genome_ids_failed, _ = (
-        _download_sequences(  # TODO predict proteins if no proteome could be downloaded
-            ctx.ui, genome_ids_to_download, genomes_fasta, proteomes_fasta
-        )
+    genome_ids_failed, genomes_without_annotated_proteome = _download_sequences(
+        ctx.ui, genome_ids_to_download, genomes_fasta, proteomes_fasta
     )
 
     for genome_id in genome_ids_failed:
         ctx.ui.show_error(f"{genome_id} could not be downloaded")
     if len(genome_ids_failed) == len(genome_ids_to_download):
         raise ValueError("No genome could be downloaded")
+    if genomes_without_annotated_proteome:
+        for genome_id in genomes_without_annotated_proteome:
+            ctx.ui.show_error(f"{genome_id} does not have an annotated proteome")
 
     # format protein sequence descriptions
     all_protein_seqs = []

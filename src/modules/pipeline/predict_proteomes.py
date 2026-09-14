@@ -9,7 +9,7 @@ def predict_proteomes(ctx: Context) -> None:
     ctx.ui.show("Predicting proteomes...")
 
     genome_fastas = utils.get_fastas(ctx.paths.sequences_dir, ".genome")
-    n_predicted_proteins = 0  # TODO if -download_seqs predicts proteome, change this
+    n_predicted_proteins = 0
     for genome_fasta in ctx.ui.progress_bar(genome_fastas):
         genome_id = genome_fasta.ids[0]
         proteome_fasta = Fasta(ctx.paths.sequences_dir / f"{genome_id}.proteome")
