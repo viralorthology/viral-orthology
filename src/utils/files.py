@@ -4,7 +4,7 @@ from pathlib import Path
 from Bio import SeqIO
 
 from models.fasta import Fasta
-from models.seq import Seq
+from models.seq import Seq, get_seq_from_seqrecord
 
 
 def get_fastas(dir_path: Path, file_extension: str) -> list[Fasta]:
@@ -100,11 +100,7 @@ def get_seqs_from_fasta_str(
         raise ValueError("fasta_str cannot be empty")
 
     return [
-        Seq(
-            seq=record.seq,
-            seq_id=record.id,
-            seq_description=record.description,
-        )
+        get_seq_from_seqrecord(record)
         for record in SeqIO.parse(StringIO(fasta_str), "fasta")
     ]
 
