@@ -26,8 +26,8 @@ def run(ctx: Context) -> None:
         ctx.paths.predicted_prots_db,
         ctx.paths.ortholog_groups_dir,
         ctx.paths.sequences_dir,
-        ctx.paths.redundant_seqs_dir,
         ctx.paths.paralogs_dir,
+        ctx.paths.redundant_proteomes_fasta,
     )
 
     genome_ids = Fasta(ctx.paths.genomes_fasta).ids

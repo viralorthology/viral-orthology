@@ -12,10 +12,8 @@ def find_redundant_genomes(ctx: Context) -> None:
     """
     Identify and remove redundant genomes from the first analysis round.
 
-    Genomes that are sufficiently similar to another genome are identified
-    and moved, along with their associated proteome files, to the redundant
-    sequences directory. Redundant genomes are only removed if at least two
-    genomes remain for the first analysis round.
+    Redundant genomes are only removed if at least two genomes remain for
+    the first analysis round.
     """
     ctx.ui.show("Searching for redundant genomes...")
 
@@ -28,9 +26,9 @@ def find_redundant_genomes(ctx: Context) -> None:
     if (  # the pipeline needs at least 2 genomes on first round, else dont filter
         n_genomes_for_first_round >= 2 and redundant_genomes
     ):
-        # move redundant genomes and proteomes
+        # copy proteomes to redundant proteomes fasta
         ctx.runtime.redundant_genomes = True  # TODO use runtime.active_genomes
-        ctx.paths.redundant_seqs_dir.mkdir()
+        redundant_fasta = Fasta(ctx.paths.redundant_proteomes_fasta)
         for genome_fasta in redundant_genomes:
             proteome_fasta = Fasta(
                 ctx.paths.sequences_dir / f"{genome_fasta.path.stem}.proteome"
@@ -38,9 +36,9 @@ def find_redundant_genomes(ctx: Context) -> None:
             predicted_proteome_fasta = Fasta(
                 ctx.paths.sequences_dir / f"{genome_fasta.path.stem}.predicted"
             )
-            genome_fasta.move_fasta(ctx.paths.redundant_seqs_dir)
-            proteome_fasta.move_fasta(ctx.paths.redundant_seqs_dir)
-            predicted_proteome_fasta.move_fasta(ctx.paths.redundant_seqs_dir)
+            redundant_fasta.add_seqs(
+                *proteome_fasta.seqs, *predicted_proteome_fasta.seqs
+            )
 
 
 def _get_redundant_genomes(ctx: Context, genome_fastas: list[Fasta]) -> list[Fasta]:
