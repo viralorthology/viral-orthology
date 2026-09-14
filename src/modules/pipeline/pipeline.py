@@ -44,12 +44,6 @@ def run(ctx: Context) -> None:
             f"There are proteomes without their corresponding genome sequence: {proteomes_without_genome}"
         )
 
-    genomes_without_proteome = set(genome_ids) - set(genome_ids_from_proteomes)
-    if genomes_without_proteome:
-        raise ValueError(
-            f"There are genomes without their corresponding proteome: {genomes_without_proteome}"
-        )
-
     ### RUN ###
     _preparation_stage(ctx)
 
