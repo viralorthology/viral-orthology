@@ -1,7 +1,14 @@
+from enum import Enum, auto
+
 from Bio.Seq import Seq as BioSeq
 from Bio.SeqRecord import SeqRecord
 
 from models.constants import PREDICTED_PROTEINS_PREFIX
+
+
+class SeqType(Enum):
+    GENERIC = auto()
+    PROTEIN = auto()
 
 
 class Seq:
@@ -19,22 +26,27 @@ class Seq:
         self.seq = seq
         self.id = seq_id
         self.description = seq_description
-        self.is_predicted = self.id.startswith(PREDICTED_PROTEINS_PREFIX)
+        self.seq_type = self._get_seq_type()
+        self._add_metadata()
+
+    def _get_seq_type(self) -> SeqType:
+        if "[protein_id=" in self.description:
+            return SeqType.PROTEIN
+        return SeqType.GENERIC
+
+    def _add_metadata(self) -> None:
+        if self.seq_type == SeqType.PROTEIN:
+            self.genome_id = self.description.split()[1]
+            self.is_predicted = self.id.startswith(PREDICTED_PROTEINS_PREFIX)
 
 
 def get_seq_from_seqrecord(seqrecord: SeqRecord, seq_id: str) -> Seq:
     """Convert a Biopython SeqRecord into a Seq model."""
-
-    seq = Seq(
+    return Seq(
         seq=BioSeq(seqrecord.seq),
         seq_id=seq_id,
         seq_description=seqrecord.description,
     )
-
-    if is_protein_seq(seq.description):
-        seq.genome_id = seq.description.split()[1]
-
-    return seq
 
 
 def get_seqrecord_from_seq(seq: Seq) -> SeqRecord:
@@ -43,7 +55,3 @@ def get_seqrecord_from_seq(seq: Seq) -> SeqRecord:
         id=seq.id,
         description=seq.description,
     )
-
-
-def is_protein_seq(seq_description: str) -> bool:
-    return "[protein_id=" in seq_description

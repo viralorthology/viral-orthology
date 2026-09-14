@@ -8,7 +8,6 @@ from models.seq import (
     Seq,
     get_seq_from_seqrecord,
     get_seqrecord_from_seq,
-    is_protein_seq,
 )
 
 
@@ -200,8 +199,9 @@ class Fasta:
                     f"{self.path} contains duplicate sequence ID: {seqrecord.id}"
                 )
 
-            ids.add(seqrecord.id)
-            seq_types.add(is_protein_seq(seqrecord.description))
+            seq = get_seq_from_seqrecord(seqrecord, seqrecord.id)
+            ids.add(seq.id)
+            seq_types.add(seq.seq_type)
 
         if len(seq_types) > 1:
             raise ValueError(f"{self.path} is not a valid FASTA")
