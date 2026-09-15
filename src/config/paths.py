@@ -14,8 +14,10 @@ class Paths:
 
     annotated_prots_db: Path = field(init=False)
     predicted_prots_db: Path = field(init=False)
+
     genomes_fasta: Path = field(init=False)
     proteomes_fasta: Path = field(init=False)
+    predicted_proteomes_fasta: Path = field(init=False)
     redundant_proteomes_fasta: Path = field(init=False)
     ids_txt: Path = field(init=False)
 
@@ -38,6 +40,9 @@ class Paths:
         )
         object.__setattr__(self, "genomes_fasta", base / "genomes.fasta")
         object.__setattr__(self, "proteomes_fasta", base / "proteomes.fasta")
+        object.__setattr__(
+            self, "predicted_proteomes_fasta", base / "predicted_proteomes.fasta"
+        )
         object.__setattr__(
             self, "redundant_proteomes_fasta", base / "redundant_proteomes.fasta"
         )
