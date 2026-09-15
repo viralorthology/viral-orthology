@@ -3,6 +3,7 @@ from config.context import Context
 from models.fasta import Fasta
 from modules.pipeline.find_paralogs import find_paralogs
 from modules.pipeline.find_redundant_genomes import find_redundant_genomes
+from modules.pipeline.make_initial_ortholog_groups import make_initial_ortholog_groups
 from modules.pipeline.predict_proteomes import predict_proteomes
 from modules.pipeline.split_fastas import split_fastas
 
@@ -28,6 +29,7 @@ def run(ctx: Context) -> None:
         ctx.paths.sequences_dir,
         ctx.paths.paralogs_dir,
         ctx.paths.redundant_proteomes_fasta,
+        ctx.paths.predicted_proteomes_fasta,
     )
 
     genome_ids = Fasta(ctx.paths.genomes_fasta).ids
@@ -46,6 +48,7 @@ def run(ctx: Context) -> None:
 
     ### RUN ###
     _preparation_stage(ctx)
+    _initial_stage(ctx)
 
     ### MAKE REPORTS ###
 
@@ -55,3 +58,7 @@ def _preparation_stage(ctx: Context) -> None:
     predict_proteomes(ctx)
     find_paralogs(ctx)
     find_redundant_genomes(ctx)
+
+
+def _initial_stage(ctx: Context) -> None:
+    make_initial_ortholog_groups(ctx)
