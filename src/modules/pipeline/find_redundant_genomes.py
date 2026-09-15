@@ -1,8 +1,6 @@
-import shutil
 import tempfile
 from pathlib import Path
 
-import utils
 from config.context import Context
 from engines.blast import make_blast_db, run_blastn
 from models.fasta import Fasta
@@ -12,74 +10,50 @@ def find_redundant_genomes(ctx: Context) -> None:
     """
     Identify and remove redundant genomes from the first analysis round.
 
-    Redundant genomes are only removed if at least two genomes remain for
+    Redundant genomes are only filtered if at least two genomes remain for
     the first analysis round.
     """
     ctx.ui.show("Searching for redundant genomes...")
 
-    genome_fastas = utils.get_fastas(ctx.paths.sequences_dir, ".genome")
-    genome_fastas.sort(key=lambda fasta: fasta.path.stem)
+    genomes_fasta = Fasta(ctx.paths.genomes_fasta)
+    redundant_genome_ids = _get_redundant_genomes(ctx, genomes_fasta)
 
-    redundant_genomes = _get_redundant_genomes(ctx, genome_fastas)
-
-    n_genomes_for_first_round = len(genome_fastas) - len(redundant_genomes)
+    n_genomes_for_first_round = genomes_fasta.n_seqs - len(redundant_genome_ids)
     if (  # the pipeline needs at least 2 genomes on first round, else dont filter
-        n_genomes_for_first_round >= 2 and redundant_genomes
+        n_genomes_for_first_round >= 2 and redundant_genome_ids
     ):
-        # copy proteomes to redundant proteomes fasta
-        ctx.runtime.redundant_genomes = True  # TODO use runtime.active_genomes
-        redundant_fasta = Fasta(ctx.paths.redundant_proteomes_fasta)
-        for genome_fasta in redundant_genomes:
-            proteome_fasta = Fasta(
-                ctx.paths.sequences_dir / f"{genome_fasta.path.stem}.proteome"
-            )
-            predicted_proteome_fasta = Fasta(
-                ctx.paths.sequences_dir / f"{genome_fasta.path.stem}.predicted"
-            )
-            redundant_fasta.add_seqs(
-                *proteome_fasta.seqs, *predicted_proteome_fasta.seqs
-            )
+        ctx.runtime.redundant_genomes = True
+        ctx.runtime.redundant_genome_ids = redundant_genome_ids
 
 
-def _get_redundant_genomes(ctx: Context, genome_fastas: list[Fasta]) -> list[Fasta]:
+def _get_redundant_genomes(ctx: Context, genomes_fasta: Fasta) -> set[str]:
     """
     Identify redundant genomes based on pairwise BLASTN similarity.
 
-    Genome files are copied to a temporary directory where BLAST databases
-    are created for the similarity comparisons. The identified redundant
-    genomes are mapped back to their original FASTA files.
-
     Args:
         ctx: Pipeline context used for progress reporting.
-        genome_fastas: Genomes to compare.
+        genomes_fasta: Fasta file with all the available genomes.
 
     Returns:
-        The original FASTA files identified as redundant.
+        The Seq IDs of the redundant genomes.
     """
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_dir_path = Path(tmp_dir)
 
-        original_fasta_by_tmp_path = {}
-        tmp_fastas = []
-        for fasta in genome_fastas:
-            fasta_tmp_path = tmp_dir_path / fasta.path.name
-            original_fasta_by_tmp_path[fasta_tmp_path] = fasta
-            shutil.copy(fasta.path, fasta_tmp_path)
-            tmp_fasta = Fasta(fasta_tmp_path)
-            tmp_fastas.append(tmp_fasta)
-
-        for genome_fasta in tmp_fastas:
+        genome_fastas = []
+        for genome_seq in genomes_fasta.seqs:
+            genome_fasta = Fasta(tmp_dir_path / f"{genome_seq.id}.fasta")
+            genome_fasta.add_seqs(genome_seq)
             make_blast_db(genome_fasta, "nucl")
+            genome_fastas.append(genome_fasta)
 
-        redundant_genomes = _find_redundant_genomes(ctx, tmp_fastas)
+        genome_fastas.sort(key=lambda fasta: fasta.path.name)  # Ensure reproducibility
+        redundant_genome_ids = _find_redundant_genomes(ctx, genome_fastas)
 
-        return [
-            original_fasta_by_tmp_path[redundant.path]
-            for redundant in redundant_genomes
-        ]
+        return redundant_genome_ids
 
 
-def _find_redundant_genomes(ctx: Context, genome_fastas: list[Fasta]) -> set[Fasta]:
+def _find_redundant_genomes(ctx: Context, genome_fastas: list[Fasta]) -> set[str]:
     """
     Identify redundant genomes based on pairwise sequence similarity.
 
@@ -91,22 +65,22 @@ def _find_redundant_genomes(ctx: Context, genome_fastas: list[Fasta]) -> set[Fas
         genome_fastas: Genomes to compare.
 
     Returns:
-        The genomes identified as redundant.
+        The Seq IDs of the redundant genomes.
     """
-    redundant_genomes = set()
+    redundant_genome_ids = set()
 
     for i, g1 in enumerate(ctx.ui.progress_bar(genome_fastas)):
-        if g1 in redundant_genomes:
+        if g1.path.stem in redundant_genome_ids:  # genome id = file stem
             continue
 
         for g2 in genome_fastas[i + 1 :]:
-            if g2 in redundant_genomes:
+            if g2.path.stem in redundant_genome_ids:
                 continue
 
             if _genomes_are_similar(g1, g2, 90, 95):
-                redundant_genomes.add(g2)
+                redundant_genome_ids.add(g2.path.stem)
 
-    return redundant_genomes
+    return redundant_genome_ids
 
 
 def _genomes_are_similar(
