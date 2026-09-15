@@ -1,3 +1,6 @@
+import tempfile
+from pathlib import Path
+
 import utils
 from models.constants import PREDICTED_PROTEINS_PREFIX
 from models.fasta import Fasta
@@ -5,7 +8,7 @@ from models.seq import Seq
 
 
 def predict_proteome(
-    genome_fasta: Fasta,
+    genome_seq: Seq,
     params: str,
     predicted_prots_n: int,
     annotated_proteome_fasta: Fasta | None = None,
@@ -18,27 +21,20 @@ def predict_proteome(
     predicted protein IDs and genomic location descriptions.
 
     Args:
-        genome_fasta: Genome FASTA file used for protein prediction.
+        genome_seq: Genome Seq used for protein prediction.
         params: Command-line parameters passed to ORFfinder.
         predicted_prots_n: Number of previously predicted proteins, used to
             generate consecutive protein IDs.
         annotated_proteome_fasta: Optional annotated proteome used to remove
             already annotated proteins.
 
-    Raises:
-        ValueError: If the genome FASTA does not contain exactly one sequence.
-
     Returns:
         A list of predicted protein sequences with formatted IDs and
         descriptions.
     """
-    if genome_fasta.n_seqs != 1:
-        raise ValueError(
-            f"{genome_fasta.path} must contain exactly one sequence for protein prediction"
-        )
 
     # predict proteins
-    predicted_prots_fasta_str = _run_orffinder(genome_fasta, params)
+    predicted_prots_fasta_str = _run_orffinder(genome_seq, params)
     predicted_prot_seqs = utils.get_seqs_from_fasta_str(predicted_prots_fasta_str)
 
     # remove annotated prots from predicted proteome
@@ -62,31 +58,39 @@ def predict_proteome(
 
     # format seq descriptions
 
-    genome_id = next(iter(genome_fasta.ids))
     seqs_with_description_format = []
     for n, seq in enumerate(predicted_prot_seqs):
         seq_location_str = _get_predicted_prot_location(seq.id)
         seq_id = f"{PREDICTED_PROTEINS_PREFIX}_{predicted_prots_n + n + 1}"
         seq_description = (
-            f"{seq_id} {genome_id} {seq_location_str} [protein_id={seq_id}]"
+            f"{seq_id} {genome_seq.id} {seq_location_str} [protein_id={seq_id}]"
         )
         seqs_with_description_format.append(Seq(seq.seq, seq_id, seq_description))
 
     return seqs_with_description_format
 
 
-def _run_orffinder(genome_fasta: Fasta, params: str) -> str:
+def _run_orffinder(genome_seq: Seq, params: str) -> str:
     """
-    Run ORFfinder on a genome FASTA file and return its output.
+    Run ORFfinder on a genome sequence and return its FASTA string output.
+
+    Args:
+        genome_seq: The genome sequence to process.
+        params: Additional parameters to pass to ORFfinder.
 
     Raises:
         ValueError: If ORFfinder does not produce a valid FASTA output.
     """
-    cmd_stdout = utils.run_cmd(f"ORFfinder -in {genome_fasta.path} {params}")
-    if not cmd_stdout.startswith(">"):
-        raise ValueError(f"Cannot predict proteome on {genome_fasta.path}")
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_path = Path(tmp_dir)
+        genome_fasta = Fasta(tmp_path / "genome.fasta")
+        genome_fasta.add_seqs(genome_seq)
 
-    return cmd_stdout
+        cmd_stdout = utils.run_cmd(f"ORFfinder -in {genome_fasta.path} {params}")
+        if not cmd_stdout.startswith(">"):
+            raise ValueError(f"Cannot predict proteome of {genome_seq.id}")
+
+        return cmd_stdout
 
 
 def _predicted_prot_is_annotated(
