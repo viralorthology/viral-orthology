@@ -23,7 +23,6 @@ class Fasta:
 
     def __init__(self, path: Path):
         self.path = path
-        self._validate_fasta()
 
     @property
     def seqs(self) -> Iterator[Seq]:
@@ -31,16 +30,36 @@ class Fasta:
         Return an iterator over the sequences in the FASTA file.
 
         Raises:
-            FileNotFoundError: if the file does not exist
-            ValueError: if the file is empty
+            FileNotFoundError: If the file does not exist.
+            ValueError: If the file is empty, contains invalid sequences,
+                duplicate sequence IDs, or sequences with different types.
         """
         if not self.path.is_file():
             raise FileNotFoundError(f"{self.path} does not exist")
         if self.path.stat().st_size == 0:
             raise ValueError(f"{self.path} is empty")
 
-        for seq in SeqIO.parse(self.path, "fasta"):
-            yield get_seq_from_seqrecord(seq)
+        ids = set()
+        seq_types = set()
+        for seqrecord in SeqIO.parse(self.path, "fasta"):
+            try:
+                seq = get_seq_from_seqrecord(seqrecord)
+            except ValueError as e:
+                raise ValueError(
+                    f"An error occurred while reading {self.path}: {e}"
+                ) from e
+
+            if seq.id in ids:
+                raise ValueError(
+                    f"{self.path} contains duplicate sequence ID: {seqrecord.id}"
+                )
+            ids.add(seq.id)
+
+            seq_types.add(seq.seq_type)
+            if len(seq_types) > 1:
+                raise ValueError(f"{self.path} contains sequences with different types")
+
+            yield seq
 
     @property
     def n_seqs(self) -> int:
@@ -92,17 +111,32 @@ class Fasta:
         Append the given sequences to the FASTA file.
 
         Raises:
-            ValueError: If no sequences are provided.
+            ValueError: If no sequences are provided, sequence IDs are
+                duplicated, or sequences have different types.
         """
         if not seqs:
             raise ValueError("At least one sequence must be provided")
+
+        seq_ids = [seq.id for seq in seqs]
+        if len(seq_ids) != len(set(seq_ids)):
+            raise ValueError("Sequences must be unique")
+
+        if self.path.exists() and self.path.stat().st_size > 0:
+            duplicated_ids = set(seq_ids) & set(self.ids)
+            if duplicated_ids:
+                raise ValueError(
+                    f"Sequence IDs already exist in {self.path}: {duplicated_ids}"
+                )
+
+            fasta_seq_types = {seq.seq_type for seq in self.seqs}
+            seq_types = {seq.seq_type for seq in seqs}
+            if len(fasta_seq_types | seq_types) != 1:
+                raise ValueError("All sequences must have the same type")
 
         seq_records = [get_seqrecord_from_seq(seq) for seq in seqs]
 
         with self.path.open("a", encoding="utf-8") as fh:
             SeqIO.write(seq_records, fh, "fasta")
-
-        self._validate_fasta()
 
     def remove_seqs(self, *ids: str) -> None:
         """
@@ -181,32 +215,3 @@ class Fasta:
             FileNotFoundError: if the file does not exist
         """
         self.path.unlink()
-
-    def _validate_fasta(self) -> None:
-        """
-        Validate the FASTA file and its sequence records.
-
-        Raises:
-            ValueError: if the file contains a malformed record, an empty sequence, or a duplicate ID
-        """
-        if not self.path.exists() or self.path.stat().st_size == 0:
-            return
-
-        ids = set()
-        seq_types = set()
-        for seqrecord in SeqIO.parse(self.path, "fasta"):
-            try:
-                seq = get_seq_from_seqrecord(seqrecord)
-            except ValueError as e:
-                raise ValueError(f"An error occurred while reading {self.path}: {e}")
-
-            if seq.id in ids:
-                raise ValueError(
-                    f"{self.path} contains duplicate sequence ID: {seqrecord.id}"
-                )
-
-            ids.add(seq.id)
-            seq_types.add(seq.seq_type)
-
-        if len(seq_types) > 1:
-            raise ValueError(f"{self.path} is not a valid FASTA")
