@@ -28,6 +28,7 @@ DEFAULT_TOOL_PARAMS: dict[str, dict[str, dict[str, str | None]]] = {
         "blastp": {"-word_size": "2", "-evalue": "0.001", "-qcov_hsp_perc": "40"},
         "orffinder": {"-ml": "90", "-s": "0"},
         "blastp_paralog_search": {"-evalue": "0.00001"},
+        "proteinortho": {},
     },
     "blastp_module": {"blastp": {"-word_size": "2", "-evalue": "0.1"}},
     "hmmsearch_module": {
