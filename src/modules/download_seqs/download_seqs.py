@@ -26,18 +26,7 @@ def run(ctx: Context) -> None:
 
     genomes_fasta = Fasta(ctx.paths.genomes_fasta)
     proteomes_fasta = Fasta(ctx.paths.proteomes_fasta)
-
-    genome_ids_failed, genomes_without_annotated_proteome = _download_sequences(
-        ctx.ui, genome_ids_to_download, genomes_fasta, proteomes_fasta
-    )
-
-    for genome_id in genome_ids_failed:
-        ctx.ui.show_error(f"{genome_id} could not be downloaded")
-    if len(genome_ids_failed) == len(genome_ids_to_download):
-        raise ValueError("No genome could be downloaded")
-    if genomes_without_annotated_proteome:
-        for genome_id in genomes_without_annotated_proteome:
-            ctx.ui.show_error(f"{genome_id} does not have an annotated proteome")
+    _download_sequences(ctx.ui, genome_ids_to_download, genomes_fasta, proteomes_fasta)
 
     # format protein sequence descriptions
     all_protein_seqs = []
@@ -77,19 +66,21 @@ def run(ctx: Context) -> None:
 
 def _download_sequences(
     ui: UI, genome_ids: set[str], genomes_fasta: Fasta, proteomes_fasta: Fasta
-) -> tuple[list[str], list[str]]:
+) -> None:
     """
-    Download genome and proteome sequences for a set of genome IDs.
+    Download genome and proteome sequences for the given genome IDs.
 
-    Genome and proteome sequences are downloaded from GenBank using
-    ``efetch``. Genome download failures are recorded and the corresponding
-    genome is skipped. Proteome download failures are also recorded, but do
-    not prevent the successfully downloaded genome sequence from being saved.
+    Genome sequences are fetched from GenBank using ``efetch`` and
+    appended to ``genomes_fasta``. For each successfully downloaded
+    genome, the corresponding annotated protein sequences are also
+    fetched and appended to ``proteomes_fasta`` when available.
 
-    Returns:
-        - A list of genome ids for genomes that could not be
-            downloaded.
-        - A list of genome IDs for which no proteome could be downloaded.
+    Genome download failures are reported through the UI and the affected
+    genome is skipped. Proteome download failures are also reported,
+    but do not prevent the corresponding genome sequence from being saved.
+
+    Raises:
+       ValueError: If none of the requested genome sequences could be downloaded.
     """
     assert genome_ids
 
@@ -127,7 +118,14 @@ def _download_sequences(
         with proteomes_fasta.path.open("a", encoding="utf-8") as fh:
             fh.write(("").join(proteome_fastas_to_write))
 
-    return genome_ids_failed, genome_ids_without_proteome
+    # check downloads
+    for genome_id in genome_ids_failed:
+        ui.show_error(f"{genome_id} could not be downloaded")
+    if len(genome_ids_failed) == len(genome_ids):
+        raise ValueError("No genome could be downloaded")
+    if genome_ids_without_proteome:
+        for genome_id in genome_ids_without_proteome:
+            ui.show_error(f"{genome_id} does not have an annotated proteome")
 
 
 def _analyze_genomes(
