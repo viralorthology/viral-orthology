@@ -65,9 +65,9 @@ class OrthologGroup(Fasta):
         if len(remaining_seq_ids) == 1:
             remaining_seq = self.get_seqs(next(iter(remaining_seq_ids)))[0]
             prot_db_path = (
-                ctx.paths.predicted_prots_db
+                ctx.paths.predicted_unique_prots_fasta
                 if remaining_seq.is_predicted
-                else ctx.paths.annotated_prots_db
+                else ctx.paths.annotated_unique_prots_fasta
             )
             prot_db = Fasta(prot_db_path)
             prot_db.add_seqs(remaining_seq)

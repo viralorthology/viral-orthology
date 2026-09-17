@@ -131,9 +131,11 @@ def test_delete_one_seq_in_two_seqs_fasta_annotated_db(
     og.remove_seqs("seq1", ctx=context_always_yes)
 
     assert not og.path.is_file()
-    assert not context_always_yes.paths.predicted_prots_db.is_file()
+    assert not context_always_yes.paths.predicted_unique_prots_fasta.is_file()
     assert (
-        context_always_yes.paths.annotated_prots_db.read_text(encoding="utf-8")
+        context_always_yes.paths.annotated_unique_prots_fasta.read_text(
+            encoding="utf-8"
+        )
         == ">seq2 genome2 [protein_id=234]\nATCG\n"
     )
 
@@ -149,9 +151,11 @@ def test_delete_one_seq_in_two_seqs_fasta_predicted_db(tmp_path, context_always_
     og.remove_seqs("seq1", ctx=context_always_yes)
 
     assert not og.path.is_file()
-    assert not context_always_yes.paths.annotated_prots_db.is_file()
+    assert not context_always_yes.paths.annotated_unique_prots_fasta.is_file()
     assert (
-        context_always_yes.paths.predicted_prots_db.read_text(encoding="utf-8")
+        context_always_yes.paths.predicted_unique_prots_fasta.read_text(
+            encoding="utf-8"
+        )
         == ">PREDICTED_10 genome2 [protein_id=234]\nATCG\n"
     )
 

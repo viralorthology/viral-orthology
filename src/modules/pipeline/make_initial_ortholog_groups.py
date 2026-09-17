@@ -20,7 +20,7 @@ def make_initial_ortholog_groups(ctx: Context) -> None:
     """
     ctx.ui.show("Creating initial ortholog groups...")
 
-    proteome_fastas = utils.get_fastas(ctx.paths.sequences_dir, ".proteome")
+    proteome_fastas = utils.get_fastas(ctx.paths.proteomes_dir, ".proteome")
     non_redundant_proteome_fastas = [
         fasta
         for fasta in proteome_fastas

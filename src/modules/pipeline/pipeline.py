@@ -23,12 +23,11 @@ def run(ctx: Context) -> None:
     )
     utils.ensure_files_have_content(ctx.paths.genomes_fasta, ctx.paths.proteomes_fasta)
     utils.ensure_paths_do_not_exist(
-        ctx.paths.annotated_prots_db,
-        ctx.paths.predicted_prots_db,
+        ctx.paths.annotated_unique_prots_fasta,
+        ctx.paths.predicted_unique_prots_fasta,
         ctx.paths.ortholog_groups_dir,
-        ctx.paths.sequences_dir,
+        ctx.paths.proteomes_dir,
         ctx.paths.paralogs_dir,
-        ctx.paths.redundant_proteomes_fasta,
         ctx.paths.predicted_proteomes_fasta,
     )
 
