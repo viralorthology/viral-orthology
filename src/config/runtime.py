@@ -5,4 +5,4 @@ from dataclasses import dataclass, field
 class Runtime:
     redundant_genomes: bool = False
     redundant_genome_ids: set[str] = field(default_factory=set)
-    predicted_proteins_count: int = 0
+    predicted_proteins_count: int = 0  # TODO do I need this?
