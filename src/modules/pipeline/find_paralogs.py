@@ -17,7 +17,7 @@ def find_paralogs(ctx: Context) -> None:
     """
     ctx.ui.show("Searching for paralogs...")
 
-    ctx.paths.paralogs_dir.mkdir(exist_ok=True)
+    ctx.paths.paralogs_dir.mkdir()
     proteomes = utils.get_fastas(ctx.paths.sequences_dir, ".proteome")
 
     for proteome in ctx.ui.progress_bar(proteomes):
