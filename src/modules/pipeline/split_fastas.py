@@ -16,5 +16,5 @@ def split_fastas(ctx: Context) -> None:
         proteins_by_genome_id[prot_seq.genome_id].append(prot_seq)
 
     for genome_id, prot_list in proteins_by_genome_id.items():
-        proteome_fasta = Fasta(ctx.paths.proteomes_dir / f"{genome_id}.proteome")
+        proteome_fasta = Fasta(ctx.paths.proteomes_dir / f"{genome_id}.fasta")
         proteome_fasta.add_seqs(*prot_list)

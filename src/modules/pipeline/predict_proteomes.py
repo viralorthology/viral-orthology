@@ -13,7 +13,7 @@ def predict_proteomes(ctx: Context) -> None:
         genomes_fasta.seqs, total=genomes_fasta.n_seqs
     ):
         proteome_fasta = Fasta(
-            ctx.paths.proteomes_dir / f"{genome_seq.id}.proteome"
+            ctx.paths.proteomes_dir / f"{genome_seq.id}.fasta"
         )  # TODO it may not exist
         predicted_proteins = predict_proteome(
             genome_seq,
