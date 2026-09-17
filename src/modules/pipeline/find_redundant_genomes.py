@@ -2,7 +2,7 @@ import tempfile
 from pathlib import Path
 
 from config.context import Context
-from engines.blast import make_blast_db, run_blastn
+from engines.blast import blastn_search, make_blast_db
 from models.fasta import Fasta
 
 
@@ -101,6 +101,6 @@ def _genomes_are_similar(
     Returns:
         True if at least one BLASTN hit exceeds both thresholds, otherwise False.
     """
-    blastn_hits = run_blastn(query_fasta, subject_fasta, "")
+    blastn_hits = blastn_search(query_fasta, subject_fasta, "")
 
     return any(hit.qcov > qcov and hit.ident > ident for hit in blastn_hits)

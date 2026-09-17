@@ -113,7 +113,7 @@ def blastp_search(
     )
 
 
-def run_blastn(query_fasta: Fasta, db_fasta: Fasta, params: str) -> list[BlastHit]:
+def blastn_search(query_fasta: Fasta, db_fasta: Fasta, params: str) -> list[BlastHit]:
     """
     Run BLASTN against a nucleotide database and return the hits sorted by evalue.
 
