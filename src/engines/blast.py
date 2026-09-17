@@ -1,61 +1,7 @@
 import multiprocessing
-import shutil
-import tempfile
-from pathlib import Path
-from types import TracebackType
-from typing import Literal
-
-from typing_extensions import Self
 
 import utils
 from models.fasta import Fasta
-
-
-class BlastDB:
-    """
-    Context manager for creating a temporary BLAST database.
-
-    If a single subject FASTA is provided, it is copied directly to the
-    temporary directory. If multiple subject FASTAs are provided, they
-    are combined into a single FASTA file. The BLAST database is created
-    from the resulting FASTA file and is automatically removed when
-    leaving the context manager.
-
-    Args:
-        db_type: BLAST database type, e.g. "prot" or "nucl".
-        *subject_fastas: One or more FASTA objects to use as BLAST
-            database subjects.
-
-    Example:
-        with BlastDB("prot", fasta1, fasta2) as blast_db:
-            run_blast(query, blast_db)
-    """
-
-    def __init__(self, db_type: str, *subject_fastas: Fasta):
-        self.db_type = db_type
-        self.subject_fastas = subject_fastas
-        self.tmp_dir = tempfile.TemporaryDirectory()
-        self.path = Path(self.tmp_dir.name) / "blast_db.fasta"
-
-    def __enter__(self) -> Self:
-        if len(self.subject_fastas) == 1:
-            shutil.copy(self.subject_fastas[0].path, self.path)
-        else:
-            utils.get_combined_fasta(self.path, *self.subject_fastas)
-
-        db_fasta = Fasta(self.path)
-        make_blast_db(db_fasta, self.db_type)
-
-        return self
-
-    def __exit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc_value: BaseException | None,
-        traceback: TracebackType | None,
-    ) -> Literal[False]:
-        self.tmp_dir.cleanup()
-        return False
 
 
 class BlastHit:
@@ -82,9 +28,7 @@ def make_blast_db(fasta: Fasta, db_type: str) -> None:
     utils.run_cmd(f"makeblastdb -dbtype {db_type} -in {fasta.path}")
 
 
-def blastp_search(
-    query_fasta: Fasta, blast_db: BlastDB | Fasta, params: str
-) -> list[BlastHit]:
+def blastp_search(query_fasta: Fasta, blast_db: Fasta, params: str) -> list[BlastHit]:
     """
     Run BLASTP against a protein database and return the hits sorted by
     E-value in ascending order (from best to worst).

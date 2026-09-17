@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from engines.blast import BlastDB, BlastHit, blastp_search, make_blast_db
+from engines.blast import BlastHit, blastp_search, make_blast_db
 from models.fasta import Fasta
 
 
@@ -55,25 +55,3 @@ def test_run_blastp_returns_empty_list(run_cmd, tmp_path):
     run_cmd.return_value = " "
 
     assert blastp_search(query, blast_db, "") == []
-
-
-@patch("engines.blast.make_blast_db")
-def test_blast_db_creates_database(make_blast_db, tmp_path):
-    fasta = Fasta(tmp_path / "db.fasta")
-    fasta.path.touch()
-
-    with BlastDB("prot", fasta) as blast_db:
-        assert blast_db.path.exists()
-        make_blast_db.assert_called_once()
-
-
-@patch("engines.blast.make_blast_db")
-def test_blast_db_cleans_up_after_context(make_blast_db, tmp_path):
-    fasta = Fasta(tmp_path / "db.fasta")
-    fasta.path.touch()
-
-    with BlastDB("prot", fasta) as blast_db:
-        db_path = blast_db.path
-        assert db_path.exists()
-
-    assert not db_path.exists()
