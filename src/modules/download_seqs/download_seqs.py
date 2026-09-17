@@ -28,16 +28,8 @@ def run(ctx: Context) -> None:
     proteomes_fasta = Fasta(ctx.paths.proteomes_fasta)
     _download_sequences(ctx.ui, genome_ids_to_download, genomes_fasta, proteomes_fasta)
 
-    # format protein sequence descriptions
-    all_protein_seqs = []
-    for seq in proteomes_fasta.seqs:
-        seq.id, seq.description = _get_seq_id_description_from_gb_description(
-            seq.description
-        )
-        all_protein_seqs.append(seq)
-
-    proteomes_fasta.delete_fasta()
-    proteomes_fasta.add_seqs(*all_protein_seqs)
+    # format protein descriptions
+    _format_protein_descriptions(proteomes_fasta)
 
     ##### MAKE REPORT #####
     ctx.ui.show("Running sequence analysis...")
@@ -165,33 +157,6 @@ def _analyze_genomes(
     return genome_lens, genome_gc_perc, genome_n_counts, identical_genomes
 
 
-def _get_seq_id_description_from_gb_description(
-    old_description: str,
-) -> tuple[str, str]:
-    """
-    Extract the protein sequence ID and reconstruct its description.
-
-    The input description is expected to contain a [protein_id=...]
-    field and a genome identifier in the format <genome_id>_prot_...
-
-    Args:
-        old_description: Original GenBank sequence description.
-
-    Returns:
-        - The protein sequence ID
-        - The reconstructed description prefixed with the genome ID.
-    """
-    if "_prot_" not in old_description or "[protein_id=" not in old_description:
-        raise ValueError(
-            f"Protein description does not contain the required data: {old_description}"
-        )
-
-    seq_id = old_description.split("[protein_id=")[1].split("]")[0]
-    genome_id = old_description.split("|")[1].split("_prot_")[0]
-    remaining_description = (" ").join(old_description.split()[1:])
-    return seq_id, f"{seq_id} {genome_id} {remaining_description}"
-
-
 def _download_fasta(cmd_str: str) -> str | None:
     """
     Run a command to download sequences from GenBank, retrying on failure.
@@ -245,3 +210,47 @@ def _get_genome_ids_to_download(ids_file_content: str) -> set[str]:
         genome_ids_to_download.add(genome_id)
 
     return genome_ids_to_download
+
+
+def _format_protein_descriptions(proteomes_fasta: Fasta) -> None:
+    """
+    Format protein sequence IDs and descriptions in a FASTA file.
+
+    The FASTA file is then replaced with the updated sequences.
+    """
+    all_protein_seqs = []
+    for seq in proteomes_fasta.seqs:
+        seq.id, seq.description = _get_seq_id_description_from_gb_description(
+            seq.description
+        )
+        all_protein_seqs.append(seq)
+
+    proteomes_fasta.delete_fasta()
+    proteomes_fasta.add_seqs(*all_protein_seqs)
+
+
+def _get_seq_id_description_from_gb_description(
+    old_description: str,
+) -> tuple[str, str]:
+    """
+    Extract the protein sequence ID and reconstruct its description.
+
+    The input description is expected to contain a [protein_id=...]
+    field and a genome identifier in the format <genome_id>_prot_...
+
+    Args:
+        old_description: Original GenBank sequence description.
+
+    Returns:
+        - The protein sequence ID
+        - The reconstructed description prefixed with the genome ID.
+    """
+    if "_prot_" not in old_description or "[protein_id=" not in old_description:
+        raise ValueError(
+            f"Protein description does not contain the required data: {old_description}"
+        )
+
+    seq_id = old_description.split("[protein_id=")[1].split("]")[0]
+    genome_id = old_description.split("|")[1].split("_prot_")[0]
+    remaining_description = (" ").join(old_description.split()[1:])
+    return seq_id, f"{seq_id} {genome_id} {remaining_description}"
