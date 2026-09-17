@@ -17,9 +17,9 @@ class Seq:
     Represents a biological sequence and its associated metadata.
 
     Args:
-            seq: The biological sequence as a Biopython Seq object.
-            seq_id: The sequence identifier.
-            seq_description: The FASTA record description.
+        seq: The biological sequence as a Biopython Seq object.
+        seq_id: The sequence identifier.
+        seq_description: The FASTA record description.
     """
 
     def __init__(self, seq: BioSeq, seq_id: str, seq_description: str):
