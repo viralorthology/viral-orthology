@@ -113,9 +113,7 @@ def _remove_paralogs(og: Fasta, paralogs_dir_path: Path) -> bool:
         assert og.path.exists()
 
         # move paralogs to paralogs dir
-        paralogs_fasta = Fasta(
-            paralogs_dir_path / f"{best_hit_seq.genome_id}_{best_hit_seq.id}.fasta"
-        )
+        paralogs_fasta = Fasta(paralogs_dir_path / f"{best_hit_seq.id}.fasta")
         paralogs_fasta.add_seqs(*other_paralog_seqs)
 
     return False
