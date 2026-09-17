@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from pathlib import Path
 
 from config.context import Context
@@ -5,7 +6,7 @@ from models.fasta import Fasta
 from models.seq import Seq
 
 
-class OrthologGroup(Fasta):
+class OrthologGroup:
     """
     Represents a FASTA file containing an ortholog group.
 
@@ -13,8 +14,28 @@ class OrthologGroup(Fasta):
     """
 
     def __init__(self, path: Path):
-        super().__init__(path)
+        self._fasta = Fasta(path)
         self._validate_ortholog_group()
+
+    @property
+    def path(self) -> Path:
+        return self._fasta.path
+
+    @property
+    def ids(self) -> list[str]:
+        return self._fasta.ids
+
+    @property
+    def genome_ids(self) -> list[str]:
+        return self._fasta.genome_ids
+
+    @property
+    def seqs(self) -> Iterator[Seq]:
+        return self._fasta.seqs
+
+    @property
+    def n_seqs(self) -> int:
+        return self._fasta.n_seqs
 
     @property
     def alignment_path(self) -> Path:
@@ -41,13 +62,16 @@ class OrthologGroup(Fasta):
             self.a2m_path,
         ]
 
+    def get_seqs(self, *ids: str) -> list[Seq]:
+        return self._fasta.get_seqs(*ids)
+
     def add_seqs(self, *seqs: Seq) -> None:
         """Add sequences to the ortholog group and revalidate it."""
-        super().add_seqs(*seqs)
+        self._fasta.add_seqs(*seqs)
         self._delete_associated_files()
         self._validate_ortholog_group()
 
-    def remove_seqs(self, *ids: str, ctx: Context | None = None) -> None:
+    def remove_seqs(self, *ids: str, ctx: Context) -> None:
         """
         Remove sequences from the ortholog group.
 
@@ -56,9 +80,6 @@ class OrthologGroup(Fasta):
         Raises:
             ValueError: If ctx is not provided.
         """
-        if ctx is None:
-            raise ValueError("ctx cannot be None in OrthologGroup.remove_seqs")
-
         self._delete_associated_files()
         remaining_seq_ids = set(self.ids) - set(ids)
 
@@ -71,24 +92,24 @@ class OrthologGroup(Fasta):
             )
             prot_db = Fasta(prot_db_path)
             prot_db.add_seqs(remaining_seq)
-            super().remove_seqs(
+            self._fasta.remove_seqs(
                 *ids, remaining_seq.id
             )  # Fasta.remove_seqs will check the ids and delete the file
             assert not self.path.is_file()
         else:
-            super().remove_seqs(*ids)
+            self._fasta.remove_seqs(*ids)
             if self.path.exists():
                 self._validate_ortholog_group()
 
     def delete_fasta(self) -> None:
         """Delete the ortholog group FASTA file and its associated files."""
         self._delete_associated_files()
-        super().delete_fasta()
+        self._fasta.delete_fasta()
 
     def rename_fasta(self, new_filename: str) -> None:
         """Rename the ortholog group FASTA file and delete its associated files."""
         self._delete_associated_files()  # associated files depend upon self.path, so delete them before renaming the file
-        super().rename_fasta(new_filename)
+        self._fasta.rename_fasta(new_filename)
 
     def _validate_ortholog_group(self) -> None:
         """
