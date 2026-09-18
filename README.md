@@ -26,15 +26,6 @@ A modular bioinformatics pipeline for automated orthology inference across viral
 - Amino acid composition analysis
 - Protein secondary and tertiary structure analysis
 
-## Workflow
-
-ViralOrthology consists of a core orthology inference pipeline followed by optional enrichment and analysis modules.
-The core pipeline processes the input sequences, generates initial orthologous groups, and iteratively refines them.
-The resulting orthologous groups can then be processed by enrichment modules, which use complementary evidence such as synteny conservation, amino acid composition, and protein structural information.
-Finally, analysis modules can be used to examine the resulting groups, evaluate their quality, and extract additional information from the inferred relationships.
-
-![Viral Orthology pipeline](workflow.png)
-
 ## Installation
 
 ### Requirements
@@ -91,16 +82,10 @@ The core workflow performs the initial orthology inference and iterative refinem
 
 Once the orthologous groups have been generated, independent enrichment and analysis modules can be executed as needed.
 
-For example:
-
-```bash
-viralorthology -synteny
-```
-
-```bash
-viralorthology -composition ...
-```
-
 ## Documentation
 
 Detailed documentation is available on [viralorthology.github.io](https://viralorthology.github.io).
+
+## Third-party software and licenses
+
+This pipeline uses several third-party software tools and libraries. These components are developed and maintained by their respective authors and organizations and remain subject to their own copyright and licensing terms.
