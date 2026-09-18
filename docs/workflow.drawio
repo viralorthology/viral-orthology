@@ -1,6 +1,6 @@
 <mxfile host="Electron">
   <diagram name="Page-1" id="n0qaS-JE8eFAOadXTZgb">
-    <mxGraphModel dx="1414" dy="876" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1414" dy="1976" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -42,6 +42,15 @@
         </mxCell>
         <mxCell id="llLjm_pUc9lWiMXUzdw_-15" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=#d5e8d4;align=center;verticalAlign=middle;rounded=0;textDirection=vertical-rl;fontStyle=1;fillStyle=solid;" value="&lt;font style=&quot;font-size: 21px;&quot;&gt;INDEPENDENT MODULES&lt;/font&gt;" vertex="1">
           <mxGeometry height="170" width="60" x="720" y="569" as="geometry" />
+        </mxCell>
+        <mxCell id="8S9z6qrOFBlvq8oGTbu0-3" edge="1" parent="1" source="8S9z6qrOFBlvq8oGTbu0-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" target="llLjm_pUc9lWiMXUzdw_-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="8S9z6qrOFBlvq8oGTbu0-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#000000;strokeWidth=2;" value="&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;Preprocessing&lt;/b&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Download sequences&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Add user sequences&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;- Format sequence files&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="220" x="290" y="-90" as="geometry" />
+        </mxCell>
+        <mxCell id="8S9z6qrOFBlvq8oGTbu0-2" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=#e1d5e7;align=center;verticalAlign=middle;rounded=0;textDirection=vertical-lr;fillStyle=solid;" value="&lt;span style=&quot;font-size: 21px;&quot;&gt;&lt;b&gt;PP&lt;/b&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="90" width="60" x="720" y="-90" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
