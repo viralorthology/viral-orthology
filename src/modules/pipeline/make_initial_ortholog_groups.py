@@ -41,12 +41,14 @@ def make_initial_ortholog_groups(ctx: Context) -> None:
             tmp_proteome_fastas.append(Fasta(tmp_dir / fasta.path.name))
 
         # run proteinortho
+        og_tmp_dir = tmp_dir / "ortholog_groups"
+        og_tmp_dir.mkdir()
         _run_proteinortho(
-            tmp_proteome_fastas, ctx.args.tool_args["proteinortho"], tmp_dir
+            tmp_proteome_fastas, ctx.args.tool_args["proteinortho"], og_tmp_dir
         )
 
         # remove paralogs from ortholog groups
-        ortholog_groups = utils.get_fastas(tmp_dir, ".fasta")
+        ortholog_groups = utils.get_fastas(og_tmp_dir, ".fasta")
         assert ortholog_groups
         deleted_ogs = set()
         for og in ortholog_groups:
