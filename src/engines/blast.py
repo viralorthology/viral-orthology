@@ -16,6 +16,15 @@ class BlastHit:
         self.ident = float(results_split[3])
         self.evalue = float(results_split[4])
 
+    def __repr__(self) -> str:
+        return (
+            f"BlastHit(query_id={self.query_id!r}, "
+            f"subject_id={self.subject_id!r}, "
+            f"qcov={self.qcov}, "
+            f"ident={self.ident}, "
+            f"evalue={self.evalue})"
+        )
+
 
 def make_blast_db(fasta: Fasta, db_type: str) -> None:
     """
