@@ -26,5 +26,6 @@ def configure_logging(base_path: Path, dev_level: bool) -> None:
 
     if dev_level:
         console = logging.StreamHandler()
+        console.setLevel(logging.INFO)
         console.setFormatter(formatter)
         logger.addHandler(console)
