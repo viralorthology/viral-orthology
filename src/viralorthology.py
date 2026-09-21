@@ -1,12 +1,16 @@
+import logging
 import sys
 from pathlib import Path
 
+import utils
 from cli.args import get_args
 from cli.ui import CLI, UI
 from config.context import Context
 from config.paths import Paths
 from config.runtime import Runtime
 from modules import download_seqs, pipeline
+
+logger = logging.getLogger(__name__)
 
 
 def get_selected_module_flag() -> str:
@@ -47,10 +51,15 @@ def main() -> None:
 
     try:
         args = get_args(selected_module_flag, sys.argv[1:])
+        utils.configure_logging(paths.base, args.debug)
         ctx = Context(args, paths, ui, Runtime())
         module.run(ctx)
 
+        logger.info("Viralorthology completed successfully")
+
     except Exception as e:
+        logger.exception("An exception occurred during the execution")
+
         if "-debug" in sys.argv:
             raise
         ui.show_error(str(e))

@@ -1,3 +1,4 @@
+import logging
 import shutil
 import tempfile
 from pathlib import Path
@@ -7,6 +8,8 @@ import utils
 from config.context import Context
 from models.fasta import Fasta
 from models.seq import Seq
+
+logger = logging.getLogger(__name__)
 
 
 def make_initial_ortholog_groups(ctx: Context) -> None:
@@ -100,12 +103,21 @@ def _remove_paralogs(og: Fasta, paralogs_dir_path: Path) -> bool:
     """
     if len(set(og.genome_ids)) == 1:  # all seqs from the same genome
         og.delete_fasta()
+        logger.debug(
+            "Ortholog group %s deleted: all seqs are from the same genome", og.path
+        )
         return True
 
     for genome_id in _get_genome_ids_with_paralogs(og.genome_ids):
         paralog_seqs, other_og_seqs = _filter_seqs_for_evaluation(og, genome_id)
         best_hit_seq, other_paralog_seqs = _evaluate_paralogs(
             paralog_seqs, other_og_seqs
+        )
+        logger.info(
+            "%s seqs of %s were detected as paralogs, moved to paralogs dir. %s kept in ortholog group",
+            (", ").join([seq.id for seq in other_paralog_seqs]),
+            genome_id,
+            best_hit_seq.id,
         )
 
         # remove paralogs from og

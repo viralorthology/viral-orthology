@@ -1,6 +1,10 @@
+import logging
+
 from config.context import Context
 from engines import predict_proteome
 from models.fasta import Fasta
+
+logger = logging.getLogger(__name__)
 
 
 def predict_proteomes(ctx: Context) -> None:
@@ -12,6 +16,8 @@ def predict_proteomes(ctx: Context) -> None:
     for genome_seq in ctx.ui.progress_bar(
         genomes_fasta.seqs, total=genomes_fasta.n_seqs
     ):
+        logger.info("Predicting %s proteome", genome_seq.id)
+
         proteome_fasta = Fasta(
             ctx.paths.proteomes_dir / f"{genome_seq.id}.fasta"
         )  # TODO it may not exist
@@ -21,5 +27,12 @@ def predict_proteomes(ctx: Context) -> None:
             ctx.runtime.predicted_proteins_count,
             proteome_fasta,
         )
+
+        logger.info(
+            "%d proteins predicted for genome %s",
+            len(predicted_proteins),
+            genome_seq.id,
+        )
+
         predicted_proteomes_fasta.add_seqs(*predicted_proteins)
         ctx.runtime.predicted_proteins_count += len(predicted_proteins)

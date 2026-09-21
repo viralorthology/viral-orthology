@@ -1,3 +1,5 @@
+import logging
+
 import utils
 from config.context import Context
 from models.fasta import Fasta
@@ -7,8 +9,12 @@ from modules.pipeline.make_initial_ortholog_groups import make_initial_ortholog_
 from modules.pipeline.predict_proteomes import predict_proteomes
 from modules.pipeline.split_fastas import split_fastas
 
+logger = logging.getLogger(__name__)
+
 
 def run(ctx: Context) -> None:
+    logger.info("Running pipeline")
+
     ### VALIDATION ###
     utils.check_dependencies(
         "blastn",
@@ -44,6 +50,8 @@ def run(ctx: Context) -> None:
         raise ValueError(
             f"There are proteomes without their corresponding genome sequence: {proteomes_without_genome}"
         )
+
+    logger.info("Validation completed successfully")
 
     ### RUN ###
     _preparation_stage(ctx)

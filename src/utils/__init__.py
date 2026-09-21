@@ -8,9 +8,11 @@ from .files import (
     get_fastas,
     get_seqs_from_fasta_str,
 )
+from .logging import configure_logging
 
 __all__ = [
     "check_dependencies",
+    "configure_logging",
     "ensure_files_exist",
     "ensure_files_have_content",
     "ensure_paths_do_not_exist",

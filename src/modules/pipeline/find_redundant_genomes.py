@@ -1,9 +1,12 @@
+import logging
 import tempfile
 from pathlib import Path
 
 from config.context import Context
 from engines.blast import blastn_search, make_blast_db
 from models.fasta import Fasta
+
+logger = logging.getLogger(__name__)
 
 
 def find_redundant_genomes(ctx: Context) -> None:
@@ -17,6 +20,11 @@ def find_redundant_genomes(ctx: Context) -> None:
 
     genomes_fasta = Fasta(ctx.paths.genomes_fasta)
     redundant_genome_ids = _get_redundant_genomes(ctx, genomes_fasta)
+
+    if redundant_genome_ids:
+        logger.info("Redundant genomes: %s", (", ").join(redundant_genome_ids))
+    else:
+        logger.info("No redundant genomes found")
 
     n_genomes_for_first_round = genomes_fasta.n_seqs - len(redundant_genome_ids)
     if (  # the pipeline needs at least 2 genomes on first round, else dont filter

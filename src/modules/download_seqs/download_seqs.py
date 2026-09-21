@@ -1,3 +1,4 @@
+import logging
 import time
 
 from Bio.SeqUtils import gc_fraction
@@ -8,17 +9,29 @@ from config.context import Context
 from models.fasta import Fasta
 from models.seq import Seq
 
+logger = logging.getLogger(__name__)
+
 
 def run(ctx: Context) -> None:
+    logger.info("Running download_seqs module")
+
     ##### VALIDATION #####
     utils.check_dependencies("efetch")
     utils.ensure_files_have_content(ctx.paths.ids_txt)
     utils.ensure_paths_do_not_exist(ctx.paths.genomes_fasta, ctx.paths.proteomes_fasta)
     ctx.paths.output_dir.mkdir(parents=True, exist_ok=True)
 
+    logger.info("Validation completed successfully")
+
     ##### RUN #####
     genome_ids_to_download = _get_genome_ids_to_download(
         ctx.paths.ids_txt.read_text(encoding="utf-8")
+    )
+
+    logger.info(
+        "%d genomes to download: %s",
+        len(genome_ids_to_download),
+        (", ").join(genome_ids_to_download),
     )
 
     # download seqs
@@ -40,10 +53,15 @@ def run(ctx: Context) -> None:
     )
 
     for genome1_id, genome2_id in identical_genomes:
+        logger.info(
+            "Genomes %s and %s have an identical sequence", genome1_id, genome2_id
+        )
         ctx.ui.show(f"{genome1_id} and {genome2_id} have an identical sequence.")
 
     genome_ids = [genome.id for genome in genome_seqs]
     dataset_hash = utils.get_dataset_hash(genome_ids)
+    logger.info("Dataset hash: %s", dataset_hash)
+
     genome_report_path = ctx.paths.output_dir / f"dataset_{dataset_hash}.csv"
 
     report_content = ["genome_id,genome_length,gc_perc,Ns_in_genome"]
@@ -112,11 +130,15 @@ def _download_sequences(
 
     # check downloads
     for genome_id in genome_ids_failed:
+        logger.error("Genome %s could not be downloaded", genome_id)
         ui.show_error(f"{genome_id} could not be downloaded")
+
     if len(genome_ids_failed) == len(genome_ids):
         raise ValueError("No genome could be downloaded")
+
     if genome_ids_without_proteome:
         for genome_id in genome_ids_without_proteome:
+            logger.error("Genome %s does not have an annotated proteome", genome_id)
             ui.show_error(f"{genome_id} does not have an annotated proteome")
 
 

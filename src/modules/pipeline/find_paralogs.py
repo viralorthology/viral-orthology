@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 
 import engines
@@ -6,6 +7,8 @@ from config.context import Context
 from engines.blast import BlastHit
 from models.fasta import Fasta
 from models.tmp_fasta import TmpFasta
+
+logger = logging.getLogger(__name__)
 
 
 def find_paralogs(ctx: Context) -> None:
@@ -29,14 +32,19 @@ def find_paralogs(ctx: Context) -> None:
             blastp_hits = engines.blastp_search(
                 proteome, blastp_db, ctx.args.tool_args["blastp_paralog_search"]
             )
+            logger.debug("blastp hits for %s: %s", proteome.path.stem, blastp_hits)
 
         # find reciprocal hits
         reciprocal_hits = _find_reciprocal_hits(blastp_hits)
         if not reciprocal_hits:
+            logger.info("No paralogs found in genome %s", proteome.path.stem)
             continue
 
         # find groups of paralog seqs
         paralog_groups = _find_paralog_groups(reciprocal_hits)
+        logger.info(
+            "Paralogs found in genome %s: %s", proteome.path.stem, paralog_groups
+        )
 
         # remove paralogs from proteome
         for paralog_group_ids in paralog_groups:
@@ -54,6 +62,13 @@ def find_paralogs(ctx: Context) -> None:
 
             paralogs_fasta = Fasta(ctx.paths.paralogs_dir / f"{biggest_prot_id}.fasta")
             paralogs_fasta.add_seqs(*seqs_to_move)
+
+            logger.info(
+                "Proteins %s removed from genome %s proteome, protein %s kept in proteome",
+                prot_ids_to_move,
+                proteome.path.stem,
+                biggest_prot_id,
+            )
 
 
 def _find_reciprocal_hits(blastp_hits: list[BlastHit]) -> set[frozenset[str]]:
