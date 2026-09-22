@@ -4,6 +4,7 @@ from pathlib import Path
 from Bio import SeqIO
 
 from models.fasta import Fasta
+from models.ortholog_group import OrthologGroup
 from models.seq import Seq, get_seq_from_seqrecord
 
 
@@ -30,6 +31,25 @@ def get_fastas(dir_path: Path, file_extension: str) -> list[Fasta]:
     assert fastas
 
     return fastas
+
+
+def get_ortholog_groups(dir_path: Path) -> list[OrthologGroup]:
+    """
+    Get OrthologGroup FASTA files from a directory.
+
+    Args:
+        dir_path: Directory containing the OrthologGroup FASTA files
+    """
+
+    ogs = [
+        OrthologGroup(p)
+        for p in dir_path.iterdir()
+        if p.is_file() and p.suffix == ".fasta"
+    ]
+
+    assert ogs
+
+    return ogs
 
 
 def ensure_files_exist(*file_paths: Path) -> None:

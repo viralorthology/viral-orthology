@@ -6,6 +6,7 @@ from .files import (
     ensure_paths_do_not_exist,
     get_combined_fasta,
     get_fastas,
+    get_ortholog_groups,
     get_seqs_from_fasta_str,
 )
 from .logging import configure_logging
@@ -19,6 +20,7 @@ __all__ = [
     "get_combined_fasta",
     "get_dataset_hash",
     "get_fastas",
+    "get_ortholog_groups",
     "get_seqs_from_fasta_str",
     "run_cmd",
 ]
