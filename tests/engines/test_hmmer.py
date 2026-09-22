@@ -12,17 +12,17 @@ from engines.hmmer import (
 
 
 @pytest.fixture
-def query_fasta():
+def query_fasta(tmp_path):
     query = MagicMock()
-    query.alignment_path = Path("/tmp/query.alignment.fasta")
-    query.hmm_hmmer_path = Path("/tmp/query.hmm")
+    query.alignment_path = tmp_path / "query_alignment.fasta"
+    query.hmm_hmmer_path = tmp_path / "query.hmm"
     return query
 
 
 @pytest.fixture
-def db_fasta():
+def db_fasta(tmp_path):
     db = MagicMock()
-    db.path = Path("/tmp/database.fasta")
+    db.path = tmp_path / "database.fasta"
     return db
 
 

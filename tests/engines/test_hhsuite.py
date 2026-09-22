@@ -1,4 +1,3 @@
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -10,20 +9,20 @@ from engines.hhsuite import (
 
 
 @pytest.fixture
-def group1():
+def group1(tmp_path):
     group = MagicMock()
-    group.alignment_path = Path("/tmp/group1.aln.fasta")
-    group.a2m_path = Path("/tmp/group1.a2m")
-    group.hmm_hhsuite_path = Path("/tmp/group1.hmm")
+    group.alignment_path = tmp_path / "group1.aln.fasta"
+    group.a2m_path = tmp_path / "group1.a2m"
+    group.hmm_hhsuite_path = tmp_path / "group1.hmm"
     return group
 
 
 @pytest.fixture
-def group2():
+def group2(tmp_path):
     group = MagicMock()
-    group.alignment_path = Path("/tmp/group2.aln.fasta")
-    group.a2m_path = Path("/tmp/group2.a2m")
-    group.hmm_hhsuite_path = Path("/tmp/group2.hmm")
+    group.alignment_path = tmp_path / "group2.aln.fasta"
+    group.a2m_path = tmp_path / "group2.a2m"
+    group.hmm_hhsuite_path = tmp_path / "group2.hmm"
     return group
 
 
