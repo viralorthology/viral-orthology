@@ -8,7 +8,7 @@ class Paths:
 
     base: Path
     output_dir: Path = field(init=False)
-    proteomes_dir: Path = field(init=False)
+    proteomes_dir: Path = field(init=False)  # TODO dont use proteomes dir
     paralogs_dir: Path = field(init=False)
     ortholog_groups_dir: Path = field(init=False)
 
