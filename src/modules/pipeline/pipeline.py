@@ -7,6 +7,9 @@ from modules.pipeline.find_paralogs import find_paralogs
 from modules.pipeline.find_redundant_genomes import find_redundant_genomes
 from modules.pipeline.make_initial_ortholog_groups import make_initial_ortholog_groups
 from modules.pipeline.predict_proteomes import predict_proteomes
+from modules.pipeline.rename_og_fastas_by_annotation import (
+    rename_og_fastas_by_annotation,
+)
 from modules.pipeline.split_fastas import split_fastas
 
 logger = logging.getLogger(__name__)
@@ -69,3 +72,4 @@ def _preparation_stage(ctx: Context) -> None:
 
 def _initial_stage(ctx: Context) -> None:
     make_initial_ortholog_groups(ctx)
+    rename_og_fastas_by_annotation(ctx)
