@@ -35,10 +35,11 @@ def get_fastas(dir_path: Path, file_extension: str) -> list[Fasta]:
 
 def get_ortholog_groups(dir_path: Path) -> list[OrthologGroup]:
     """
-    Get OrthologGroup FASTA files from a directory.
+    Load all OrthologGroup FASTA files from a directory.
 
-    Args:
-        dir_path: Directory containing the OrthologGroup FASTA files
+    Returns:
+        Ortholog groups sorted by number of sequences in descending order,
+        with filename used as the secondary sorting criterion.
     """
 
     ogs = [
@@ -49,7 +50,9 @@ def get_ortholog_groups(dir_path: Path) -> list[OrthologGroup]:
 
     assert ogs
 
-    return ogs
+    return sorted(
+        ogs, key=lambda og: (og.n_seqs, og.path.stem), reverse=True
+    )  # stem provides a deterministic tie-breaker.
 
 
 def ensure_files_exist(*file_paths: Path) -> None:
