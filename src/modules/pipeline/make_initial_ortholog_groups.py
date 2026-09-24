@@ -111,7 +111,9 @@ def _remove_paralogs(og: Fasta, paralogs_dir_path: Path) -> bool:
         return True
 
     for genome_id in _get_genome_ids_with_paralogs(og.genome_ids):
-        paralog_seqs, other_og_seqs = _filter_seqs_for_evaluation(og, genome_id)
+        paralog_seqs, other_og_seqs = _filter_seqs_for_evaluation(
+            og, genome_id
+        )  # TODO add this to Runtime.paralog_ids
         best_hit_seq, other_paralog_seqs = _evaluate_paralogs(
             paralog_seqs, other_og_seqs
         )
