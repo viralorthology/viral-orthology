@@ -3,6 +3,7 @@ import logging
 import utils
 from config.context import Context
 from models.fasta import Fasta
+from modules.pipeline.clean_ortholog_groups import clean_ortholog_groups
 from modules.pipeline.find_paralogs import find_paralogs
 from modules.pipeline.find_redundant_genomes import find_redundant_genomes
 from modules.pipeline.make_initial_ortholog_groups import make_initial_ortholog_groups
@@ -73,3 +74,4 @@ def _preparation_stage(ctx: Context) -> None:
 def _initial_stage(ctx: Context) -> None:
     make_initial_ortholog_groups(ctx)
     rename_og_fastas_by_annotation(ctx)
+    clean_ortholog_groups(ctx)
