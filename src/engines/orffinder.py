@@ -11,7 +11,7 @@ def predict_proteome(
     genome_seq: Seq,
     params: str,
     predicted_prots_n: int,
-    annotated_proteome_fasta: Fasta | None = None,
+    annotated_proteins: list[Seq] | None = None,
 ) -> list[Seq]:
     """
     Predict genome proteins and return the formatted sequences.
@@ -25,7 +25,7 @@ def predict_proteome(
         params: Command-line parameters passed to ORFfinder.
         predicted_prots_n: Number of previously predicted proteins, used to
             generate consecutive protein IDs.
-        annotated_proteome_fasta: Optional annotated proteome used to remove
+        annotated_proteins: Optional annotated proteome used to remove
             already annotated proteins.
 
     Returns:
@@ -38,13 +38,13 @@ def predict_proteome(
     predicted_prot_seqs = utils.get_seqs_from_fasta_str(predicted_prots_fasta_str)
 
     # remove annotated prots from predicted proteome
-    if annotated_proteome_fasta is not None:
+    if annotated_proteins is not None:
         ids_prots_to_remove = []
 
         for predicted_prot in predicted_prot_seqs:
             predicted_prot_str = str(predicted_prot.seq)
 
-            for annotated_prot in annotated_proteome_fasta.seqs:
+            for annotated_prot in annotated_proteins:
                 if _predicted_prot_is_annotated(
                     str(annotated_prot.seq), predicted_prot_str
                 ):
@@ -57,7 +57,6 @@ def predict_proteome(
             ]
 
     # format seq descriptions
-
     seqs_with_description_format = []
     for n, seq in enumerate(predicted_prot_seqs):
         seq_location_str = _get_predicted_prot_location(seq.id)
@@ -97,7 +96,6 @@ def _predicted_prot_is_annotated(
     annotated_prot_seq: str, predicted_prot_seq: str
 ) -> bool:
     """Check whether either protein sequence is contained in the other."""
-
     if len(predicted_prot_seq) <= len(annotated_prot_seq):
         return predicted_prot_seq in annotated_prot_seq
 
