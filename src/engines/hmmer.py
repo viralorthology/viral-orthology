@@ -14,7 +14,7 @@ class HMMHit:
 
 
 def hmm_search(
-    query_fasta: OrthologGroup, db_fasta: Fasta, params: str
+    query_fasta: OrthologGroup, db_fasta: Fasta, params: str = ""
 ) -> list[HMMHit]:
     """
     Search a protein database using an HMM built from an ortholog group.
