@@ -8,24 +8,16 @@ from models.ortholog_group import OrthologGroup
 from models.seq import Seq, get_seq_from_seqrecord
 
 
-def get_fastas(dir_path: Path, file_extension: str) -> list[Fasta]:
+def get_fastas(dir_path: Path) -> list[Fasta]:
     """
     Get FASTA files from a directory.
 
     Args:
         dir_path: Directory containing the FASTA files
-        file_extension: File extension to filter by (it must start with .)
-
-    Raises:
-        ValueError: If the file extension is not valid
     """
-    if not file_extension.startswith("."):
-        raise ValueError(f"{file_extension} is not a valid file extension")
 
     fastas = [
-        Fasta(p)
-        for p in dir_path.iterdir()
-        if p.is_file() and p.suffix == file_extension
+        Fasta(p) for p in dir_path.iterdir() if p.is_file() and p.suffix == ".fasta"
     ]
 
     assert fastas

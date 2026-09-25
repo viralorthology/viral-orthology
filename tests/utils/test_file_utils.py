@@ -13,7 +13,7 @@ from utils import (
 )
 
 
-def test_get_fastas_returns_files_with_matching_extension(tmp_path):
+def test_get_fastas_returns_fasta_files(tmp_path):
     fasta_1 = tmp_path / "a.fasta"
     fasta_2 = tmp_path / "b.fasta"
     other_file = tmp_path / "c.txt"
@@ -22,14 +22,9 @@ def test_get_fastas_returns_files_with_matching_extension(tmp_path):
     fasta_2.touch()
     other_file.touch()
 
-    result = get_fastas(tmp_path, ".fasta")
+    result = get_fastas(tmp_path)
 
     assert {f.path for f in result} == {fasta_1, fasta_2}
-
-
-def test_get_fastas_invalid_extension(tmp_path):
-    with pytest.raises(ValueError):
-        get_fastas(tmp_path, "fasta")
 
 
 def test_ensure_files_exist_existing_files(tmp_path):

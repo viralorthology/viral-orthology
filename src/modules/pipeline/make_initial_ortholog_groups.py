@@ -50,7 +50,7 @@ def make_initial_ortholog_groups(ctx: Context) -> None:
         )
 
         # remove paralogs from ortholog groups
-        ortholog_groups = utils.get_fastas(og_tmp_dir, ".fasta")
+        ortholog_groups = utils.get_fastas(og_tmp_dir)
         assert ortholog_groups
         deleted_ogs = set()
         for og in ortholog_groups:
