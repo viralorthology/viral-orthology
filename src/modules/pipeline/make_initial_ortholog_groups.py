@@ -1,5 +1,4 @@
 import logging
-import shutil
 import tempfile
 from pathlib import Path
 
@@ -23,22 +22,25 @@ def make_initial_ortholog_groups(ctx: Context) -> None:
     """
     ctx.ui.show("Creating initial ortholog groups...")
 
-    proteome_fastas = utils.get_fastas(ctx.paths.proteomes_dir, ".fasta")
-    non_redundant_proteome_fastas = [
-        fasta
-        for fasta in proteome_fastas
-        if fasta.path.stem  # file stem == genome id
-        not in ctx.runtime.redundant_genome_ids
-    ]
+    proteomes_fasta = Fasta(ctx.paths.proteomes_fasta)
 
     with tempfile.TemporaryDirectory() as tmp_path:
-        # copy proteomes to temp dir
         tmp_dir = Path(tmp_path)
 
+        # make proteome fastas
         tmp_proteome_fastas = []
-        for fasta in non_redundant_proteome_fastas:
-            shutil.copy(fasta.path, tmp_dir / fasta.path.name)
-            tmp_proteome_fastas.append(Fasta(tmp_dir / fasta.path.name))
+        for genome_id in ctx.runtime.active_genome_ids:
+            proteome_seqs = [
+                seq
+                for seq in proteomes_fasta.seqs
+                if seq.genome_id == genome_id and seq.id not in ctx.runtime.paralog_ids
+            ]
+            if not proteome_seqs:
+                continue
+
+            proteome_fasta = Fasta(tmp_dir / f"{genome_id}.fasta")
+            proteome_fasta.add_seqs(*proteome_seqs)
+            tmp_proteome_fastas.append(proteome_fasta)
 
         # run proteinortho
         og_tmp_dir = tmp_dir / "ortholog_groups"
@@ -52,7 +54,7 @@ def make_initial_ortholog_groups(ctx: Context) -> None:
         assert ortholog_groups
         deleted_ogs = set()
         for og in ortholog_groups:
-            og_was_deleted = _remove_paralogs(og, ctx.paths.paralogs_dir)
+            og_was_deleted = _remove_paralogs(og, ctx.runtime.paralog_ids)
             if og_was_deleted:
                 deleted_ogs.add(og)
 
@@ -85,19 +87,18 @@ def _run_proteinortho(proteome_fastas: list[Fasta], params: str, cwd: Path) -> N
     )
 
 
-def _remove_paralogs(og: Fasta, paralogs_dir_path: Path) -> bool:
+def _remove_paralogs(og: Fasta, paralog_ids: set[str]) -> bool:
     """
-    Remove paralogs from an ortholog group and save them in the paralogs dir.
+    Remove paralogs from an ortholog group and add them to Runtime
 
     For each genome containing multiple proteins in the group, the paralog
     with the best BLASTP hit against proteins from the other genomes is
-    retained in the group. The remaining paralogs are removed from the
-    group and saved to the paralogs directory.
+    retained in the group. The remaining paralogs are addedd to Runtime.
     An ortholog group containing proteins from only one genome is deleted.
 
     Args:
         og: Ortholog group FASTA file to process.
-        paralogs_dir_path: Directory where removed paralog sequences are saved.
+        paralog_ids: Set from Runtime
 
     Returns:
         True if the ortholog group was deleted because it contained proteins
@@ -111,26 +112,24 @@ def _remove_paralogs(og: Fasta, paralogs_dir_path: Path) -> bool:
         return True
 
     for genome_id in _get_genome_ids_with_paralogs(og.genome_ids):
-        paralog_seqs, other_og_seqs = _filter_seqs_for_evaluation(
-            og, genome_id
-        )  # TODO add this to Runtime.paralog_ids
-        best_hit_seq, other_paralog_seqs = _evaluate_paralogs(
+        paralog_seqs, other_og_seqs = _filter_seqs_for_evaluation(og, genome_id)
+        selected_paralog, ignored_paralogs = _evaluate_paralogs(
             paralog_seqs, other_og_seqs
         )
         logger.info(
-            "%s seqs of %s were detected as paralogs, moved to paralogs dir. %s kept in ortholog group",
-            (", ").join([seq.id for seq in other_paralog_seqs]),
+            "%s seqs of %s were detected as paralogs. %s kept in ortholog group",
+            (", ").join([seq.id for seq in ignored_paralogs]),
             genome_id,
-            best_hit_seq.id,
+            selected_paralog.id,
         )
 
         # remove paralogs from og
-        og.remove_seqs(*[seq.id for seq in other_paralog_seqs])
+        ignored_paralog_ids = [seq.id for seq in ignored_paralogs]
+        og.remove_seqs(*ignored_paralog_ids)
         assert og.path.exists()
 
-        # move paralogs to paralogs dir
-        paralogs_fasta = Fasta(paralogs_dir_path / f"{best_hit_seq.id}.fasta")
-        paralogs_fasta.add_seqs(*other_paralog_seqs)
+        # add ignored paralogs to Runtime
+        paralog_ids.update(ignored_paralog_ids)
 
     return False
 
