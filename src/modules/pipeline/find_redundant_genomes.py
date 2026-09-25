@@ -30,8 +30,8 @@ def find_redundant_genomes(ctx: Context) -> None:
     if (  # the pipeline needs at least 2 genomes on first round, else dont filter
         n_genomes_for_first_round >= 2 and redundant_genome_ids
     ):
-        ctx.runtime.redundant_genomes = True
         ctx.runtime.redundant_genome_ids = redundant_genome_ids
+        ctx.runtime.active_genome_ids = set(genomes_fasta.ids) - redundant_genome_ids
 
 
 def _get_redundant_genomes(ctx: Context, genomes_fasta: Fasta) -> set[str]:
