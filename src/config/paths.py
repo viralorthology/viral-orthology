@@ -8,8 +8,6 @@ class Paths:
 
     base: Path
     output_dir: Path = field(init=False)
-    proteomes_dir: Path = field(init=False)  # TODO dont use proteomes dir
-    paralogs_dir: Path = field(init=False)
     ortholog_groups_dir: Path = field(init=False)
 
     annotated_unique_prots_fasta: Path = field(init=False)
@@ -28,8 +26,6 @@ class Paths:
 
         object.__setattr__(self, "base", base)
         object.__setattr__(self, "output_dir", base / "output")
-        object.__setattr__(self, "proteomes_dir", base / "proteomes")
-        object.__setattr__(self, "paralogs_dir", base / "paralogs")
         object.__setattr__(self, "ortholog_groups_dir", base / "ortholog_groups")
 
         object.__setattr__(
