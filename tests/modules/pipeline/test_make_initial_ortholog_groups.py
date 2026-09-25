@@ -26,7 +26,6 @@ def test_remove_paralogs_all_seqs_are_paralogs(tmp_path):
     og.delete_fasta.assert_called_once()
 
 
-@patch("modules.pipeline.make_initial_ortholog_groups.Fasta")
 @patch("modules.pipeline.make_initial_ortholog_groups._evaluate_paralogs")
 @patch("modules.pipeline.make_initial_ortholog_groups._filter_seqs_for_evaluation")
 @patch("modules.pipeline.make_initial_ortholog_groups._get_genome_ids_with_paralogs")
@@ -34,8 +33,6 @@ def test_remove_paralogs(
     mock_get_genome_ids_with_paralogs,
     mock_filter_seqs_for_evaluation,
     mock_evaluate_paralogs,
-    mock_fasta,
-    tmp_path,
 ):
     seq1 = make_seq("seq1", "genome1")
     seq2 = make_seq("seq2", "genome1")
@@ -45,14 +42,13 @@ def test_remove_paralogs(
     mock_get_genome_ids_with_paralogs.return_value = ["A"]
     mock_filter_seqs_for_evaluation.return_value = [1, 2]
     mock_evaluate_paralogs.return_value = (seq1, [seq2])
-
-    deleted = _remove_paralogs(og, tmp_path)
+    ignored_paralog_ids = set()
+    deleted = _remove_paralogs(og, ignored_paralog_ids)
 
     assert deleted is False
     og.delete_fasta.assert_not_called()
     og.remove_seqs.assert_called_once_with(seq2.id)
-    mock_fasta.assert_called_once_with(tmp_path / f"{seq1.id}.fasta")
-    mock_fasta.return_value.add_seqs.assert_called_once_with(seq2)
+    assert ignored_paralog_ids == {"seq2"}
 
 
 @pytest.mark.parametrize(
