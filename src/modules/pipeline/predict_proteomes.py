@@ -11,8 +11,8 @@ def predict_proteomes(ctx: Context, genome_ids: set[str]) -> None:
     """Predict proteomes from genome sequences and save the resulting proteomes."""
     ctx.ui.show("Predicting proteomes...")
 
-    annotated_proteomes_fasta = Fasta(ctx.paths.proteomes_fasta)
-    predicted_proteomes_fasta = Fasta(ctx.paths.predicted_proteomes_fasta)
+    proteomes_fasta = Fasta(ctx.paths.proteomes_fasta)
+    predicted_unique_prots_fasta = Fasta(ctx.paths.predicted_unique_prots_fasta)
     genomes_fasta = Fasta(ctx.paths.genomes_fasta)
 
     for genome_id in ctx.ui.progress_bar(genome_ids):
@@ -20,7 +20,7 @@ def predict_proteomes(ctx: Context, genome_ids: set[str]) -> None:
 
         genome_seq = genomes_fasta.get_seqs(genome_id)[0]
         proteome = [
-            seq for seq in annotated_proteomes_fasta.seqs if seq.genome_id == genome_id
+            seq for seq in proteomes_fasta.seqs if seq.genome_id == genome_id
         ] or None
 
         predicted_proteins = predict_proteome(
@@ -36,5 +36,5 @@ def predict_proteomes(ctx: Context, genome_ids: set[str]) -> None:
             genome_id,
         )
 
-        predicted_proteomes_fasta.add_seqs(*predicted_proteins)
+        predicted_unique_prots_fasta.add_seqs(*predicted_proteins)
         ctx.runtime.predicted_proteins_count += len(predicted_proteins)

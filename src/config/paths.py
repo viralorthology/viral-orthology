@@ -14,7 +14,6 @@ class Paths:
     predicted_unique_prots_fasta: Path = field(init=False)
     genomes_fasta: Path = field(init=False)
     proteomes_fasta: Path = field(init=False)
-    predicted_proteomes_fasta: Path = field(init=False)
     ids_txt: Path = field(init=False)
 
     def __post_init__(self) -> None:
@@ -36,7 +35,4 @@ class Paths:
         )
         object.__setattr__(self, "genomes_fasta", base / "genomes.fasta")
         object.__setattr__(self, "proteomes_fasta", base / "proteomes.fasta")
-        object.__setattr__(
-            self, "predicted_proteomes_fasta", base / "predicted_proteomes.fasta"
-        )
         object.__setattr__(self, "ids_txt", base / "ids.txt")

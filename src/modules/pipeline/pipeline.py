@@ -35,7 +35,6 @@ def run(ctx: Context) -> None:
         ctx.paths.annotated_unique_prots_fasta,
         ctx.paths.predicted_unique_prots_fasta,
         ctx.paths.ortholog_groups_dir,
-        ctx.paths.predicted_proteomes_fasta,
     )
 
     genome_ids = Fasta(ctx.paths.genomes_fasta).ids
