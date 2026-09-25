@@ -11,7 +11,6 @@ from modules.pipeline.predict_proteomes import predict_proteomes
 from modules.pipeline.rename_og_fastas_by_annotation import (
     rename_og_fastas_by_annotation,
 )
-from modules.pipeline.split_fastas import split_fastas
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +18,7 @@ logger = logging.getLogger(__name__)
 def run(ctx: Context) -> None:
     logger.info("Running pipeline")
 
-    ### VALIDATION ###
+    ### PRE-RUN ###
     utils.check_dependencies(
         "blastn",
         "blastp",
@@ -36,8 +35,6 @@ def run(ctx: Context) -> None:
         ctx.paths.annotated_unique_prots_fasta,
         ctx.paths.predicted_unique_prots_fasta,
         ctx.paths.ortholog_groups_dir,
-        ctx.paths.proteomes_dir,
-        ctx.paths.paralogs_dir,
         ctx.paths.predicted_proteomes_fasta,
     )
 
@@ -61,17 +58,14 @@ def run(ctx: Context) -> None:
     _preparation_stage(ctx)
     _initial_stage(ctx)
 
-    ### MAKE REPORTS ###
-
 
 def _preparation_stage(ctx: Context) -> None:
-    split_fastas(ctx)
-    predict_proteomes(ctx)
     find_paralogs(ctx)
     find_redundant_genomes(ctx)
 
 
 def _initial_stage(ctx: Context) -> None:
+    predict_proteomes(ctx, ctx.runtime.active_genome_ids)
     make_initial_ortholog_groups(ctx)
     rename_og_fastas_by_annotation(ctx)
     clean_ortholog_groups(ctx)
