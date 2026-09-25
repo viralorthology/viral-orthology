@@ -7,22 +7,20 @@ from models.fasta import Fasta
 logger = logging.getLogger(__name__)
 
 
-def predict_proteomes(ctx: Context) -> None:
+def predict_proteomes(ctx: Context, genome_ids: set[str]) -> None:
     """Predict proteomes from genome sequences and save the resulting proteomes."""
     ctx.ui.show("Predicting proteomes...")
 
     annotated_proteomes_fasta = Fasta(ctx.paths.proteomes_fasta)
     predicted_proteomes_fasta = Fasta(ctx.paths.predicted_proteomes_fasta)
     genomes_fasta = Fasta(ctx.paths.genomes_fasta)
-    for genome_seq in ctx.ui.progress_bar(
-        genomes_fasta.seqs, total=genomes_fasta.n_seqs
-    ):
-        logger.info("Predicting %s proteome", genome_seq.id)
 
+    for genome_id in ctx.ui.progress_bar(genome_ids):
+        logger.info("Predicting %s proteome", genome_id)
+
+        genome_seq = genomes_fasta.get_seqs(genome_id)[0]
         proteome = [
-            seq
-            for seq in annotated_proteomes_fasta.seqs
-            if seq.genome_id == genome_seq.id
+            seq for seq in annotated_proteomes_fasta.seqs if seq.genome_id == genome_id
         ] or None
 
         predicted_proteins = predict_proteome(
@@ -35,7 +33,7 @@ def predict_proteomes(ctx: Context) -> None:
         logger.info(
             "%d proteins predicted for genome %s",
             len(predicted_proteins),
-            genome_seq.id,
+            genome_id,
         )
 
         predicted_proteomes_fasta.add_seqs(*predicted_proteins)
