@@ -2,7 +2,6 @@ import logging
 from collections import defaultdict
 
 import engines
-import utils
 from config.context import Context
 from engines.blast import BlastHit
 from models.fasta import Fasta
@@ -13,61 +12,63 @@ logger = logging.getLogger(__name__)
 
 def find_paralogs(ctx: Context) -> None:
     """
-    Find and remove paralog protein sequences from each proteome.
+    Identify paralog proteins within each proteome and select one representative.
 
-    Reciprocal BLASTP hits are used to identify groups of paralog sequences.
-    Within each group, the longest sequence is retained in the proteome and
-    the remaining sequences are moved to a separate FASTA file.
+    BLASTP reciprocal hits are used to identify groups of paralogous proteins.
+    Within each group, the longest protein sequence is selected for further
+    analysis, while the remaining paralogs are marked as ignored in the
+    runtime context.
     """
     ctx.ui.show("Searching for paralogs...")
 
-    ctx.paths.paralogs_dir.mkdir()
-    proteomes = utils.get_fastas(ctx.paths.proteomes_dir, ".fasta")
+    genomes_fasta = Fasta(ctx.paths.genomes_fasta)
+    proteomes_fasta = Fasta(ctx.paths.proteomes_fasta)
 
-    for proteome in ctx.ui.progress_bar(proteomes):
-        with TmpFasta() as blastp_db:
-            blastp_db.add_seqs(*proteome.seqs)
-            engines.make_blast_db(blastp_db, "prot")
+    for genome_id in ctx.ui.progress_bar(genomes_fasta.ids):
+        proteome = [seq for seq in proteomes_fasta.seqs if seq.genome_id == genome_id]
+        if not proteome:
+            logger.info("Genome %s ignored: no annotated proteome found", genome_id)
+            continue
+
+        with TmpFasta() as proteome_fasta:
+            proteome_fasta.add_seqs(*proteome)
+            engines.make_blast_db(proteome_fasta, "prot")
 
             blastp_hits = engines.blastp_search(
-                proteome, blastp_db, ctx.args.tool_args["blastp_paralog_search"]
+                proteome_fasta,
+                proteome_fasta,
+                ctx.args.tool_args["blastp_paralog_search"],
             )
-            logger.debug("blastp hits for %s: %s", proteome.path.stem, blastp_hits)
+            logger.debug("blastp hits for %s: %s", genome_id, blastp_hits)
 
         # find reciprocal hits
         reciprocal_hits = _find_reciprocal_hits(blastp_hits)
         if not reciprocal_hits:
-            logger.info("No paralogs found in genome %s", proteome.path.stem)
+            logger.info("No paralogs found in genome %s", genome_id)
             continue
 
         # find groups of paralog seqs
         paralog_groups = _find_paralog_groups(reciprocal_hits)
-        logger.info(
-            "Paralogs found in genome %s: %s", proteome.path.stem, paralog_groups
-        )
+        logger.info("Paralogs found in genome %s: %s", genome_id, paralog_groups)
 
-        # remove paralogs from proteome
+        # add ignored paralogs to Runtime
         for paralog_group_ids in paralog_groups:
-            biggest_prot = max(
-                (seq for seq in proteome.seqs if seq.id in paralog_group_ids),
-                key=lambda seq: len(seq.seq),
+            selected_paralog = max(
+                (seq for seq in proteome if seq.id in paralog_group_ids),
+                key=lambda seq: (len(seq.seq), seq.id),  # Ensure reproducibility
             )
-            biggest_prot_id = biggest_prot.id
 
-            prot_ids_to_move = [
-                seq_id for seq_id in paralog_group_ids if seq_id != biggest_prot_id
+            ignored_paralog_ids = [
+                seq_id for seq_id in paralog_group_ids if seq_id != selected_paralog.id
             ]
-            seqs_to_move = proteome.get_seqs(*prot_ids_to_move)
-            proteome.remove_seqs(*prot_ids_to_move)
 
-            paralogs_fasta = Fasta(ctx.paths.paralogs_dir / f"{biggest_prot_id}.fasta")
-            paralogs_fasta.add_seqs(*seqs_to_move)
+            ctx.runtime.paralog_ids.update(ignored_paralog_ids)
 
             logger.info(
-                "Proteins %s removed from genome %s proteome, protein %s kept in proteome",
-                prot_ids_to_move,
-                proteome.path.stem,
-                biggest_prot_id,
+                "Genome %s proteins ignored: %s, protein %s selected for further analysis",
+                genome_id,
+                ignored_paralog_ids,
+                selected_paralog.id,
             )
 
 
