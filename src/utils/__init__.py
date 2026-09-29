@@ -1,5 +1,6 @@
 from .cmd import check_dependencies, run_cmd
 from .dataset import get_dataset_hash
+from .fasta import o_groups_are_compatible
 from .files import (
     ensure_files_exist,
     ensure_files_have_content,
@@ -22,5 +23,6 @@ __all__ = [
     "get_fastas",
     "get_ortholog_groups",
     "get_seqs_from_fasta_str",
+    "o_groups_are_compatible",
     "run_cmd",
 ]
