@@ -7,6 +7,7 @@ from modules.pipeline.clean_ortholog_groups import clean_ortholog_groups
 from modules.pipeline.find_paralogs import find_paralogs
 from modules.pipeline.find_redundant_genomes import find_redundant_genomes
 from modules.pipeline.make_initial_ortholog_groups import make_initial_ortholog_groups
+from modules.pipeline.merge_by_annotation import merge_by_annotation
 from modules.pipeline.predict_proteomes import predict_proteomes
 from modules.pipeline.rename_og_fastas_by_annotation import (
     rename_og_fastas_by_annotation,
@@ -56,6 +57,7 @@ def run(ctx: Context) -> None:
     ### RUN ###
     _preparation_stage(ctx)
     _initial_stage(ctx)
+    _enrichment_stage(ctx)
 
 
 def _preparation_stage(ctx: Context) -> None:
@@ -68,3 +70,7 @@ def _initial_stage(ctx: Context) -> None:
     make_initial_ortholog_groups(ctx)
     rename_og_fastas_by_annotation(ctx)
     clean_ortholog_groups(ctx)
+
+
+def _enrichment_stage(ctx: Context) -> None:
+    merge_by_annotation(ctx)
