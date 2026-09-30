@@ -1,12 +1,11 @@
 import logging
 import tempfile
+from collections import Counter
 from pathlib import Path
 
-import engines
 import utils
 from config.context import Context
 from models.fasta import Fasta
-from models.seq import Seq
 
 logger = logging.getLogger(__name__)
 
@@ -16,9 +15,9 @@ def make_initial_ortholog_groups(ctx: Context) -> None:
     Create initial ortholog groups from the non-redundant proteomes.
 
     Proteomes are compared with ProteinOrtho to generate ortholog groups.
-    Groups containing paralogs are filtered by retaining the paralog with
-    the best BLASTP hit against the other proteins in the group. Groups
-    containing proteins from only one genome are deleted.
+    Groups containing paralogs are filtered by retaining the longest protein
+    from each genome. Groups containing proteins from only one genome are
+    deleted.
     """
     ctx.ui.show("Creating initial ortholog groups...")
 
@@ -26,27 +25,18 @@ def make_initial_ortholog_groups(ctx: Context) -> None:
 
     with tempfile.TemporaryDirectory() as tmp_path:
         tmp_dir = Path(tmp_path)
-
-        # make proteome fastas
-        tmp_proteome_fastas = []
-        for genome_id in ctx.runtime.active_genome_ids:
-            proteome_seqs = [
-                seq
-                for seq in proteomes_fasta.seqs
-                if seq.genome_id == genome_id and seq.id not in ctx.runtime.paralog_ids
-            ]
-            if not proteome_seqs:
-                continue
-
-            proteome_fasta = Fasta(tmp_dir / f"{genome_id}.fasta")
-            proteome_fasta.add_seqs(*proteome_seqs)
-            tmp_proteome_fastas.append(proteome_fasta)
+        proteome_fastas = _get_proteome_fastas(
+            tmp_dir,
+            proteomes_fasta,
+            ctx.runtime.active_genome_ids,
+            ctx.runtime.paralog_ids,
+        )
 
         # run proteinortho
         og_tmp_dir = tmp_dir / "ortholog_groups"
         og_tmp_dir.mkdir()
         _run_proteinortho(
-            tmp_proteome_fastas, ctx.args.tool_args["proteinortho"], og_tmp_dir
+            proteome_fastas, ctx.args.tool_args["proteinortho"], og_tmp_dir
         )
 
         # remove paralogs from ortholog groups
@@ -64,6 +54,35 @@ def make_initial_ortholog_groups(ctx: Context) -> None:
             if og in deleted_ogs:
                 continue
             og.move_fasta(ctx.paths.ortholog_groups_dir)
+
+
+def _get_proteome_fastas(
+    tmp_dir: Path,
+    proteomes_fasta: Fasta,
+    active_genome_ids: set[str],
+    paralog_ids: set[str],
+) -> list[Fasta]:
+    """
+    Create temporary FASTA files containing the proteome of each active genome.
+
+    Proteins identified as paralogs are excluded from the generated proteomes.
+    Genomes without proteins are skipped.
+    """
+    tmp_proteome_fastas = []
+    for genome_id in active_genome_ids:
+        proteome_seqs = [
+            seq
+            for seq in proteomes_fasta.seqs
+            if seq.genome_id == genome_id and seq.id not in paralog_ids
+        ]
+        if not proteome_seqs:
+            continue
+
+        proteome_fasta = Fasta(tmp_dir / f"{genome_id}.fasta")
+        proteome_fasta.add_seqs(*proteome_seqs)
+        tmp_proteome_fastas.append(proteome_fasta)
+
+    return tmp_proteome_fastas
 
 
 def _run_proteinortho(proteome_fastas: list[Fasta], params: str, cwd: Path) -> None:
@@ -89,20 +108,21 @@ def _run_proteinortho(proteome_fastas: list[Fasta], params: str, cwd: Path) -> N
 
 def _remove_paralogs(og: Fasta, paralog_ids: set[str]) -> bool:
     """
-    Remove paralogs from an ortholog group and add them to Runtime
+    Remove paralogous sequences from an ortholog group.
 
-    For each genome containing multiple proteins in the group, the paralog
-    with the best BLASTP hit against proteins from the other genomes is
-    retained in the group. The remaining paralogs are addedd to Runtime.
-    An ortholog group containing proteins from only one genome is deleted.
+    If all sequences in the ortholog group belong to the same genome, the
+    ortholog group is deleted. Otherwise, for each genome containing multiple
+    sequences, the longest sequence is retained and the remaining sequences
+    are removed and added to the set of paralog IDs. Sequence IDs are used
+    as a deterministic tie-breaker when sequences have the same length.
 
     Args:
-        og: Ortholog group FASTA file to process.
-        paralog_ids: Set from Runtime
+        og: FASTA file representing an ortholog group.
+        paralog_ids: Set of sequence IDs identified as paralogs.
 
     Returns:
-        True if the ortholog group was deleted because it contained proteins
-        from only one genome, otherwise False.
+        True if the ortholog group was deleted because all sequences belonged
+        to the same genome, otherwise False.
     """
     if len(set(og.genome_ids)) == 1:  # all seqs from the same genome
         og.delete_fasta()
@@ -112,19 +132,26 @@ def _remove_paralogs(og: Fasta, paralog_ids: set[str]) -> bool:
         return True
 
     for genome_id in _get_genome_ids_with_paralogs(og.genome_ids):
-        paralog_seqs, other_og_seqs = _filter_seqs_for_evaluation(og, genome_id)
-        selected_paralog, ignored_paralogs = _evaluate_paralogs(
-            paralog_seqs, other_og_seqs
+        paralog_seqs = [seq for seq in og.seqs if seq.genome_id == genome_id]
+        assert len(paralog_seqs) >= 2
+
+        selected_paralog = max(
+            paralog_seqs,
+            key=lambda seq: (len(seq.seq), seq.id),  # Ensure reproducibility
         )
+
+        ignored_paralog_ids = [
+            seq.id for seq in paralog_seqs if seq.id != selected_paralog.id
+        ]
+
         logger.info(
-            "%s seqs of %s were detected as paralogs. %s kept in ortholog group",
-            (", ").join([seq.id for seq in ignored_paralogs]),
+            "%s seqs from %s were detected as paralogs. %s kept in ortholog group",
+            (", ").join([seq_id for seq_id in ignored_paralog_ids]),
             genome_id,
             selected_paralog.id,
         )
 
         # remove paralogs from og
-        ignored_paralog_ids = [seq.id for seq in ignored_paralogs]
         og.remove_seqs(*ignored_paralog_ids)
         assert og.path.exists()
 
@@ -138,95 +165,10 @@ def _get_genome_ids_with_paralogs(genome_ids: list[str]) -> list[str]:
     """
     Find genome IDs that occur more than once.
 
-    Args:
-        genome_ids: List of genome IDs associated with the sequences in an
-            orthologous group.
-
     Returns:
         Sorted list of genome IDs that have multiple sequences.
     """
     assert len(set(genome_ids)) > 1
+    counts = Counter(genome_ids)
 
-    return sorted(  # Ensure reproducibility
-        [genome_id for genome_id in set(genome_ids) if genome_ids.count(genome_id) > 1]
-    )
-
-
-def _filter_seqs_for_evaluation(
-    og: Fasta, genome_id: str
-) -> tuple[list[Seq], list[Seq]]:
-    """
-    Separate paralogs from the remaining proteins in an ortholog group.
-
-    Args:
-        og: Ortholog group containing the sequences to separate.
-        genome_id: Genome ID whose paralog sequences should be used as
-            BLASTP queries.
-
-    Returns:
-        - The paralogous sequences from genome_id
-        - The sequences from all other genomes in the ortholog group.
-    """
-    paralog_seqs = []
-    other_og_seqs = []
-
-    for seq in og.seqs:
-        if seq.genome_id == genome_id:
-            paralog_seqs.append(seq)
-        else:
-            other_og_seqs.append(seq)
-
-    assert len(paralog_seqs) > 1
-    assert other_og_seqs
-
-    return paralog_seqs, other_og_seqs
-
-
-def _evaluate_paralogs(
-    paralog_seqs: list[Seq], other_og_seqs: list[Seq]
-) -> tuple[Seq, list[Seq]]:
-    """
-    Identify the best-supported paralog using BLASTP.
-
-    The paralog sequences are used as BLASTP queries against a database
-    containing the proteins from other genomes in the ortholog group.
-    The query producing the best hit is retained, while the remaining
-    paralogs are returned for removal.
-
-    Args:
-        paralog_seqs: Paralogous sequences from the same genome.
-        other_og_seqs: Sequences from other genomes in the ortholog
-            group, used to build the BLASTP database.
-
-    Returns:
-        - The best-supported paralog
-        - The remaining paralog sequences.
-    """
-    with tempfile.TemporaryDirectory() as tmp_path:
-        tmp_dir = Path(tmp_path)
-
-        assert other_og_seqs
-        fasta_blastp_db = Fasta(tmp_dir / "blastp_db.fasta")
-        fasta_blastp_db.add_seqs(*other_og_seqs)
-        engines.make_blast_db(fasta_blastp_db, "prot")
-
-        assert len(paralog_seqs) > 1
-        fasta_query = Fasta(tmp_dir / "blastp_query.fasta")
-        fasta_query.add_seqs(*paralog_seqs)
-
-        hits = engines.blastp_search(fasta_query, fasta_blastp_db, "-evalue 100000")
-        assert hits
-        best_query_id = hits[0].query_id
-
-        best_seq = None
-        other_seqs = []
-        for seq in paralog_seqs:
-            if seq.id == best_query_id:
-                assert best_seq is None
-                best_seq = seq
-            else:
-                other_seqs.append(seq)
-        assert best_seq is not None
-        assert other_seqs
-
-        return best_seq, other_seqs
+    return sorted(genome_id for genome_id, count in counts.items() if count > 1)
