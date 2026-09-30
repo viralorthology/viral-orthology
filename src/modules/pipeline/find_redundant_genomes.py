@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 def find_redundant_genomes(ctx: Context) -> None:
     """
-    Identify and remove redundant genomes from the first analysis round.
+    Identify redundant genomes from the first analysis round.
 
     Redundant genomes are only filtered if at least two genomes remain for
     the first analysis round.
@@ -21,26 +21,21 @@ def find_redundant_genomes(ctx: Context) -> None:
     genomes_fasta = Fasta(ctx.paths.genomes_fasta)
     redundant_genome_ids = _get_redundant_genomes(ctx, genomes_fasta)
 
-    if redundant_genome_ids:
-        logger.info("Redundant genomes: %s", (", ").join(redundant_genome_ids))
-    else:
-        logger.info("No redundant genomes found")
-
     n_genomes_for_first_round = genomes_fasta.n_seqs - len(redundant_genome_ids)
-    if (  # the pipeline needs at least 2 genomes on first round, else dont filter
-        n_genomes_for_first_round >= 2 and redundant_genome_ids
-    ):
+
+    # the pipeline needs at least 2 genomes on first round, else dont filter
+    if redundant_genome_ids and n_genomes_for_first_round >= 2:
         ctx.runtime.redundant_genome_ids = redundant_genome_ids
         ctx.runtime.active_genome_ids = set(genomes_fasta.ids) - redundant_genome_ids
+        logger.info("Redundant genomes found: %s", (", ").join(redundant_genome_ids))
+    else:
+        ctx.runtime.active_genome_ids = set(genomes_fasta.ids)
+        logger.info("No redundant genomes filtered")
 
 
 def _get_redundant_genomes(ctx: Context, genomes_fasta: Fasta) -> set[str]:
     """
     Identify redundant genomes based on pairwise BLASTN similarity.
-
-    Args:
-        ctx: Pipeline context used for progress reporting.
-        genomes_fasta: Fasta file with all the available genomes.
 
     Returns:
         The Seq IDs of the redundant genomes.
