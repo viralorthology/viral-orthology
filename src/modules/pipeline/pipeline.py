@@ -6,6 +6,10 @@ from models.fasta import Fasta
 from modules.pipeline.clean_ortholog_groups import clean_ortholog_groups
 from modules.pipeline.find_paralogs import find_paralogs
 from modules.pipeline.find_redundant_genomes import find_redundant_genomes
+from modules.pipeline.hmm_search import hmm_search
+from modules.pipeline.make_annotated_unique_prots_fasta import (
+    make_annotated_unique_prots_fasta,
+)
 from modules.pipeline.make_initial_ortholog_groups import make_initial_ortholog_groups
 from modules.pipeline.merge_by_annotation import merge_by_annotation
 from modules.pipeline.predict_proteomes import predict_proteomes
@@ -70,7 +74,9 @@ def _initial_stage(ctx: Context) -> None:
     make_initial_ortholog_groups(ctx)
     rename_og_fastas_by_annotation(ctx)
     clean_ortholog_groups(ctx)
+    make_annotated_unique_prots_fasta(ctx)
 
 
 def _enrichment_stage(ctx: Context) -> None:
     merge_by_annotation(ctx)
+    hmm_search(ctx)

@@ -6,7 +6,7 @@ from models.fasta import Fasta
 from models.ortholog_group import OrthologGroup
 
 
-@dataclass
+@dataclass(frozen=True)
 class HMMHit:
     evalue: float
     seq_id: str
