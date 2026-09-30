@@ -5,6 +5,7 @@ import engines
 from config.context import Context
 from engines.blast import BlastHit
 from models.fasta import Fasta
+from models.seq import Seq
 from models.tmp_fasta import TmpFasta
 
 logger = logging.getLogger(__name__)
@@ -30,16 +31,11 @@ def find_paralogs(ctx: Context) -> None:
             logger.info("Genome %s ignored: no annotated proteome found", genome_id)
             continue
 
-        with TmpFasta() as proteome_fasta:
-            proteome_fasta.add_seqs(*proteome)
-            engines.make_blast_db(proteome_fasta, "prot")
-
-            blastp_hits = engines.blastp_search(
-                proteome_fasta,
-                proteome_fasta,
-                ctx.args.tool_args["blastp_paralog_search"],
-            )
-            logger.debug("blastp hits for %s: %s", genome_id, blastp_hits)
+        # run self blastp
+        blastp_hits = _get_blastp_hits(
+            proteome, ctx.args.tool_args["blastp_paralog_search"]
+        )
+        logger.debug("blastp hits for genome %s: %s", genome_id, blastp_hits)
 
         # find reciprocal hits
         reciprocal_hits = _find_reciprocal_hits(blastp_hits)
@@ -58,9 +54,7 @@ def find_paralogs(ctx: Context) -> None:
                 key=lambda seq: (len(seq.seq), seq.id),  # Ensure reproducibility
             )
 
-            ignored_paralog_ids = [
-                seq_id for seq_id in paralog_group_ids if seq_id != selected_paralog.id
-            ]
+            ignored_paralog_ids = paralog_group_ids - {selected_paralog.id}
 
             ctx.runtime.paralog_ids.update(ignored_paralog_ids)
 
@@ -70,6 +64,31 @@ def find_paralogs(ctx: Context) -> None:
                 ignored_paralog_ids,
                 selected_paralog.id,
             )
+
+
+def _get_blastp_hits(proteome: list[Seq], blastp_params: str) -> list[BlastHit]:
+    """
+    Run BLASTP on a proteome against itself and return the resulting hits.
+
+    Args:
+        proteome: Protein sequences to use as both the BLAST database and
+            query sequences.
+        blastp_params: Parameters passed to the BLASTP search.
+
+    Returns:
+        List of Blast hits found among the protein sequences.
+    """
+    with TmpFasta() as proteome_fasta:
+        proteome_fasta.add_seqs(*proteome)
+        engines.make_blast_db(proteome_fasta, "prot")
+
+        blastp_hits = engines.blastp_search(
+            proteome_fasta,
+            proteome_fasta,
+            blastp_params,
+        )
+
+    return blastp_hits
 
 
 def _find_reciprocal_hits(blastp_hits: list[BlastHit]) -> set[frozenset[str]]:
