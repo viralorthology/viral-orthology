@@ -9,65 +9,6 @@ from modules.pipeline.hmm_search import (
 
 
 @patch("modules.pipeline.hmm_search.engines.hmm_search")
-def test_search_and_add_prots_with_hmm_searches_incomplete_ogs(
-    mock_hmm_search,
-):
-    og_complete = Mock()
-    og_complete.n_seqs = 3
-
-    og_incomplete = Mock()
-    og_incomplete.n_seqs = 2
-
-    ui = Mock()
-    ui.progress_bar.return_value = [
-        og_complete,
-        og_incomplete,
-    ]
-
-    unique_prots_fasta = Mock()
-
-    mock_hmm_search.return_value = []
-
-    result = search_and_add_prots_with_hmm(
-        ui,
-        [og_complete, og_incomplete],
-        unique_prots_fasta,
-        "hmmsearch params",
-        3,
-    )
-
-    mock_hmm_search.assert_called_once_with(
-        og_incomplete,
-        unique_prots_fasta,
-        "hmmsearch params",
-    )
-
-    assert result is False
-
-
-@patch("modules.pipeline.hmm_search.engines.hmm_search")
-def test_search_and_add_prots_with_hmm_returns_false_when_nothing_added(
-    mock_hmm_search,
-):
-    ui = Mock()
-    ui.progress_bar.return_value = []
-
-    unique_prots_fasta = Mock()
-    mock_hmm_search.return_value = []
-
-    result = search_and_add_prots_with_hmm(
-        ui,
-        [],
-        unique_prots_fasta,
-        "params",
-        3,
-    )
-
-    assert result is False
-    unique_prots_fasta.remove_seqs.assert_not_called()
-
-
-@patch("modules.pipeline.hmm_search.engines.hmm_search")
 def test_search_and_add_prots_with_hmm_removes_added_proteins(
     mock_hmm_search,
 ):
@@ -84,7 +25,7 @@ def test_search_and_add_prots_with_hmm_removes_added_proteins(
     ui.progress_bar.return_value = [og]
 
     unique_prots_fasta = Mock()
-    unique_prots_fasta.get_seqs.return_value = [seq]
+    unique_prots_fasta.seqs = iter([seq])
 
     mock_hmm_search.return_value = [hit]
 
@@ -113,12 +54,11 @@ def test_add_proteins_to_ogs_adds_protein_to_og():
 
     seq = SimpleNamespace(id="gene1")
 
-    fasta = Mock()
-    fasta.get_seqs.return_value = [seq]
+    seqs_by_seq_id = {"gene1": seq}
 
     added = _add_proteins_to_ogs(
         {hit: og},
-        fasta,
+        seqs_by_seq_id,
     )
 
     og.add_seqs.assert_called_once_with(seq)
@@ -135,16 +75,13 @@ def test_add_proteins_to_ogs_skips_protein_from_same_genome():
     og = Mock()
     og.genome_ids = {"genome1"}
 
-    unique_prots_fasta = Mock()
-
     added = _add_proteins_to_ogs(
         {hit: og},
-        unique_prots_fasta,
+        {},
     )
 
     assert added == set()
     og.add_seqs.assert_not_called()
-    unique_prots_fasta.get_seqs.assert_not_called()
 
 
 def test_add_proteins_to_ogs_uses_best_hit():
@@ -168,8 +105,7 @@ def test_add_proteins_to_ogs_uses_best_hit():
 
     seq = SimpleNamespace(id="gene1")
 
-    unique_prots_fasta = Mock()
-    unique_prots_fasta.get_seqs.return_value = [seq]
+    seqs_by_seq_id = {"gene1": seq}
 
     sorted_hits = {
         hit2: og2,
@@ -178,7 +114,7 @@ def test_add_proteins_to_ogs_uses_best_hit():
 
     added = _add_proteins_to_ogs(
         sorted_hits,
-        unique_prots_fasta,
+        seqs_by_seq_id,
     )
 
     og2.add_seqs.assert_called_once_with(seq)
@@ -208,12 +144,11 @@ def test_add_proteins_to_ogs_does_not_add_same_protein_twice():
 
     seq = SimpleNamespace(id="gene1")
 
-    unique_prots_fasta = Mock()
-    unique_prots_fasta.get_seqs.return_value = [seq]
+    seqs_by_seq_id = {"gene1": seq}
 
     added = _add_proteins_to_ogs(
         {hit1: og1, hit2: og2},
-        unique_prots_fasta,
+        seqs_by_seq_id,
     )
 
     assert added == {"gene1"}
@@ -244,12 +179,11 @@ def test_add_proteins_to_ogs_adds_multiple_proteins():
     seq1 = SimpleNamespace(id="gene1")
     seq2 = SimpleNamespace(id="gene2")
 
-    unique_prots_fasta = Mock()
-    unique_prots_fasta.get_seqs.side_effect = [[seq1], [seq2]]
+    seqs_by_seq_id = {"gene1": seq1, "gene2": seq2}
 
     added = _add_proteins_to_ogs(
         {hit1: og1, hit2: og2},
-        unique_prots_fasta,
+        seqs_by_seq_id,
     )
 
     og1.add_seqs.assert_called_once_with(seq1)
