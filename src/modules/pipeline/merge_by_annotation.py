@@ -22,7 +22,8 @@ def merge_by_annotation(ctx: Context) -> None:
     active_genomes_count = len(ctx.runtime.active_genome_ids)
     for i, og1 in enumerate(ortholog_groups):
         if (
-            "hypothetical-protein" in og1.path.stem
+            not og1.path.exists()
+            or "hypothetical-protein" in og1.path.stem
             or og1.n_seqs == active_genomes_count
         ):
             continue
