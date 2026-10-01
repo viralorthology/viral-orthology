@@ -3,6 +3,7 @@ import logging
 import utils
 from config.context import Context
 from models.fasta import Fasta
+from modules.pipeline.blastp_search import blastp_search
 from modules.pipeline.clean_ortholog_groups import clean_ortholog_groups
 from modules.pipeline.find_paralogs import find_paralogs
 from modules.pipeline.find_redundant_genomes import find_redundant_genomes
@@ -79,4 +80,8 @@ def _initial_stage(ctx: Context) -> None:
 
 def _enrichment_stage(ctx: Context) -> None:
     merge_by_annotation(ctx)
+    hmm_search(ctx)
+    blastp_search(ctx, ctx.paths.annotated_unique_prots_fasta)
+    hmm_search(ctx)
+    blastp_search(ctx, ctx.paths.predicted_unique_prots_fasta)
     hmm_search(ctx)
