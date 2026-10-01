@@ -61,8 +61,8 @@ def blastp_search(query_fasta: Fasta, blast_db: Fasta, params: str) -> list[Blas
         return []
 
     return sorted(
-        [BlastHit(line) for line in output.split("\n") if line.strip()],
-        key=lambda hit: hit.evalue,
+        [BlastHit(line) for line in output.splitlines() if line.strip()],
+        key=lambda hit: (hit.evalue, hit.query_id),  # Ensure reproducibility
     )
 
 
