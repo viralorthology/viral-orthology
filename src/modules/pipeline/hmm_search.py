@@ -5,6 +5,7 @@ from config.context import Context
 from engines.hmmer import HMMHit
 from models.fasta import Fasta
 from models.ortholog_group import OrthologGroup
+from models.seq import Seq
 
 
 def hmm_search(ctx: Context) -> None:
@@ -86,7 +87,8 @@ def search_and_add_prots_with_hmm(
 
     sorted_hits = dict(sorted(all_hits.items(), key=lambda item: item[0].evalue))
 
-    added_gene_ids = _add_proteins_to_ogs(sorted_hits, unique_prots_fasta)
+    seqs_by_seq_id = {seq.id: seq for seq in unique_prots_fasta.seqs}
+    added_gene_ids = _add_proteins_to_ogs(sorted_hits, seqs_by_seq_id)
 
     if not added_gene_ids:
         return False
@@ -97,7 +99,8 @@ def search_and_add_prots_with_hmm(
 
 
 def _add_proteins_to_ogs(
-    sorted_hits: dict[HMMHit, OrthologGroup], unique_prots_fasta: Fasta
+    sorted_hits: dict[HMMHit, OrthologGroup],
+    seqs_by_seq_id: dict[str, Seq],
 ) -> set[str]:
     """
     Add proteins to ortholog groups based on their best HMM hits.
@@ -106,10 +109,6 @@ def _add_proteins_to_ogs(
     assigned to the ortholog group associated with its best hit. A protein
     is not added if its genome is already represented in the target
     ortholog group.
-
-    Args:
-        hits: Mapping of HMM hits to their corresponding ortholog groups.
-        unique_prots_fasta: FASTA file containing candidate protein sequences.
 
     Returns:
         Set of protein IDs that were successfully added to ortholog groups.
@@ -121,7 +120,7 @@ def _add_proteins_to_ogs(
         if hit.genome_id in og.genome_ids:
             continue
 
-        seq = unique_prots_fasta.get_seqs(hit.seq_id)[0]
+        seq = seqs_by_seq_id[hit.seq_id]
         og.add_seqs(seq)
         added_gene_ids.add(seq.id)
 
