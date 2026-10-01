@@ -21,23 +21,26 @@ def merge_by_annotation(ctx: Context) -> None:
 
     active_genomes_count = len(ctx.runtime.active_genome_ids)
     for i, og1 in enumerate(ortholog_groups):
-        if (
-            not og1.path.exists()
-            or "hypothetical-protein" in og1.path.stem
-            or og1.n_seqs == active_genomes_count
-        ):
+        if _skip_og(og1, active_genomes_count):
             continue
 
-        ogs_same_annotation = _get_same_annotation_ogs(
-            og1.path.stem,
-            ortholog_groups[i + 1 :],
-        )
+        for og2 in ortholog_groups[i + 1 :]:
+            if _skip_og(og2, active_genomes_count):
+                continue
 
-        for og2 in ogs_same_annotation:
-            if utils.o_groups_are_compatible(og1, og2) and (
-                ctx.args.assume_yes
-                or ctx.ui.ask_yes_no(
-                    f"The following files can be merged:\n{og1.path} / {og2.path}\nWant to merge them?"
+            if not _ogs_have_same_annotation(og1.path.stem, og2.path.stem):
+                continue
+
+            if not utils.o_groups_are_compatible(og1, og2):
+                continue
+
+            if ctx.args.assume_yes or ctx.ui.ask_yes_no(
+                ("\n").join(
+                    [
+                        "The following files can be merged:",
+                        f"{og1.path} / {og2.path}",
+                        "Want to merge them?",
+                    ]
                 )
             ):
                 og1.add_seqs(*og2.seqs)
@@ -50,26 +53,33 @@ def merge_by_annotation(ctx: Context) -> None:
                 )
 
 
-def _get_same_annotation_ogs(
-    og1_stem: str, ogs: list[OrthologGroup]
-) -> list[OrthologGroup]:
+def _skip_og(og: OrthologGroup, active_genomes_count: int) -> bool:
     """
-    Return ortholog groups with the same annotation as ``og1_stem``.
+    Return whether an ortholog group should be skipped during merging.
 
-    The annotation is inferred from the ortholog group filename by removing
-    the suffix after the last hyphen. Only groups whose FASTA file still
-    exists are returned.
-
-    Returns:
-        Ortholog groups whose annotation matches ``og1_stem`` and whose
-        FASTA files still exist.
+    Skips groups whose file does not exist, whose annotation is
+    hypothetical-protein, or that already contain all active genomes.
     """
-    same_annotation_ogs = []
+    return (
+        not og.path.exists()
+        or "hypothetical-protein" in og.path.stem
+        or og.n_seqs == active_genomes_count
+    )
 
-    for og2 in ogs:
-        assert og2.path.stem != og1_stem
 
-        if og2.path.exists() and og2.path.stem.rsplit("-", 1)[0] == og1_stem:
-            same_annotation_ogs.append(og2)
+def _ogs_have_same_annotation(og1_stem: str, og2_stem: str) -> bool:
+    """
+    Return whether two ortholog groups represent the same annotation.
 
-    return same_annotation_ogs
+    Ortholog groups with a numeric suffix in their name are considered
+    to have the same annotation as the unsuffixed group. For example,
+    'pol', 'pol-1', and 'pol-2' are considered the same annotation.
+    """
+
+    def _annotation(stem: str) -> str:
+        parts = stem.rsplit("-", 1)
+        if len(parts) == 2 and parts[1].isdigit():
+            return parts[0]
+        return stem
+
+    return _annotation(og1_stem) == _annotation(og2_stem)
