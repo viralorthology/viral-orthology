@@ -8,10 +8,11 @@ from modules.pipeline.clean_ortholog_groups import clean_ortholog_groups
 from modules.pipeline.find_paralogs import find_paralogs
 from modules.pipeline.find_redundant_genomes import find_redundant_genomes
 from modules.pipeline.hmm_search import hmm_search
-from modules.pipeline.make_annotated_unique_prots_fasta import (
+from modules.pipeline.make_initial_ortholog_groups import make_initial_ortholog_groups
+from modules.pipeline.manage_unique_prots_fasta import (
+    add_redundant_genome_prots_unique_prots_fasta,
     make_annotated_unique_prots_fasta,
 )
-from modules.pipeline.make_initial_ortholog_groups import make_initial_ortholog_groups
 from modules.pipeline.merge_by_annotation import merge_by_annotation
 from modules.pipeline.merge_by_hmm import merge_by_hmm
 from modules.pipeline.predict_proteomes import predict_proteomes
@@ -73,6 +74,17 @@ def run(ctx: Context) -> None:
     make_annotated_unique_prots_fasta(ctx)
 
     _enrichment_stage(ctx)
+
+    if ctx.runtime.redundant_genome_ids:
+        ctx.runtime.active_genome_ids.update(ctx.runtime.redundant_genome_ids)
+        add_redundant_genome_prots_unique_prots_fasta(ctx)
+        predict_proteomes(ctx, ctx.runtime.redundant_genome_ids)
+        _enrichment_stage(ctx)
+
+    # final stage
+    merge_by_hmm(ctx)
+    rename_og_fastas_by_annotation(ctx)
+    merge_by_annotation(ctx)
 
 
 def _enrichment_stage(ctx: Context) -> None:
