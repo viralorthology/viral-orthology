@@ -13,6 +13,7 @@ from modules.pipeline.make_annotated_unique_prots_fasta import (
 )
 from modules.pipeline.make_initial_ortholog_groups import make_initial_ortholog_groups
 from modules.pipeline.merge_by_annotation import merge_by_annotation
+from modules.pipeline.merge_by_hmm import merge_by_hmm
 from modules.pipeline.predict_proteomes import predict_proteomes
 from modules.pipeline.rename_og_fastas_by_annotation import (
     rename_og_fastas_by_annotation,
@@ -80,6 +81,7 @@ def _initial_stage(ctx: Context) -> None:
 
 def _enrichment_stage(ctx: Context) -> None:
     merge_by_annotation(ctx)
+    merge_by_hmm(ctx)
     hmm_search(ctx)
     blastp_search(ctx, ctx.paths.annotated_unique_prots_fasta)
     hmm_search(ctx)
