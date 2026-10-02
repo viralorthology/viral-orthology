@@ -61,22 +61,18 @@ def run(ctx: Context) -> None:
     logger.info("Validation completed successfully")
 
     ### RUN ###
-    _preparation_stage(ctx)
-    _initial_stage(ctx)
-    _enrichment_stage(ctx)
-
-
-def _preparation_stage(ctx: Context) -> None:
+    # preparation stage
     find_paralogs(ctx)
     find_redundant_genomes(ctx)
 
-
-def _initial_stage(ctx: Context) -> None:
+    # initial stage
     predict_proteomes(ctx, ctx.runtime.active_genome_ids)
     make_initial_ortholog_groups(ctx)
     rename_og_fastas_by_annotation(ctx)
     clean_ortholog_groups(ctx)
     make_annotated_unique_prots_fasta(ctx)
+
+    _enrichment_stage(ctx)
 
 
 def _enrichment_stage(ctx: Context) -> None:
