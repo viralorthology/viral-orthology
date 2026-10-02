@@ -1,6 +1,7 @@
 import engines
 import utils
 from config.context import Context
+from models.ortholog_group import OrthologGroup
 from models.tmp_fasta import TmpFasta
 
 MIN_SCORE_TO_MERGE_HMMS = 70
@@ -37,7 +38,9 @@ def merge_by_hmm(ctx: Context) -> None:
         og.delete_fasta()
 
 
-def _get_ogs_to_try(og1, available_ogs):
+def _get_ogs_to_try(
+    og1: OrthologGroup, available_ogs: list[OrthologGroup]
+) -> list[OrthologGroup]:
     """
     Find ortholog groups containing sequences that match the given ortholog group in a BLASTP search.
 
