@@ -2,6 +2,7 @@ import multiprocessing
 
 import utils
 from models.fasta import Fasta
+from models.ortholog_group import OrthologGroup
 
 
 class BlastHit:
@@ -37,7 +38,9 @@ def make_blast_db(fasta: Fasta, db_type: str) -> None:
     utils.run_cmd(f"makeblastdb -dbtype {db_type} -in {fasta.path}")
 
 
-def blastp_search(query_fasta: Fasta, blast_db: Fasta, params: str) -> list[BlastHit]:
+def blastp_search(
+    query_fasta: Fasta | OrthologGroup, blast_db: Fasta, params: str
+) -> list[BlastHit]:
     """
     Run BLASTP against a protein database and return the hits sorted by
     E-value in ascending order (from best to worst).
