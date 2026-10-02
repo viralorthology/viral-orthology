@@ -31,3 +31,18 @@ def make_annotated_unique_prots_fasta(ctx: Context) -> None:
             seqs.append(seq)
 
     annotated_unique_prots_fasta.add_seqs(*seqs)
+
+
+def add_redundant_genome_prots_unique_prots_fasta(ctx: Context) -> None:
+    """Add non-paralog proteins from redundant genomes to the annotated unique proteins FASTA."""
+    proteomes_fasta = Fasta(ctx.paths.proteomes_fasta)
+    annotated_unique_prots_fasta = Fasta(ctx.paths.annotated_unique_prots_fasta)
+
+    seqs = []
+    for seq in proteomes_fasta.seqs:
+        if seq.genome_id not in ctx.runtime.redundant_genome_ids:
+            continue
+        if seq.id not in ctx.runtime.paralog_ids:
+            seqs.append(seq)
+
+    annotated_unique_prots_fasta.add_seqs(*seqs)
