@@ -71,29 +71,32 @@ def run(ctx: Context) -> None:
     predict_proteomes(ctx, ctx.runtime.active_genome_ids)
     make_initial_ortholog_groups(ctx)
     rename_og_fastas_by_annotation(ctx)
+    merge_by_annotation(ctx)
     clean_ortholog_groups(ctx)
+    merge_by_hmm(ctx)
     make_annotated_unique_prots_fasta(ctx)
 
-    _enrichment_stage(ctx)
+    # enrichment stage
+    hmm_search(ctx)
+    blastp_search(ctx, ctx.paths.annotated_unique_prots_fasta)
+    hmm_search(ctx)
+    blastp_search(ctx, ctx.paths.predicted_unique_prots_fasta)
+    hmm_search(ctx)
 
     if ctx.runtime.redundant_genome_ids:
         ctx.runtime.active_genome_ids.update(ctx.runtime.redundant_genome_ids)
         add_redundant_genome_prots_unique_prots_fasta(ctx)
         predict_proteomes(ctx, ctx.runtime.redundant_genome_ids)
-        _enrichment_stage(ctx)
+
+        # enrichment stage
+        hmm_search(ctx)
+        blastp_search(ctx, ctx.paths.annotated_unique_prots_fasta)
+        hmm_search(ctx)
+        blastp_search(ctx, ctx.paths.predicted_unique_prots_fasta)
+        hmm_search(ctx)
 
     # final stage
     merge_by_hmm(ctx)
     paralogs_hmm_search(ctx)
     rename_og_fastas_by_annotation(ctx)
     merge_by_annotation(ctx)
-
-
-def _enrichment_stage(ctx: Context) -> None:
-    merge_by_annotation(ctx)
-    merge_by_hmm(ctx)
-    hmm_search(ctx)
-    blastp_search(ctx, ctx.paths.annotated_unique_prots_fasta)
-    hmm_search(ctx)
-    blastp_search(ctx, ctx.paths.predicted_unique_prots_fasta)
-    hmm_search(ctx)
