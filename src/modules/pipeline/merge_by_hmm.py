@@ -31,7 +31,7 @@ def merge_by_hmm(ctx: Context) -> None:
             score = engines.hmm_compare_groups(og1, og2)
 
             if score >= MIN_SCORE_TO_MERGE_HMMS:
-                og1.add_seqs(og2.seqs)
+                og1.add_seqs(*og2.seqs)
                 merged_ogs.add(og2)
 
     for og in merged_ogs:
