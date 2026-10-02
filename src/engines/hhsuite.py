@@ -36,7 +36,7 @@ def _convert_aligned_fasta_to_a2m(fasta: OrthologGroup) -> None:
     """
     Convert a FASTA alignment to A2M format using HHsuite.
     """
-    utils.run_cmd(f"reformat_msa fas a2m {fasta.alignment_path} {fasta.a2m_path}")
+    utils.run_cmd(f"reformat.pl fas a2m {fasta.alignment_path} {fasta.a2m_path}")
 
 
 def _build_hmm_hhsuite(fasta: OrthologGroup) -> None:
