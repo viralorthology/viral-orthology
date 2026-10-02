@@ -20,7 +20,7 @@ def configure_logging(base_path: Path, dev_level: bool) -> None:
         format = "%(asctime)s - %(levelname)s - %(message)s"
     formatter = logging.Formatter(format)
 
-    log_file = logging.FileHandler(base_path / "app.log")
+    log_file = logging.FileHandler(base_path / "viralorthology.log")
     log_file.setFormatter(formatter)
     logger.addHandler(log_file)
 
