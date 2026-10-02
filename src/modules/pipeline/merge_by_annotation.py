@@ -38,7 +38,7 @@ def merge_by_annotation(ctx: Context) -> None:
                 ("\n").join(
                     [
                         "The following files can be merged:",
-                        f"{og1.path} / {og2.path}",
+                        f"{og1.path.name} / {og2.path.name}",
                         "Want to merge them?",
                     ]
                 )
