@@ -1,45 +1,73 @@
-from unittest.mock import Mock
-
 import pytest
 
-from modules.pipeline.merge_by_annotation import _skip_og
+from modules.pipeline.merge_by_annotation import _ogs_can_be_merged, _skip_og
 
 
 @pytest.mark.parametrize(
-    "stem, n_seqs, active_genomes_count",
+    ("annotation", "n_seqs", "active_genomes", "expected"),
     [
-        ("abc", 3, 3),
-        ("abc", 2, 2),
-        ("abc-hypothetical-protein", 1, 3),
+        ("hypothetical-protein", 1, 5, True),
+        ("ABC transporter", 5, 5, True),
+        ("ABC transporter", 3, 5, False),
+        ("hypothetical-protein", 5, 5, True),
     ],
 )
-def test_skip_og(stem, n_seqs, active_genomes_count):
-    og = Mock()
-    og.path.exists.return_value = True
-    og.path.stem = stem
-    og.n_seqs = n_seqs
-
-    assert _skip_og(og, active_genomes_count)
-
-
-def test_skip_og_when_path_does_not_exist():
-    og = Mock()
-    og.path.exists.return_value = False
-
-    assert _skip_og(og, active_genomes_count=3)
+def test_skip_og(annotation, n_seqs, active_genomes, expected):
+    assert _skip_og(annotation, n_seqs, active_genomes) is expected
 
 
 @pytest.mark.parametrize(
-    "stem, n_seqs, active_genomes_count",
+    (
+        "og1_annotation",
+        "og2_annotation",
+        "og1_genome_ids",
+        "og2_genome_ids",
+        "expected",
+    ),
     [
-        ("abc", 2, 3),
-        ("abc", 1, 3),
+        (
+            "ABC transporter",
+            "ABC transporter",
+            {"genome1", "genome2"},
+            {"genome3", "genome4"},
+            True,
+        ),
+        (
+            "ABC transporter",
+            "DNA-binding protein",
+            {"genome1", "genome2"},
+            {"genome3", "genome4"},
+            False,
+        ),
+        (
+            "ABC transporter",
+            "ABC transporter",
+            {"genome1", "genome2"},
+            {"genome2", "genome3"},
+            False,
+        ),
+        (
+            "ABC transporter",
+            "DNA-binding protein",
+            {"genome1", "genome2"},
+            {"genome2", "genome3"},
+            False,
+        ),
     ],
 )
-def test_do_not_skip_og(stem, n_seqs, active_genomes_count):
-    og = Mock()
-    og.path.exists.return_value = True
-    og.path.stem = stem
-    og.n_seqs = n_seqs
-
-    assert not _skip_og(og, active_genomes_count)
+def test_ogs_can_be_merged(
+    og1_annotation,
+    og2_annotation,
+    og1_genome_ids,
+    og2_genome_ids,
+    expected,
+):
+    assert (
+        _ogs_can_be_merged(
+            og1_annotation,
+            og2_annotation,
+            og1_genome_ids,
+            og2_genome_ids,
+        )
+        is expected
+    )
