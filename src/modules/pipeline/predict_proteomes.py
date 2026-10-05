@@ -1,7 +1,7 @@
 import logging
 
+import engines
 from config.context import Context
-from engines import predict_proteome
 from models.fasta import Fasta
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ def predict_proteomes(ctx: Context, genome_ids: set[str]) -> None:
             seq for seq in proteomes_fasta.seqs if seq.genome_id == genome_id
         ] or None
 
-        predicted_proteins = predict_proteome(
+        predicted_proteins = engines.predict_proteome(
             genome_seq,
             ctx.args.tool_args["orffinder"],
             ctx.runtime.predicted_proteins_count,
