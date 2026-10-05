@@ -1,10 +1,7 @@
-import logging
 import shlex
 import shutil
 import subprocess
 from pathlib import Path
-
-logger = logging.getLogger(__name__)
 
 
 def run_cmd(cmd_str: str, cwd: Path | None = None) -> str:
@@ -19,13 +16,9 @@ def run_cmd(cmd_str: str, cwd: Path | None = None) -> str:
         subprocess.CalledProcessError: if the command exits with a non-zero status
         FileNotFoundError: if the command is not found
     """
-    logger.debug("Runnning %s in cwd %s", cmd_str, cwd)
-
     output = subprocess.run(
         shlex.split(cmd_str), capture_output=True, text=True, check=True, cwd=cwd
     )
-
-    logger.debug("%s output: %s", cmd_str, output.stdout)
 
     return output.stdout
 
