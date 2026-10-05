@@ -24,7 +24,7 @@ def rename_og_fastas_by_annotation(ctx: Context) -> None:
     # rename files
     used_names: set[str] = set()
     for og in og_fastas:
-        new_name = _get_og_most_frequent_annotation(og)
+        new_name = get_og_most_frequent_annotation(og)
 
         if new_name in used_names:
             new_name = _add_number_to_repeated_name(new_name, used_names)
@@ -33,7 +33,7 @@ def rename_og_fastas_by_annotation(ctx: Context) -> None:
         used_names.add(new_name)
 
 
-def _get_og_most_frequent_annotation(og: OrthologGroup) -> str:
+def get_og_most_frequent_annotation(og: OrthologGroup) -> str:
     """
     Get the most frequent valid annotation in an ortholog group.
 
