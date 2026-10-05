@@ -2,35 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from modules.pipeline.merge_by_annotation import _ogs_have_same_annotation, _skip_og
-
-
-@pytest.mark.parametrize(
-    "stem1, stem2",
-    [
-        ("pol", "pol"),
-        ("pol", "pol-1"),
-        ("pol", "pol-2"),
-        ("pol-1", "pol-2"),
-        ("pol-2", "pol-3"),
-        ("pol-2", "pol"),
-    ],
-)
-def test_ogs_have_same_annotation(stem1, stem2):
-    assert _ogs_have_same_annotation(stem1, stem2)
-
-
-@pytest.mark.parametrize(
-    "stem1, stem2",
-    [
-        ("pol", "env"),
-        ("pol-1", "env-1"),
-        ("pol", "pol-alpha"),
-        ("pol", "pol-hypothetical-protein"),
-    ],
-)
-def test_ogs_do_not_have_same_annotation(stem1, stem2):
-    assert not _ogs_have_same_annotation(stem1, stem2)
+from modules.pipeline.merge_by_annotation import _skip_og
 
 
 @pytest.mark.parametrize(

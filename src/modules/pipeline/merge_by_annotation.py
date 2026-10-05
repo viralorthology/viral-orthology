@@ -3,6 +3,9 @@ import logging
 import utils
 from config.context import Context
 from models.ortholog_group import OrthologGroup
+from modules.pipeline.rename_og_fastas_by_annotation import (
+    get_og_most_frequent_annotation,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +22,9 @@ def merge_by_annotation(ctx: Context) -> None:
     ortholog_groups = utils.get_ortholog_groups(ctx.paths.ortholog_groups_dir)
     ortholog_groups.sort(key=lambda og: og.path.stem)
 
+    og_annotation = {og: get_og_most_frequent_annotation(og) for og in ortholog_groups}
+    og_genomes = {og: set(og.genome_ids) for og in ortholog_groups}
+
     active_genomes_count = len(ctx.runtime.active_genome_ids)
     for i, og1 in enumerate(ortholog_groups):
         if _skip_og(og1, active_genomes_count):
@@ -28,10 +34,10 @@ def merge_by_annotation(ctx: Context) -> None:
             if _skip_og(og2, active_genomes_count):
                 continue
 
-            if not _ogs_have_same_annotation(og1.path.stem, og2.path.stem):
+            if og_annotation[og1] != og_annotation[og2]:
                 continue
 
-            if not utils.o_groups_are_compatible(og1, og2):
+            if og_genomes[og1].intersection(og_genomes[og2]):
                 continue
 
             if ctx.args.assume_yes or ctx.ui.ask_yes_no(
@@ -44,6 +50,7 @@ def merge_by_annotation(ctx: Context) -> None:
                 )
             ):
                 og1.add_seqs(*og2.seqs)
+                og_annotation[og1] = get_og_most_frequent_annotation(og1)
                 og2.delete_fasta()
 
                 logger.info(
@@ -65,21 +72,3 @@ def _skip_og(og: OrthologGroup, active_genomes_count: int) -> bool:
         or "hypothetical-protein" in og.path.stem
         or og.n_seqs == active_genomes_count
     )
-
-
-def _ogs_have_same_annotation(og1_stem: str, og2_stem: str) -> bool:
-    """
-    Return whether two ortholog groups represent the same annotation.
-
-    Ortholog groups with a numeric suffix in their name are considered
-    to have the same annotation as the unsuffixed group. For example,
-    'pol', 'pol-1', and 'pol-2' are considered the same annotation.
-    """
-
-    def _annotation(stem: str) -> str:
-        parts = stem.rsplit("-", 1)
-        if len(parts) == 2 and parts[1].isdigit():
-            return parts[0]
-        return stem
-
-    return _annotation(og1_stem) == _annotation(og2_stem)
