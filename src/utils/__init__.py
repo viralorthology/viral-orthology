@@ -11,6 +11,7 @@ from .files import (
     get_seqs_from_fasta_str,
 )
 from .logging import configure_logging
+from .reports import make_og_report
 
 __all__ = [
     "check_dependencies",
@@ -23,6 +24,7 @@ __all__ = [
     "get_fastas",
     "get_ortholog_groups",
     "get_seqs_from_fasta_str",
+    "make_og_report",
     "o_groups_are_compatible",
     "run_cmd",
 ]
