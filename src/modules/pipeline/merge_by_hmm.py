@@ -14,6 +14,7 @@ def merge_by_hmm(ctx: Context) -> None:
     ctx.ui.show("Merging ortholog groups using HMMs...")
 
     ogs = utils.get_ortholog_groups(ctx.paths.ortholog_groups_dir)
+    og_genomes = {og: set(og.genome_ids) for og in ogs}
 
     merged_ogs = set()
     for i, og1 in enumerate(ctx.ui.progress_bar(ogs)):
@@ -25,17 +26,16 @@ def merge_by_hmm(ctx: Context) -> None:
         )
 
         for og2 in ogs_to_try:
-            if not utils.o_groups_are_compatible(og1, og2):
+            if og_genomes[og1].intersection(og_genomes[og2]):
                 continue
 
             score = engines.hmm_compare_groups(og1, og2)
 
             if score >= MIN_SCORE_TO_MERGE_HMMS:
                 og1.add_seqs(*og2.seqs)
+                og_genomes[og1] = set(og1.genome_ids)
+                og2.delete_fasta()
                 merged_ogs.add(og2)
-
-    for og in merged_ogs:
-        og.delete_fasta()
 
 
 def _get_ogs_to_try(
