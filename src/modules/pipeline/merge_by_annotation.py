@@ -51,6 +51,7 @@ def merge_by_annotation(ctx: Context) -> None:
             ):
                 og1.add_seqs(*og2.seqs)
                 og_annotation[og1] = get_og_most_frequent_annotation(og1)
+                og_genomes[og1] = set(og1.genome_ids)
                 og2.delete_fasta()
 
                 logger.info(
