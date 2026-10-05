@@ -100,3 +100,9 @@ def run(ctx: Context) -> None:
     paralogs_hmm_search(ctx)
     rename_og_fastas_by_annotation(ctx)
     merge_by_annotation(ctx)
+
+    ### POST-RUN ###
+    rename_og_fastas_by_annotation(ctx)
+    ctx.paths.output_dir.mkdir(exist_ok=True)
+    ctx.ui.show("Writing reports...")
+    utils.make_og_report(ctx)
