@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Iterator
 
 import engines
@@ -8,6 +9,8 @@ from models.fasta import Fasta
 from models.ortholog_group import OrthologGroup
 from models.seq import Seq
 from models.tmp_fasta import TmpFasta
+
+logger = logging.getLogger(__name__)
 
 
 def paralogs_hmm_search(ctx: Context) -> None:
@@ -21,6 +24,7 @@ def paralogs_hmm_search(ctx: Context) -> None:
     }
 
     sorted_hits = _get_hmm_sorted_hits(ogs, paralogs_by_seq_id)
+    logger.debug("HMM hits: %s", sorted_hits.keys())
 
     added_paralogs = set()
     for hit, og in sorted_hits.items():
@@ -34,6 +38,7 @@ def paralogs_hmm_search(ctx: Context) -> None:
             og.add_seqs(new_paralog)
             ctx.runtime.paralog_ids.remove(new_paralog.id)
             added_paralogs.add(new_paralog.id)
+            logger.info("%s added to %s", new_paralog.id, og.path.name)
             continue
 
         # compare the paralog in the og with the new paralog
@@ -55,6 +60,12 @@ def paralogs_hmm_search(ctx: Context) -> None:
             ctx.runtime.paralog_ids.remove(new_paralog.id)
             ctx.runtime.paralog_ids.add(old_paralog.id)
             added_paralogs.add(new_paralog.id)
+            logger.info(
+                "%s added to %s, %s deleted from og",
+                new_paralog.id,
+                og.path.name,
+                old_paralog.id,
+            )
 
 
 def _get_hmm_sorted_hits(
