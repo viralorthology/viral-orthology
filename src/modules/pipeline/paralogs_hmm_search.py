@@ -38,7 +38,11 @@ def paralogs_hmm_search(ctx: Context) -> None:
             og.add_seqs(new_paralog)
             ctx.runtime.paralog_ids.remove(new_paralog.id)
             added_paralogs.add(new_paralog.id)
-            logger.info("%s added to %s", new_paralog.id, og.path.name)
+            logger.info(
+                "Protein %s added to %s based on HMM-profile search on previously ignored paralogs.",
+                new_paralog.id,
+                og.path.name,
+            )
             continue
 
         # compare the paralog in the og with the new paralog
@@ -61,7 +65,7 @@ def paralogs_hmm_search(ctx: Context) -> None:
             ctx.runtime.paralog_ids.add(old_paralog.id)
             added_paralogs.add(new_paralog.id)
             logger.info(
-                "%s added to %s, %s deleted from og",
+                "Protein %s added to %s based on HMM-profile search on previously ignored paralogs; protein %s removed from ortholog group",
                 new_paralog.id,
                 og.path.name,
                 old_paralog.id,

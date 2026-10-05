@@ -1,3 +1,5 @@
+import logging
+
 import engines
 import utils
 from cli.ui import UI
@@ -6,6 +8,8 @@ from engines.hmmer import HMMHit
 from models.fasta import Fasta
 from models.ortholog_group import OrthologGroup
 from models.seq import Seq
+
+logger = logging.getLogger(__name__)
 
 
 def hmm_search(ctx: Context) -> None:
@@ -123,5 +127,9 @@ def _add_proteins_to_ogs(
         seq = seqs_by_seq_id[hit.seq_id]
         og.add_seqs(seq)
         added_gene_ids.add(seq.id)
+
+        logger.info(
+            "Protein %s added to %s based on HMM-profile search.", seq.id, og.path.name
+        )
 
     return added_gene_ids

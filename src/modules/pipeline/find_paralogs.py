@@ -28,7 +28,10 @@ def find_paralogs(ctx: Context) -> None:
     for genome_id in ctx.ui.progress_bar(genomes_fasta.ids):
         proteome = [seq for seq in proteomes_fasta.seqs if seq.genome_id == genome_id]
         if not proteome:
-            logger.info("Genome %s ignored: no annotated proteome found", genome_id)
+            logger.info(
+                "No annotated proteome found for %s; skipping paralog search.",
+                genome_id,
+            )
             continue
 
         # run self blastp
@@ -45,7 +48,7 @@ def find_paralogs(ctx: Context) -> None:
 
         # find groups of paralog seqs
         paralog_groups = _find_paralog_groups(reciprocal_hits)
-        logger.info("Paralogs found in genome %s: %s", genome_id, paralog_groups)
+        logger.debug("Paralogs found in genome %s: %s", genome_id, paralog_groups)
 
         # add ignored paralogs to Runtime
         for paralog_group_ids in paralog_groups:
@@ -59,7 +62,7 @@ def find_paralogs(ctx: Context) -> None:
             ctx.runtime.paralog_ids.update(ignored_paralog_ids)
 
             logger.info(
-                "Genome %s proteins ignored: %s, protein %s selected for further analysis",
+                "Genome %s paralog proteins ignored: %s; protein %s selected for further analysis",
                 genome_id,
                 ignored_paralog_ids,
                 selected_paralog.id,

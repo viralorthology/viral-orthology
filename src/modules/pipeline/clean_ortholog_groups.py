@@ -1,7 +1,11 @@
+import logging
+
 import engines
 import utils
 from config.context import Context
 from models.fasta import Fasta
+
+logger = logging.getLogger(__name__)
 
 
 def clean_ortholog_groups(ctx: Context) -> None:
@@ -11,6 +15,7 @@ def clean_ortholog_groups(ctx: Context) -> None:
     Each ortholog group is searched against the available proteomes, and sequences
     whose IDs are not present among the search hits are removed from the group.
     """
+    # TODO remove protein if its og is not the best hit?
     ctx.ui.show("Cleaning ortholog groups...")
 
     o_groups = utils.get_ortholog_groups(ctx.paths.ortholog_groups_dir)
@@ -23,3 +28,4 @@ def clean_ortholog_groups(ctx: Context) -> None:
 
         if ids_to_remove:
             og.remove_seqs(*ids_to_remove, ctx=ctx)
+            logger.debug("proteins %s removed from %", ids_to_remove, og.path)

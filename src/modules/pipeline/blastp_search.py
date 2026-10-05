@@ -84,6 +84,8 @@ def _add_proteins_to_ogs(
             assert seq.id not in added_seq_ids
             og.add_seqs(seq)
             added_seq_ids.add(seq.id)
-            logger.info("Protein %s added to %s", seq.id, og.path)
+            logger.info(
+                "Protein %s added to %s based on BlastP search.", seq.id, og.path.name
+            )
 
     return added_seq_ids

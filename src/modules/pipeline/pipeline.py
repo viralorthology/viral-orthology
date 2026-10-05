@@ -106,3 +106,5 @@ def run(ctx: Context) -> None:
     ctx.paths.output_dir.mkdir(exist_ok=True)
     ctx.ui.show("Writing reports...")
     utils.make_og_report(ctx)
+
+    logger.info("Pipeline ended successfully")

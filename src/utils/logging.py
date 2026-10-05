@@ -17,7 +17,7 @@ def configure_logging(base_path: Path, dev_level: bool) -> None:
     if dev_level:
         format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     else:
-        format = "%(asctime)s - %(levelname)s - %(message)s"
+        format = "%(asctime)s - %(message)s"
     formatter = logging.Formatter(format)
 
     log_file = logging.FileHandler(base_path / "viralorthology.log")
@@ -27,5 +27,10 @@ def configure_logging(base_path: Path, dev_level: bool) -> None:
     if dev_level:
         console = logging.StreamHandler()
         console.setLevel(logging.INFO)
-        console.setFormatter(formatter)
+        console.setFormatter(
+            logging.Formatter(
+                "%(asctime)s - %(message)s",
+                datefmt="%H:%M:%S",
+            )
+        )
         logger.addHandler(console)

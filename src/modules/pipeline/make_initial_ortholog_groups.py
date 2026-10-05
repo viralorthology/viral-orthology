@@ -145,9 +145,9 @@ def _remove_paralogs(og: Fasta, paralog_ids: set[str]) -> bool:
         ]
 
         logger.info(
-            "%s seqs from %s were detected as paralogs. %s kept in ortholog group",
-            (", ").join([seq_id for seq_id in ignored_paralog_ids]),
+            "Genome %s paralog proteins ignored: %s; protein %s selected for further analysis",
             genome_id,
+            (", ").join([seq_id for seq_id in ignored_paralog_ids]),
             selected_paralog.id,
         )
 

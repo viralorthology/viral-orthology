@@ -1,8 +1,12 @@
+import logging
+
 import engines
 import utils
 from config.context import Context
 from models.ortholog_group import OrthologGroup
 from models.tmp_fasta import TmpFasta
+
+logger = logging.getLogger(__name__)
 
 MIN_SCORE_TO_MERGE_HMMS = 70
 
@@ -36,6 +40,12 @@ def merge_by_hmm(ctx: Context) -> None:
                 og_genomes[og1] = set(og1.genome_ids)
                 og2.delete_fasta()
                 merged_ogs.add(og2)
+                logger.info(
+                    "Ortholog groups %s and %s were merged due to HMM-profile similarity, with a score of %s",
+                    og1.path.name,
+                    og2.path.name,
+                    score,
+                )
 
 
 def _get_ogs_to_try(
