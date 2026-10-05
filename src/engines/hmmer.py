@@ -67,7 +67,7 @@ def _search_hmm_hmmer(
         A list of HMMER hits sorted by E-value.
     """
     output = utils.run_cmd(
-        f"hmmsearch {params} {query_fasta.hmm_hmmer_path} {db_fasta.path}"
+        f"hmmsearch {params} --noali {query_fasta.hmm_hmmer_path} {db_fasta.path}"
     )
     return _parse_hmmsearch_output(output)
 
