@@ -1,4 +1,5 @@
 import logging
+import multiprocessing
 import tempfile
 from collections import Counter
 from pathlib import Path
@@ -94,10 +95,11 @@ def _run_proteinortho(proteome_fastas: list[Fasta], params: str, cwd: Path) -> N
         params: Additional parameters to pass to ProteinOrtho.
         cwd: Working directory for ProteinOrtho and its output files.
     """
+    num_threads = max(1, multiprocessing.cpu_count() - 1)
     fasta_paths = (" ").join(str(fasta.path) for fasta in proteome_fastas)
 
     utils.run_cmd(
-        f"proteinortho {fasta_paths} {params}",
+        f"proteinortho {fasta_paths} {params} -cpus={num_threads}",
         cwd=cwd,
     )
     utils.run_cmd(
