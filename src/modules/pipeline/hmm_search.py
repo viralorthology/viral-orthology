@@ -21,7 +21,7 @@ def hmm_search(ctx: Context) -> None:
     Annotated proteins are searched iteratively until no additional proteins
     can be assigned, while predicted proteins are processed in a single round.
     """
-    ctx.ui.show("Searching for new orthologs using HMM...")
+    ctx.ui.show("Searching for new orthologs using HMMs...")
 
     annotated_unique_prots_fasta = Fasta(ctx.paths.annotated_unique_prots_fasta)
     predicted_unique_prots_fasta = Fasta(ctx.paths.predicted_unique_prots_fasta)

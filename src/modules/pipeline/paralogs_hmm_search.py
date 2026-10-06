@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 def paralogs_hmm_search(ctx: Context) -> None:
     """Find and assign paralog sequences to ortholog groups using HMM searches."""
-    ctx.ui.show("Checking the paralog sequences...")
+    ctx.ui.show("Re-evaluating paralogs using HMMs...")
 
     ogs = utils.get_ortholog_groups(ctx.paths.ortholog_groups_dir)
     proteomes_fasta = Fasta(ctx.paths.proteomes_fasta)
