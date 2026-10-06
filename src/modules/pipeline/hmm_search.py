@@ -129,7 +129,10 @@ def _add_proteins_to_ogs(
         added_gene_ids.add(seq.id)
 
         logger.info(
-            "Protein %s added to %s based on HMM-profile search.", seq.id, og.path.name
+            "Protein %s added to %s based on HMM profile search, with an evalue of %s",
+            seq.id,
+            og.path.name,
+            hit.evalue,
         )
 
     return added_gene_ids

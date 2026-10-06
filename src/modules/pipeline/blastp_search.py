@@ -85,7 +85,11 @@ def _add_proteins_to_ogs(
             og.add_seqs(seq)
             added_seq_ids.add(seq.id)
             logger.info(
-                "Protein %s added to %s based on BlastP search.", seq.id, og.path.name
+                "Protein %s added to %s based on BlastP search with an evalue of %s with protein %s",
+                seq.id,
+                og.path.name,
+                hit.evalue,
+                hit.subject_id,
             )
 
     return added_seq_ids

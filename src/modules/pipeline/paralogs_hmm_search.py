@@ -39,9 +39,10 @@ def paralogs_hmm_search(ctx: Context) -> None:
             ctx.runtime.paralog_ids.remove(new_paralog.id)
             added_paralogs.add(new_paralog.id)
             logger.info(
-                "Protein %s added to %s based on HMM-profile search on previously ignored paralogs.",
+                "Protein %s added to %s based on HMM profile search on previously ignored paralogs with an evalue of %s",
                 new_paralog.id,
                 og.path.name,
+                hit.evalue,
             )
             continue
 
