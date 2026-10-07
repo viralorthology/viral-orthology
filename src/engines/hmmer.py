@@ -119,4 +119,6 @@ def _parse_hmmsearch_output(hmmsearch_output: str) -> list[HMMHit]:
             hit = _parse_hmmsearch_hit(line)
             hits.append(hit)
 
-    return sorted(hits, key=lambda hit: hit.evalue)
+    return sorted(
+        hits, key=lambda hit: (hit.evalue, hit.seq_id)
+    )  # Ensure reproducibility
