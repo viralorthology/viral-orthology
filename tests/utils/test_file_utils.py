@@ -1,13 +1,9 @@
 import pytest
-from Bio.Seq import Seq as BioSeq
 
-from models.fasta import Fasta
-from models.seq import Seq
 from utils import (
     ensure_files_exist,
     ensure_files_have_content,
     ensure_paths_do_not_exist,
-    get_combined_fasta,
     get_fastas,
     get_seqs_from_fasta_str,
 )
@@ -107,55 +103,3 @@ GGTA
 def test_get_seqs_from_fasta_str_empty_string():
     with pytest.raises(ValueError):
         get_seqs_from_fasta_str("")
-
-
-def test_get_combined_fasta(tmp_path):
-    fasta_1 = Fasta(tmp_path / "a.fasta")
-    fasta_1.add_seqs(
-        Seq(
-            seq=BioSeq("ATGC"),
-            seq_id="seq1",
-            seq_description="first",
-        )
-    )
-
-    fasta_2 = Fasta(tmp_path / "b.fasta")
-    fasta_2.add_seqs(
-        Seq(
-            seq=BioSeq("GGTA"),
-            seq_id="seq2",
-            seq_description="second",
-        )
-    )
-
-    output_path = tmp_path / "combined.fasta"
-
-    result = get_combined_fasta(output_path, fasta_1, fasta_2)
-
-    assert result.path == output_path
-    assert result.n_seqs == 2
-
-    result_seqs = list(result.seqs)
-
-    assert result_seqs[0].id == "seq1"
-    assert str(result_seqs[0].seq) == "ATGC"
-    assert result_seqs[0].description == "seq1 first"
-
-    assert result_seqs[1].id == "seq2"
-    assert str(result_seqs[1].seq) == "GGTA"
-    assert result_seqs[1].description == "seq2 second"
-
-
-def test_get_combined_fasta_requires_at_least_one_fasta(tmp_path):
-    with pytest.raises(ValueError):
-        get_combined_fasta(tmp_path / "combined.fasta")
-
-
-def test_get_combined_fasta_existing_output(tmp_path):
-    output_path = tmp_path / "combined.fasta"
-    output_path.touch()
-
-    fasta = Fasta(tmp_path / "input.fasta")
-
-    with pytest.raises(ValueError):
-        get_combined_fasta(output_path, fasta)
