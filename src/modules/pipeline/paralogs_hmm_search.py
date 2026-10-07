@@ -3,6 +3,7 @@ from collections.abc import Iterator
 
 import engines
 import utils
+from cli.ui import UI
 from config.context import Context
 from engines.hmmer import HMMHit
 from models.fasta import Fasta
@@ -23,7 +24,7 @@ def paralogs_hmm_search(ctx: Context) -> None:
         seq.id: seq for seq in proteomes_fasta.seqs if seq.id in ctx.runtime.paralog_ids
     }
 
-    sorted_hits = _get_hmm_sorted_hits(ogs, paralogs_by_seq_id)
+    sorted_hits = _get_hmm_sorted_hits(ctx.ui, ogs, paralogs_by_seq_id)
     logger.debug("HMM hits: %s", sorted_hits.keys())
 
     added_paralogs = set()
@@ -74,6 +75,7 @@ def paralogs_hmm_search(ctx: Context) -> None:
 
 
 def _get_hmm_sorted_hits(
+    ui: UI,
     ogs: list[OrthologGroup],
     paralogs_by_seq_id: dict[str, Seq],
 ) -> dict[HMMHit, OrthologGroup]:
@@ -92,7 +94,7 @@ def _get_hmm_sorted_hits(
 
     with TmpFasta() as paralogs_fasta:
         paralogs_fasta.add_seqs(*paralogs_by_seq_id.values())
-        for og in ogs:
+        for og in ui.progress_bar(ogs):
             hits = engines.hmm_search(og, paralogs_fasta)
             all_hits.update({hit: og for hit in hits})
 
