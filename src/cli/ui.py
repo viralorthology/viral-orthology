@@ -55,3 +55,27 @@ class CLI(UI):
                 return yes_no == "y"
 
             print("Wrong input, try again.")
+
+
+class DebugCLI(UI):
+    def show(self, text: str) -> None:
+        print(text)
+
+    def show_error(self, text: str) -> None:
+        """Print an error message to stderr."""
+        print(f"ERROR: {text}", file=sys.stderr)
+
+    def progress_bar[T](
+        self, iterable: Iterable[T], total: int | None = None
+    ) -> Iterable[T]:
+        return iterable
+
+    def ask_yes_no(self, question: str) -> bool:
+        """Prompt the user until a valid yes/no answer is provided."""
+        while True:
+            yes_no = input(f"{question} [y/n]: ").strip().lower()
+
+            if yes_no in {"y", "n"}:
+                return yes_no == "y"
+
+            print("Wrong input, try again.")

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import utils
 from cli.args import get_args
-from cli.ui import CLI, UI
+from cli.ui import CLI, UI, DebugCLI
 from config.context import Context
 from config.paths import Paths
 from config.runtime import Runtime
@@ -65,7 +65,7 @@ MODULES = {
 
 
 def main() -> None:
-    ui = CLI()
+    ui = DebugCLI() if "-debug" in sys.argv else CLI()
 
     if "-help" in sys.argv or "-h" in sys.argv:
         print_help(ui)
