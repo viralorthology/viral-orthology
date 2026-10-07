@@ -11,7 +11,7 @@ A modular bioinformatics pipeline for automated orthology inference across viral
 
 - [x] Core objects
 - [x] Core engines
-- [ ] Core pipeline
+- [x] Core pipeline
 - [ ] Enrichment modules
 - [ ] Analysis modules
 
