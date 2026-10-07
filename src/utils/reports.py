@@ -6,7 +6,7 @@ from config.context import Context
 from models.seq import Seq
 
 
-def make_og_report(ctx: Context) -> None:
+def make_og_report(ctx: Context, dataset_hash: str) -> None:
     """Generate a CSV report with statistics for each ortholog group."""
     lines = ["name,n_seqs,min_prot_len,max_prot_len,av_prot_len,st_dev_prot_len"]
 
@@ -21,9 +21,7 @@ def make_og_report(ctx: Context) -> None:
             f"{og.path.name},{og.n_seqs},{min_prot_len},{max_prot_len},{av_prot_len},{stdev}"
         )
 
-    report_file = (
-        ctx.paths.output_dir / "ortholog_groups_report.csv"
-    )  # TODO include dataset hash in file name
+    report_file = ctx.paths.output_dir / f"{dataset_hash}_ortholog_groups_report.csv"
     report_file.write_text(("\n").join(lines), encoding="utf-8")
 
 
