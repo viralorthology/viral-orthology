@@ -18,7 +18,10 @@ def configure_logging(base_path: Path, dev_level: bool) -> None:
         format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     else:
         format = "%(asctime)s - %(message)s"
-    formatter = logging.Formatter(format)
+    formatter = logging.Formatter(
+        format,
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
 
     log_file = logging.FileHandler(base_path / "viralorthology.log")
     log_file.setFormatter(formatter)

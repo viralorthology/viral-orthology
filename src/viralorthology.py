@@ -81,14 +81,13 @@ def main() -> None:
         ctx = Context(args, paths, ui, Runtime())
         module.run(ctx)
 
-        logger.info("Viralorthology completed successfully")
-
     except Exception as e:
-        logger.exception("An exception occurred during the execution")
-
         if "-debug" in sys.argv:
-            raise
-        ui.show_error(str(e))
+            logger.exception("EXCEPTION")
+        else:
+            logger.error("ERROR: %s", e)
+            ui.show_error(str(e))
+
         sys.exit(1)
 
 
