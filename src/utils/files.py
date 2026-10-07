@@ -43,7 +43,7 @@ def get_ortholog_groups(dir_path: Path) -> list[OrthologGroup]:
     assert ogs
 
     return sorted(
-        ogs, key=lambda og: (og.n_seqs, og.path.stem), reverse=True
+        ogs, key=lambda og: (-og.n_seqs, og.path.stem)
     )  # stem provides a deterministic tie-breaker.
 
 
