@@ -11,6 +11,8 @@ def make_og_report(ctx: Context) -> None:
     lines = ["name,n_seqs,min_prot_len,max_prot_len,av_prot_len,st_dev_prot_len"]
 
     ogs = utils.get_ortholog_groups(ctx.paths.ortholog_groups_dir)
+    ogs.sort(key=lambda og: (-og.n_seqs, og.path.stem))
+
     for og in ogs:
         min_prot_len, max_prot_len, av_prot_len, stdev = _get_prot_len_statistics(
             og.seqs
