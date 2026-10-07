@@ -1,4 +1,5 @@
 import logging
+import sys
 
 import utils
 from config.context import Context
@@ -25,7 +26,11 @@ logger = logging.getLogger(__name__)
 
 
 def run(ctx: Context) -> None:
-    logger.info("Running pipeline")
+    logger.info("Running pipeline: %s", (" ").join(sys.argv))
+    logger.info("Pipeline parameters:")
+    for tool, params in ctx.args.tool_args.items():
+        logger.info(" %s: %s", tool, params if params else "tool defaults")
+    logger.info(" assume yes: %s", ctx.args.assume_yes)
 
     ### PRE-RUN ###
     utils.check_dependencies(
@@ -61,6 +66,8 @@ def run(ctx: Context) -> None:
         )
 
     logger.info("Validation completed successfully")
+    dataset_hash = utils.get_dataset_hash(genome_ids)
+    logger.info("Starting pipeline on dataset %s", dataset_hash)
 
     ### RUN ###
     # preparation stage
