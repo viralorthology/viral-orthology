@@ -17,10 +17,18 @@ AVAILABLE_TOOLS_BY_PUBLIC_MODULE = {
         "blastp_paralog_search",
         "orffinder",
     },
-    "download_seqs": {},
-    "blastp_module": {"blastp"},
-    "hmmsearch_module": {"hmmsearch"},
+    "download-seqs": {},
+    # enrichment modules
+    "blastp": {"blastp"},
+    "hmm": {"hmmsearch"},
     "synteny": {"blastp"},
+    "composition": {},
+    "secondary-structure": {},
+    "tertiary-structure": {},
+    # analysis modules
+    "protein-domain": {},
+    "zscore": {},
+    "kimura": {},
 }
 
 DEFAULT_TOOL_PARAMS: dict[str, dict[str, dict[str, str | None]]] = {

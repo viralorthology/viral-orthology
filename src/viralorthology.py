@@ -8,7 +8,19 @@ from cli.ui import CLI, UI
 from config.context import Context
 from config.paths import Paths
 from config.runtime import Runtime
-from modules import download_seqs, pipeline
+from modules import (
+    aa_composition,
+    blastp_search,
+    download_seqs,
+    hmm_search,
+    kimura,
+    pipeline,
+    protein_domain_search,
+    secondary_structure,
+    synteny,
+    tertiary_structure,
+    zscore,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +47,21 @@ def print_help(ui: UI) -> None:
     ui.show("help")
 
 
-MODULES = {"-pipeline": pipeline, "-download_seqs": download_seqs}
+MODULES = {
+    "-pipeline": pipeline,
+    "-download-seqs": download_seqs,
+    # enrichment modules
+    "-composition": aa_composition,
+    "-blastp": blastp_search,
+    "-hmm": hmm_search,
+    "-secondary-structure": secondary_structure,
+    "-tertiary-structure": tertiary_structure,
+    "-synteny": synteny,
+    # analysis modules
+    "-protein-domain": protein_domain_search,
+    "-zscore": zscore,
+    "-kimura": kimura,
+}
 
 
 def main() -> None:
