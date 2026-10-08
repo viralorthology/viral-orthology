@@ -20,9 +20,6 @@ trap 'rm -rf "$tmp_dir"' EXIT
 wget https://github.com/viralorthology/viral-orthology/archive/refs/heads/main.zip -O "$tmp_dir/viral-orthology.zip"
 unzip -q "$tmp_dir/viral-orthology.zip" -d "$tmp_dir"
 
-# install 3rd party libs
-# cp -rp libs/* "$local_bin_path" # TODO
-
 # install viralorthology
 cp -rp "$tmp_dir/viral-orthology-main/src/"* "$viralorthology_files_path"
 
