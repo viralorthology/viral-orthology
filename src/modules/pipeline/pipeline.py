@@ -70,11 +70,11 @@ def run(ctx: Context) -> None:
     logger.info("Starting pipeline on dataset %s", dataset_hash)
 
     ### RUN ###
-    # preparation stage
-    find_paralogs(ctx)
+    # redundancy reduction stage
     find_redundant_genomes(ctx)
 
     # initial stage
+    find_paralogs(ctx, ctx.runtime.active_genome_ids)
     predict_proteomes(ctx, ctx.runtime.active_genome_ids)
     make_initial_ortholog_groups(ctx)
     rename_og_fastas_by_annotation(ctx)
@@ -93,6 +93,7 @@ def run(ctx: Context) -> None:
     if ctx.runtime.redundant_genome_ids:
         ctx.runtime.active_genome_ids.update(ctx.runtime.redundant_genome_ids)
         add_redundant_genome_prots_unique_prots_fasta(ctx)
+        find_paralogs(ctx, ctx.runtime.redundant_genome_ids)
         predict_proteomes(ctx, ctx.runtime.redundant_genome_ids)
 
         # enrichment stage
