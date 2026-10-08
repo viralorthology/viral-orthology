@@ -65,7 +65,7 @@ NC_XXXXX
 ### 2. Retrieve sequences
 
 ```bash
-viralorthology -download_seqs
+viralorthology -download-seqs
 ```
 
 This command retrieves the required genomic and protein sequence data and prepares the input for downstream analysis.
