@@ -1,9 +1,12 @@
+import logging
 from collections.abc import Iterator
 from pathlib import Path
 
 from config.context import Context
 from models.fasta import Fasta
 from models.seq import Seq
+
+logger = logging.getLogger(__name__)
 
 
 class OrthologGroup:
@@ -96,6 +99,11 @@ class OrthologGroup:
                 *ids, remaining_seq.id
             )  # Fasta.remove_seqs will check the ids and delete the file
             assert not self.path.is_file()
+            logger.debug(
+                "%s og was deleted during remove_seqs; seqs removed: %s",
+                self.path.name,
+                ids,
+            )
         else:
             self._fasta.remove_seqs(*ids)
             if self.path.exists():
