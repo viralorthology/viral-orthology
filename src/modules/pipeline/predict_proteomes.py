@@ -15,7 +15,7 @@ def predict_proteomes(ctx: Context, genome_ids: set[str]) -> None:
     predicted_unique_prots_fasta = Fasta(ctx.paths.predicted_unique_prots_fasta)
     genomes_fasta = Fasta(ctx.paths.genomes_fasta)
 
-    for genome_id in ctx.ui.progress_bar(genome_ids):
+    for genome_id in ctx.ui.progress_bar(sorted(genome_ids)):
         genome_seq = genomes_fasta.get_seqs(genome_id)[0]
         proteome = [
             seq for seq in proteomes_fasta.seqs if seq.genome_id == genome_id

@@ -70,7 +70,7 @@ def _get_proteome_fastas(
     Genomes without proteins are skipped.
     """
     tmp_proteome_fastas = []
-    for genome_id in active_genome_ids:
+    for genome_id in sorted(active_genome_ids):
         proteome_seqs = [
             seq
             for seq in proteomes_fasta.seqs

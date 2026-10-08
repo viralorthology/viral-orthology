@@ -24,7 +24,7 @@ def find_paralogs(ctx: Context, genome_ids: set[str]) -> None:
 
     proteomes_fasta = Fasta(ctx.paths.proteomes_fasta)
 
-    for genome_id in ctx.ui.progress_bar(genome_ids):
+    for genome_id in ctx.ui.progress_bar(sorted(genome_ids)):
         proteome = [seq for seq in proteomes_fasta.seqs if seq.genome_id == genome_id]
         if not proteome:
             logger.info(
