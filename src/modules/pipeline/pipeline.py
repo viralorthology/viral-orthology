@@ -78,8 +78,8 @@ def run(ctx: Context) -> None:
     predict_proteomes(ctx, ctx.runtime.active_genome_ids)
     make_initial_ortholog_groups(ctx)
     rename_og_fastas_by_annotation(ctx)
-    merge_by_annotation(ctx)
     clean_ortholog_groups(ctx)
+    merge_by_annotation(ctx)
     merge_by_hmm(ctx)
     make_annotated_unique_prots_fasta(ctx)
 
