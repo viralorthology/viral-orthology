@@ -6,4 +6,6 @@ class Runtime:
     redundant_genome_ids: set[str] = field(default_factory=set)
     active_genome_ids: set[str] = field(default_factory=set)
     predicted_proteins_count: int = 0
-    paralog_ids: set[str] = field(default_factory=set)
+    paralog_ids: set[str] = field(
+        default_factory=set
+    )  # TODO use dict[ignored,selected]
