@@ -9,28 +9,6 @@ class Args:
     tool_args: dict[str, str]
 
 
-AVAILABLE_TOOLS_BY_PUBLIC_MODULE = {
-    "pipeline": {
-        "blastp-search",
-        "proteinortho",
-        "hmm-search",
-        "blastp_paralog_search",
-        "orffinder",
-    },
-    "download-seqs": {},
-    # enrichment modules
-    "blastp": {"blastp"},
-    "hmm": {"hmmsearch"},
-    "synteny": {"blastp"},
-    "composition": {},
-    "secondary-structure": {},
-    "tertiary-structure": {},
-    # analysis modules
-    "protein-domain": {},
-    "zscore": {},
-    "kimura": {},
-}
-
 DEFAULT_TOOL_PARAMS: dict[str, dict[str, dict[str, str | None]]] = {
     "pipeline": {
         "blastp-search": {
@@ -62,7 +40,7 @@ def get_args(selected_public_module_flag: str, argv: list[str]) -> Args:
     argv = [arg for arg in argv if arg != selected_public_module_flag]
     assert "-" in selected_public_module_flag
     selected_public_module_flag = selected_public_module_flag.lstrip("-")
-    assert selected_public_module_flag in AVAILABLE_TOOLS_BY_PUBLIC_MODULE
+    assert selected_public_module_flag in DEFAULT_TOOL_PARAMS
 
     # parse args
     global_bool_flags = {flag: False for flag in GLOBAL_BOOL_FLAGS}
@@ -71,7 +49,7 @@ def get_args(selected_public_module_flag: str, argv: list[str]) -> Args:
     for arg in argv:
         clean_arg = arg.lstrip("-")
 
-        if clean_arg in AVAILABLE_TOOLS_BY_PUBLIC_MODULE[selected_public_module_flag]:
+        if clean_arg in DEFAULT_TOOL_PARAMS[selected_public_module_flag]:
             current_tool = clean_arg
             tool_args[clean_arg] = []
             continue
