@@ -11,9 +11,9 @@ class Args:
 
 AVAILABLE_TOOLS_BY_PUBLIC_MODULE = {
     "pipeline": {
-        "blastp",
+        "blastp-search",
         "proteinortho",
-        "hmmsearch",
+        "hmm-search",
         "blastp_paralog_search",
         "orffinder",
     },
@@ -33,15 +33,19 @@ AVAILABLE_TOOLS_BY_PUBLIC_MODULE = {
 
 DEFAULT_TOOL_PARAMS: dict[str, dict[str, dict[str, str | None]]] = {
     "pipeline": {
-        "blastp": {"-word_size": "2", "-evalue": "0.001", "-qcov_hsp_perc": "40"},
-        "hmmsearch": {},
+        "blastp-search": {
+            "-word_size": "2",
+            "-evalue": "0.001",
+            "-qcov_hsp_perc": "40",
+        },
+        "hmm-search": {},
         "orffinder": {"-ml": "90", "-s": "0"},
         "blastp_paralog_search": {"-evalue": "0.00001"},
         "proteinortho": {},
     },
-    "blastp_module": {"blastp": {"-word_size": "2", "-evalue": "0.1"}},
-    "hmmsearch_module": {
-        "hmmsearch": {"--nobias": None}
+    "blastp": {"blastp-search": {"-word_size": "2", "-evalue": "0.1"}},
+    "hmm": {
+        "hmm-search": {"--nobias": None}
     },  # None indicates a flag without an argument
 }
 

@@ -28,7 +28,7 @@ def blastp_search(ctx: Context, unique_prots_fasta_path: Path) -> None:
     ogs = utils.get_ortholog_groups(ctx.paths.ortholog_groups_dir)
 
     search_and_add_prots_with_blastp(
-        ogs, unique_prots_fasta, ctx.args.tool_args["blastp"]
+        ogs, unique_prots_fasta, ctx.args.tool_args["blastp-search"]
     )
 
 

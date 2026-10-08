@@ -35,7 +35,7 @@ def hmm_search(ctx: Context) -> None:
                 ctx.ui,
                 [og for og in ogs if og.n_seqs < active_genomes_count],
                 annotated_unique_prots_fasta,
-                ctx.args.tool_args["hmmsearch"],
+                ctx.args.tool_args["hmm-search"],
             )
 
             if not annotated_prots_added:
@@ -45,7 +45,7 @@ def hmm_search(ctx: Context) -> None:
             ctx.ui,
             [og for og in ogs if og.n_seqs < active_genomes_count],
             predicted_unique_prots_fasta,
-            ctx.args.tool_args["hmmsearch"],
+            ctx.args.tool_args["hmm-search"],
         )
 
         if not predicted_prots_added:
