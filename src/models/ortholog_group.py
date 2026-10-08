@@ -2,7 +2,7 @@ import logging
 from collections.abc import Iterator
 from pathlib import Path
 
-from config.context import Context
+from config.paths import Paths
 from models.fasta import Fasta
 from models.seq import Seq
 
@@ -74,7 +74,7 @@ class OrthologGroup:
         self._delete_associated_files()
         self._validate_ortholog_group()
 
-    def remove_seqs(self, *ids: str, ctx: Context) -> None:
+    def remove_seqs(self, *ids: str, paths: Paths) -> None:
         """
         Remove sequences from the ortholog group.
 
@@ -89,9 +89,9 @@ class OrthologGroup:
         if len(remaining_seq_ids) == 1:
             remaining_seq = self.get_seqs(next(iter(remaining_seq_ids)))[0]
             prot_db_path = (
-                ctx.paths.predicted_unique_prots_fasta
+                paths.predicted_unique_prots_fasta
                 if remaining_seq.is_predicted
-                else ctx.paths.annotated_unique_prots_fasta
+                else paths.annotated_unique_prots_fasta
             )
             prot_db = Fasta(prot_db_path)
             prot_db.add_seqs(remaining_seq)

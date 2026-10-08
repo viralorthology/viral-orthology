@@ -44,7 +44,7 @@ def clean_ortholog_groups(ctx: Context) -> None:
     for og, seqs_to_keep in best_hits.items():
         seqs_to_remove = set(og.ids) - seqs_to_keep
         if seqs_to_remove:
-            og.remove_seqs(*seqs_to_remove, ctx=ctx)
+            og.remove_seqs(*seqs_to_remove, paths=ctx.paths)
             logger.info(
                 "Proteins %s removed from %s during HMM-based cleaning",
                 seqs_to_remove,

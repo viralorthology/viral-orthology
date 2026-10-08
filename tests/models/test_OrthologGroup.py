@@ -80,7 +80,7 @@ def test_delete_associated_files_with_remove_seqs(
     for file_ in associated_files:
         assert file_.is_file()
 
-    og.remove_seqs("seq1", ctx=context_always_yes)
+    og.remove_seqs("seq1", paths=context_always_yes.paths)
 
     for file_ in associated_files:
         assert not file_.is_file()
@@ -128,7 +128,7 @@ def test_delete_one_seq_in_two_seqs_fasta_annotated_db(
     valid_ortholog_group, context_always_yes
 ):
     og = OrthologGroup(valid_ortholog_group)
-    og.remove_seqs("seq1", ctx=context_always_yes)
+    og.remove_seqs("seq1", paths=context_always_yes.paths)
 
     assert not og.path.is_file()
     assert not context_always_yes.paths.predicted_unique_prots_fasta.is_file()
@@ -148,7 +148,7 @@ def test_delete_one_seq_in_two_seqs_fasta_predicted_db(tmp_path, context_always_
     )
 
     og = OrthologGroup(path)
-    og.remove_seqs("seq1", ctx=context_always_yes)
+    og.remove_seqs("seq1", paths=context_always_yes.paths)
 
     assert not og.path.is_file()
     assert not context_always_yes.paths.annotated_unique_prots_fasta.is_file()
@@ -167,7 +167,7 @@ def test_delete_one_seq(tmp_path, context_always_yes):
         encoding="utf-8",
     )
     og = OrthologGroup(path)
-    og.remove_seqs("seq1", ctx=context_always_yes)
+    og.remove_seqs("seq1", paths=context_always_yes.paths)
 
     assert og.path.is_file()
 
@@ -175,4 +175,4 @@ def test_delete_one_seq(tmp_path, context_always_yes):
 def test_delete_missing_seq(valid_ortholog_group, context_always_yes):
     og = OrthologGroup(valid_ortholog_group)
     with pytest.raises(ValueError):
-        og.remove_seqs("seq1", "seq10", ctx=context_always_yes)
+        og.remove_seqs("seq1", "seq10", paths=context_always_yes.paths)
