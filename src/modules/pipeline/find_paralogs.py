@@ -11,7 +11,7 @@ from models.tmp_fasta import TmpFasta
 logger = logging.getLogger(__name__)
 
 
-def find_paralogs(ctx: Context) -> None:
+def find_paralogs(ctx: Context, genome_ids: set[str]) -> None:
     """
     Identify paralog proteins within each proteome and select one representative.
 
@@ -22,10 +22,9 @@ def find_paralogs(ctx: Context) -> None:
     """
     ctx.ui.show("Searching for paralogs...")
 
-    genomes_fasta = Fasta(ctx.paths.genomes_fasta)
     proteomes_fasta = Fasta(ctx.paths.proteomes_fasta)
 
-    for genome_id in ctx.ui.progress_bar(genomes_fasta.ids):
+    for genome_id in ctx.ui.progress_bar(genome_ids):
         proteome = [seq for seq in proteomes_fasta.seqs if seq.genome_id == genome_id]
         if not proteome:
             logger.info(
