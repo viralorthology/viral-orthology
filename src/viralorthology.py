@@ -86,7 +86,7 @@ def main() -> None:
             logger.exception("EXCEPTION")
         else:
             logger.error("ERROR: %s", e)
-            ui.show_error(str(e))
+            ui.show_error(str(e))  # TODO can show error two times when debug=False
 
         sys.exit(1)
 
