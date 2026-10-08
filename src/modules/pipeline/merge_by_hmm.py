@@ -18,6 +18,9 @@ def merge_by_hmm(ctx: Context) -> None:
     ctx.ui.show("Merging ortholog groups using HMMs...")
 
     ogs = utils.get_ortholog_groups(ctx.paths.ortholog_groups_dir)
+    ogs = [
+        og for og in ogs if og.n_seqs < len(ctx.runtime.active_genome_ids) - 1
+    ]  # ogs have a min of 2 seqs
     og_genomes = {og: set(og.genome_ids) for og in ogs}
 
     merged_ogs = set()
