@@ -34,7 +34,6 @@ def test_search_and_add_prots_with_hmm_removes_added_proteins(
         [og],
         unique_prots_fasta,
         "params",
-        3,
     )
 
     assert result is True

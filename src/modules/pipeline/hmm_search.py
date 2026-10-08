@@ -33,10 +33,9 @@ def hmm_search(ctx: Context) -> None:
         while True:
             annotated_prots_added = search_and_add_prots_with_hmm(
                 ctx.ui,
-                ogs,
+                [og for og in ogs if og.n_seqs < active_genomes_count],
                 annotated_unique_prots_fasta,
                 ctx.args.tool_args["hmmsearch"],
-                active_genomes_count,
             )
 
             if not annotated_prots_added:
@@ -44,10 +43,9 @@ def hmm_search(ctx: Context) -> None:
 
         predicted_prots_added = search_and_add_prots_with_hmm(
             ctx.ui,
-            ogs,
+            [og for og in ogs if og.n_seqs < active_genomes_count],
             predicted_unique_prots_fasta,
             ctx.args.tool_args["hmmsearch"],
-            active_genomes_count,
         )
 
         if not predicted_prots_added:
@@ -59,7 +57,6 @@ def search_and_add_prots_with_hmm(
     ogs: list[OrthologGroup],
     unique_prots_fasta: Fasta,
     params: str,
-    active_genomes_count: int,
 ) -> bool:
     """
     Assign unique proteins to ortholog groups based on HMM search hits.
@@ -73,8 +70,6 @@ def search_and_add_prots_with_hmm(
         ogs: Ortholog groups to search against.
         unique_prots_fasta: FASTA file containing candidate protein sequences.
         params: Parameters passed to the HMM search tool.
-        active_genomes_count: Number of active genomes used to determine
-            whether an ortholog group is complete.
 
     Returns:
         True if at least one protein was added to an ortholog group,
@@ -83,9 +78,6 @@ def search_and_add_prots_with_hmm(
     all_hits: dict[HMMHit, OrthologGroup] = {}
 
     for og in ui.progress_bar(ogs):
-        if og.n_seqs == active_genomes_count:
-            continue
-
         hits = engines.hmm_search(og, unique_prots_fasta, params)
         all_hits.update({hit: og for hit in hits})
 
