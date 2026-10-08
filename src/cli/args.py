@@ -45,7 +45,7 @@ DEFAULT_TOOL_PARAMS: dict[str, dict[str, dict[str, str | None]]] = {
     },  # None indicates a flag without an argument
 }
 
-GLOBAL_BOOL_FLAGS = {"assume_yes", "debug"}
+GLOBAL_BOOL_FLAGS = {"assume_yes", "debug"}  # TODO use assume-yes
 
 
 def get_args(selected_public_module_flag: str, argv: list[str]) -> Args:
