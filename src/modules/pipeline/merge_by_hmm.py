@@ -28,14 +28,18 @@ def merge_by_hmm(ctx: Context) -> None:
         if og1 in merged_ogs:
             continue
 
-        ogs_to_try = _get_ogs_to_try(
-            og1, [og for og in ogs[i + 1 :] if og not in merged_ogs]
-        )
+        ogs_to_blast_against = [
+            og
+            for og in ogs[i + 1 :]
+            if og not in merged_ogs and not og_genomes[og1].intersection(og_genomes[og])
+        ]
+
+        if not ogs_to_blast_against:
+            continue
+
+        ogs_to_try = _get_ogs_to_try(og1, ogs_to_blast_against)
 
         for og2 in ogs_to_try:
-            if og_genomes[og1].intersection(og_genomes[og2]):
-                continue
-
             score = engines.hmm_compare_groups(og1, og2)
 
             if score >= MIN_SCORE_TO_MERGE_HMMS:
@@ -64,9 +68,6 @@ def _get_ogs_to_try(
     Returns:
         Ortholog groups containing sequences that match `og1` in the BLASTP search.
     """
-    if not available_ogs:
-        return []
-
     ogs_by_seq_id = {}
 
     with TmpFasta() as blastp_db:
