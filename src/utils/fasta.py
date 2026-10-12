@@ -13,11 +13,13 @@ def get_fastas(dir_path: Path) -> list[Fasta]:
 
     fastas = [
         Fasta(p) for p in dir_path.iterdir() if p.is_file() and p.suffix == ".fasta"
-    ]  # TODO sort fastas
+    ]
 
     assert fastas
 
-    return fastas
+    return sorted(
+        fastas, key=lambda fasta: (-fasta.n_seqs, fasta.path.stem)
+    )  # stem provides a deterministic tie-breaker.
 
 
 def get_ortholog_groups(dir_path: Path) -> list[OrthologGroup]:

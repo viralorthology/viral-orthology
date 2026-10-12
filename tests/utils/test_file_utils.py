@@ -11,8 +11,11 @@ from utils import (
 
 def test_get_fastas_returns_fasta_files(tmp_path):
     fasta_1 = tmp_path / "a.fasta"
+    fasta_1.write_text(">seq1\nATG")
     fasta_2 = tmp_path / "b.fasta"
+    fasta_2.write_text(">seq2\nATG")
     other_file = tmp_path / "c.txt"
+    other_file.write_text("sdf")
 
     fasta_1.touch()
     fasta_2.touch()
