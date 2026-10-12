@@ -81,9 +81,11 @@ def _get_ogs_to_try(
         )
 
     ogs_to_try = []
+    added_ogs = set()
     for hit in hits:
         og = ogs_by_seq_id[hit.subject_id]
-        if og not in ogs_to_try:
+        if og not in added_ogs:
+            added_ogs.add(og)
             ogs_to_try.append(og)
 
     return ogs_to_try
