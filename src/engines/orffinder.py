@@ -34,14 +34,13 @@ def predict_proteome(
     """
 
     # predict proteins
-    predicted_prots_fasta_str = _run_orffinder(genome_seq, params)
-    predicted_prot_seqs = utils.get_seqs_from_fasta_str(predicted_prots_fasta_str)
+    predicted_prots = _run_orffinder(genome_seq, params)
 
     # remove annotated prots from predicted proteome
     if annotated_proteins is not None:
         ids_prots_to_remove = []
 
-        for predicted_prot in predicted_prot_seqs:
+        for predicted_prot in predicted_prots:
             predicted_prot_str = str(predicted_prot.seq)
 
             for annotated_prot in annotated_proteins:
@@ -52,13 +51,13 @@ def predict_proteome(
                     break
 
         if ids_prots_to_remove:
-            predicted_prot_seqs = [
-                seq for seq in predicted_prot_seqs if seq.id not in ids_prots_to_remove
+            predicted_prots = [
+                seq for seq in predicted_prots if seq.id not in ids_prots_to_remove
             ]
 
     # format seq descriptions
     seqs_with_description_format = []
-    for n, seq in enumerate(predicted_prot_seqs):
+    for n, seq in enumerate(predicted_prots):
         seq_location_str = _get_predicted_prot_location(seq.id)
         seq_id = f"{PREDICTED_PROTEINS_PREFIX}_{predicted_prots_n + n + 1}"
         seq_description = (
@@ -69,9 +68,9 @@ def predict_proteome(
     return seqs_with_description_format
 
 
-def _run_orffinder(genome_seq: Seq, params: str) -> str:
+def _run_orffinder(genome_seq: Seq, params: str) -> list[Seq]:
     """
-    Run ORFfinder on a genome sequence and return its FASTA string output. # TODO return list[Seq]
+    Run ORFfinder on a genome sequence and return the predicted sequences.
 
     Args:
         genome_seq: The genome sequence to process.
@@ -89,7 +88,9 @@ def _run_orffinder(genome_seq: Seq, params: str) -> str:
         if not cmd_stdout.startswith(">"):
             raise ValueError(f"Cannot predict proteome of {genome_seq.id}")
 
-        return cmd_stdout
+        predicted_prot_seqs = utils.get_seqs_from_fasta_str(cmd_stdout)
+
+        return predicted_prot_seqs
 
 
 def _predicted_prot_is_annotated(
