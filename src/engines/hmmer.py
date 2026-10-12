@@ -19,10 +19,6 @@ def hmm_search(
     """
     Search a protein database using an HMM built from an ortholog group.
 
-    The ortholog group is first aligned with MUSCLE and an HMM is built
-    from the resulting alignment. The HMM is then searched against the
-    provided protein database using HMMER.
-
     Args:
         query_fasta: Ortholog group used to build the query HMM.
         db_fasta: FASTA file containing the protein sequences to search.
@@ -43,29 +39,21 @@ def hmm_search(
 def _build_hmm_hmmer(fasta: OrthologGroup) -> None:
     """
     Build an HMM from a multiple sequence alignment using HMMER.
-
-    Args:
-        fasta: Ortholog group containing the alignment used to build the HMM.
     """
     utils.run_cmd(f"hmmbuild {fasta.hmm_hmmer_path} {fasta.alignment_path}")
 
 
 def _search_hmm_hmmer(
-    query_fasta: OrthologGroup, db_fasta: Fasta, params: str
+    query_fasta: OrthologGroup, db_fasta: Fasta, search_params: str
 ) -> list[HMMHit]:
     """
     Search a protein database using an HMM with hmmsearch.
-
-    Args:
-        query_fasta: Ortholog group containing the HMM used for the search.
-        db_fasta: FASTA file containing the protein sequences to search.
-        params: Additional command-line parameters to pass to hmmsearch.
 
     Returns:
         A list of HMMER hits sorted by E-value.
     """
     output = utils.run_cmd(
-        f"hmmsearch {params} --noali {query_fasta.hmm_hmmer_path} {db_fasta.path}"
+        f"hmmsearch {search_params} --noali {query_fasta.hmm_hmmer_path} {db_fasta.path}"
     )
     return _parse_hmmsearch_output(output)
 

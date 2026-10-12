@@ -8,13 +8,10 @@ def make_annotated_unique_prots_fasta(ctx: Context) -> None:
     Create the annotated unique proteins FASTA file.
 
     Selects protein sequences from the active genomes that are not identified
-    as paralogs and do not belong to any orthologous group. The selected
+    as paralogs and do not belong to any ortholog group. The selected
     sequences are written to the annotated unique proteins FASTA file.
-
-    Args:
-        ctx: Pipeline context containing input/output paths, active genome IDs,
-            paralog IDs, and other runtime information.
     """
+    # TODO merge the two fns
     ogs = utils.get_ortholog_groups(ctx.paths.ortholog_groups_dir)
     seq_in_group_ids = set()
     for og in ogs:

@@ -17,7 +17,7 @@ def clean_ortholog_groups(ctx: Context) -> None:
 
     Each ortholog group is searched against the available proteomes. If a
     protein is detected by multiple ortholog group HMMs, it is assigned to
-    the group with the best HMM score (lowest E-value). Proteins that are
+    the group with the lowest e-value. Proteins that are
     not assigned to their original ortholog group are removed from the
     group.
     """

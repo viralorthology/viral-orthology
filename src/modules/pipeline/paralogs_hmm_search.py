@@ -15,7 +15,17 @@ logger = logging.getLogger(__name__)
 
 
 def paralogs_hmm_search(ctx: Context) -> None:
-    """Find and assign paralog sequences to ortholog groups using HMM searches."""
+    """
+    Re-evaluate previously ignored paralogs using HMM profiles.
+
+    Each ortholog group profile HMM is used to search against all
+    the previously ignored paralog sequences. If a hit belongs to
+    a genome not represented in the ortholog group, the protein is
+    added. If there is a protein from the same genome,
+    blastp is used to determine whether the new paralog has a
+    better match with the rest of the sequences in the ortholog
+    group.
+    """
     ctx.ui.show("Re-evaluating paralogs using HMMs...")
 
     ogs = utils.get_ortholog_groups(ctx.paths.ortholog_groups_dir)
@@ -134,12 +144,6 @@ def _find_best_paralog(
 ) -> str:
     """
     Find the best paralog using Blastp.
-
-    Args:
-        new_paralog: New paralog candidate being evaluated.
-        old_paralog: Existing paralog in the ortholog group.
-        other_og_proteins: Proteins from the ortholog group belonging to other
-            genomes.
     """
     with TmpFasta() as og_blast_db:
         og_blast_db.add_seqs(*other_og_proteins)

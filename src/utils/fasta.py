@@ -9,16 +9,11 @@ from models.seq import Seq, get_seq_from_seqrecord
 
 
 def get_fastas(dir_path: Path) -> list[Fasta]:
-    """
-    Get FASTA files from a directory.
-
-    Args:
-        dir_path: Directory containing the FASTA files
-    """
+    """Get FASTA files from a directory."""
 
     fastas = [
         Fasta(p) for p in dir_path.iterdir() if p.is_file() and p.suffix == ".fasta"
-    ]
+    ]  # TODO sort fastas
 
     assert fastas
 
@@ -27,7 +22,7 @@ def get_fastas(dir_path: Path) -> list[Fasta]:
 
 def get_ortholog_groups(dir_path: Path) -> list[OrthologGroup]:
     """
-    Load all OrthologGroup FASTA files from a directory.
+    Get all OrthologGroup FASTA files from a directory.
 
     Returns:
         Ortholog groups sorted by number of sequences in descending order,

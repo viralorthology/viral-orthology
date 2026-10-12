@@ -80,10 +80,10 @@ def _download_sequences(
     """
     Download genome and proteome sequences for the given genome IDs.
 
-    Genome sequences are fetched from GenBank using ``efetch`` and
-    appended to ``genomes_fasta``. For each successfully downloaded
+    Genome sequences are fetched from GenBank using efetch and
+    appended to genomes_fasta. For each successfully downloaded
     genome, the corresponding annotated protein sequences are also
-    fetched and appended to ``proteomes_fasta`` when available.
+    fetched and appended to proteomes_fasta when available.
 
     Genome download failures are reported through the UI and the affected
     genome is skipped. Proteome download failures are also reported,

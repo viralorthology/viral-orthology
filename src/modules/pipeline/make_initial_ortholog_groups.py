@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def make_initial_ortholog_groups(ctx: Context) -> None:
     """
-    Create initial ortholog groups from the non-redundant proteomes.
+    Create initial ortholog groups from the non-redundant genome proteomes.
 
     Proteomes are compared with ProteinOrtho to generate ortholog groups.
     Groups containing paralogs are filtered by retaining the longest protein
@@ -110,13 +110,12 @@ def _run_proteinortho(proteome_fastas: list[Fasta], params: str, cwd: Path) -> N
 
 def _remove_paralogs(og: Fasta, paralog_ids: set[str]) -> bool:
     """
-    Remove paralogous sequences from an ortholog group.
+    Remove paralog sequences from an ortholog group.
 
     If all sequences in the ortholog group belong to the same genome, the
     ortholog group is deleted. Otherwise, for each genome containing multiple
     sequences, the longest sequence is retained and the remaining sequences
-    are removed and added to the set of paralog IDs. Sequence IDs are used
-    as a deterministic tie-breaker when sequences have the same length.
+    are removed and added to the set of paralog IDs.
 
     Args:
         og: FASTA file representing an ortholog group.

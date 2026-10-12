@@ -52,5 +52,5 @@ def ensure_files_have_content(*file_paths: Path) -> None:
     """
     ensure_files_exist(*file_paths)
     for file_path in file_paths:
-        if not file_path.stat().st_size > 0:
+        if not file_path.stat().st_size > 0:  # TODO if == 0
             raise ValueError(f"{file_path} is empty")

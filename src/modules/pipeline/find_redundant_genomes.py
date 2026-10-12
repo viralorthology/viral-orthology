@@ -63,10 +63,6 @@ def _find_redundant_genomes(ctx: Context, genome_fastas: list[Fasta]) -> set[str
     Genomes are compared pairwise and a genome is considered redundant when
     it is sufficiently similar to an earlier genome in the input list.
 
-    Args:
-        ctx: Pipeline context used for progress reporting.
-        genome_fastas: Genomes to compare.
-
     Returns:
         The Seq IDs of the redundant genomes.
     """

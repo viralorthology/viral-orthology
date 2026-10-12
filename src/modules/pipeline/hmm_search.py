@@ -16,7 +16,7 @@ def hmm_search(ctx: Context) -> None:
     """
     Search for new orthologs using HMM profiles.
 
-    Searches for orthologous proteins among annotated and predicted unique
+    Searches for ortholog proteins among annotated and predicted unique
     proteins using HMM profiles associated with the existing ortholog groups.
     Annotated proteins are searched iteratively until no additional proteins
     can be assigned, while predicted proteins are processed in a single round.
@@ -67,7 +67,7 @@ def search_and_add_prots_with_hmm(
 
     Args:
         ui: User interface used to display progress.
-        ogs: Ortholog groups to search against.
+        ogs: Ortholog groups whose HMM profile will be used for the search.
         unique_prots_fasta: FASTA file containing candidate protein sequences.
         params: Parameters passed to the HMM search tool.
 

@@ -71,7 +71,7 @@ def predict_proteome(
 
 def _run_orffinder(genome_seq: Seq, params: str) -> str:
     """
-    Run ORFfinder on a genome sequence and return its FASTA string output.
+    Run ORFfinder on a genome sequence and return its FASTA string output. # TODO return list[Seq]
 
     Args:
         genome_seq: The genome sequence to process.

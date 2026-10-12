@@ -15,7 +15,7 @@ def find_paralogs(ctx: Context, genome_ids: set[str]) -> None:
     """
     Identify paralog proteins within each proteome and select one representative.
 
-    BLASTP reciprocal hits are used to identify groups of paralogous proteins.
+    BLASTP reciprocal hits are used to identify groups of paralog proteins.
     Within each group, the longest protein sequence is selected for further
     analysis, while the remaining paralogs are marked as ignored in the
     runtime context.
@@ -97,13 +97,6 @@ def _find_reciprocal_hits(blastp_hits: list[BlastHit]) -> set[frozenset[str]]:
     """
     Find reciprocal BLASTP hits between protein sequences.
 
-    A reciprocal hit is a pair of sequences where each sequence is a BLASTP
-    hit of the other. Self-hits are excluded, and each reciprocal pair is
-    represented as a frozenset to avoid duplicate pairs.
-
-    Args:
-        blastp_hits: BLASTP hits to analyze.
-
     Returns:
         A set of frozensets, where each frozenset contains the IDs of a
         reciprocal hit pair.
@@ -118,7 +111,9 @@ def _find_reciprocal_hits(blastp_hits: list[BlastHit]) -> set[frozenset[str]]:
     for query_id, subject_id_set in hits_by_query_id.items():
         for subject_id in subject_id_set:
             if query_id in hits_by_query_id.get(subject_id, set()):
-                reciprocal_hits.add(frozenset((query_id, subject_id)))
+                reciprocal_hits.add(
+                    frozenset((query_id, subject_id))
+                )  # avoid duplicate pairs
 
     return reciprocal_hits
 

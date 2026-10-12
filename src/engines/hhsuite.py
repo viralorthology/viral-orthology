@@ -9,11 +9,6 @@ def hmm_compare_groups(
     """
     Compare two ortholog groups using HHsuite profile-profile alignment.
 
-    Each ortholog group is aligned with MUSCLE if an alignment does not
-    already exist. The alignments are then converted to A2M format and
-    used to build HHsuite HMM profiles. The two profiles are finally
-    compared with HHalign.
-
     Returns:
         The HHalign probability score between the two HMM profiles.
     """
@@ -45,9 +40,6 @@ def _convert_aligned_fasta_to_a2m(fasta: OrthologGroup) -> None:
 def _build_hmm_hhsuite(fasta: OrthologGroup) -> None:
     """
     Build an HHsuite HMM profile from an A2M alignment.
-
-    Args:
-        fasta: Ortholog group containing the alignment used to build the HMM.
     """
     utils.run_cmd(f"hhmake -i {fasta.a2m_path} -o {fasta.hmm_hhsuite_path}")
 
