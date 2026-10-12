@@ -4,7 +4,6 @@ from .fasta import (
     get_fastas,
     get_ortholog_groups,
     get_seqs_from_fasta_str,
-    o_groups_are_compatible,
 )
 from .files import (
     ensure_files_exist,
@@ -25,6 +24,5 @@ __all__ = [
     "get_ortholog_groups",
     "get_seqs_from_fasta_str",
     "make_og_report",
-    "o_groups_are_compatible",
     "run_cmd",
 ]
