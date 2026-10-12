@@ -22,10 +22,13 @@ def hmm_compare_groups(
     if not group2_fasta.alignment_path.is_file():
         muscle_align(group2_fasta)
 
-    _convert_aligned_fasta_to_a2m(group1_fasta)
-    _convert_aligned_fasta_to_a2m(group2_fasta)
-    _build_hmm_hhsuite(group1_fasta)
-    _build_hmm_hhsuite(group2_fasta)
+    if not group1_fasta.a2m_path.is_file():
+        _convert_aligned_fasta_to_a2m(group1_fasta)
+        _build_hmm_hhsuite(group1_fasta)
+
+    if not group2_fasta.a2m_path.is_file():
+        _convert_aligned_fasta_to_a2m(group2_fasta)
+        _build_hmm_hhsuite(group2_fasta)
 
     score = _hhalign(group1_fasta, group2_fasta)
 
