@@ -27,7 +27,7 @@ DEFAULT_TOOL_PARAMS: dict[str, dict[str, dict[str, str | None]]] = {
     },  # None indicates a flag without an argument
 }
 
-GLOBAL_BOOL_FLAGS = {"assume_yes", "debug"}  # TODO use assume-yes
+GLOBAL_BOOL_FLAGS = {"assume-yes", "debug"}
 
 
 def get_args(selected_public_module_flag: str, argv: list[str]) -> Args:
@@ -77,6 +77,7 @@ def get_args(selected_public_module_flag: str, argv: list[str]) -> Args:
                     tool_params.extend([param, value])
 
     return Args(
-        **global_bool_flags,
+        assume_yes=global_bool_flags["assume-yes"],
+        debug=global_bool_flags["debug"],
         tool_args={tool: shlex.join(params) for tool, params in tool_args.items()},
     )

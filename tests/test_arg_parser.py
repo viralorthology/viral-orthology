@@ -43,7 +43,7 @@ def test_debug_flag():
 
 
 def test_assume_yes_flag():
-    args = get_args("-pipeline", ["-pipeline", "--assume_yes"])
+    args = get_args("-pipeline", ["-pipeline", "--assume-yes"])
 
     assert args.assume_yes is True
 
@@ -51,7 +51,7 @@ def test_assume_yes_flag():
 def test_both_global_flags():
     args = get_args(
         "-pipeline",
-        ["-pipeline", "-debug", "-assume_yes"],
+        ["-pipeline", "-debug", "-assume-yes"],
     )
 
     assert args.debug is True
