@@ -11,8 +11,7 @@ from modules.pipeline.find_redundant_genomes import find_redundant_genomes
 from modules.pipeline.hmm_search import hmm_search
 from modules.pipeline.make_initial_ortholog_groups import make_initial_ortholog_groups
 from modules.pipeline.manage_unique_prots_fasta import (
-    add_redundant_genome_prots_unique_prots_fasta,
-    make_annotated_unique_prots_fasta,
+    add_prots_to_annotated_unique_prots_fasta,
 )
 from modules.pipeline.merge_by_annotation import merge_by_annotation
 from modules.pipeline.merge_by_hmm import merge_by_hmm
@@ -81,7 +80,7 @@ def run(ctx: Context) -> None:
     clean_ortholog_groups(ctx)
     merge_by_annotation(ctx)
     merge_by_hmm(ctx)
-    make_annotated_unique_prots_fasta(ctx)
+    add_prots_to_annotated_unique_prots_fasta(ctx, ctx.runtime.active_genome_ids)
 
     # enrichment stage
     hmm_search(ctx)
@@ -94,7 +93,7 @@ def run(ctx: Context) -> None:
         ctx.runtime.active_genome_ids.update(ctx.runtime.redundant_genome_ids)
         find_paralogs(ctx, ctx.runtime.redundant_genome_ids)
         predict_proteomes(ctx, ctx.runtime.redundant_genome_ids)
-        add_redundant_genome_prots_unique_prots_fasta(ctx)
+        add_prots_to_annotated_unique_prots_fasta(ctx, ctx.runtime.redundant_genome_ids)
 
         # enrichment stage
         hmm_search(ctx)
