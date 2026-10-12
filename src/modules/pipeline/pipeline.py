@@ -92,9 +92,9 @@ def run(ctx: Context) -> None:
 
     if ctx.runtime.redundant_genome_ids:
         ctx.runtime.active_genome_ids.update(ctx.runtime.redundant_genome_ids)
-        add_redundant_genome_prots_unique_prots_fasta(ctx)
         find_paralogs(ctx, ctx.runtime.redundant_genome_ids)
         predict_proteomes(ctx, ctx.runtime.redundant_genome_ids)
+        add_redundant_genome_prots_unique_prots_fasta(ctx)
 
         # enrichment stage
         hmm_search(ctx)
