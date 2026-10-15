@@ -40,6 +40,11 @@ def merge_by_hmm(ctx: Context) -> None:
         ogs_to_try = _get_ogs_to_try(og1, ogs_to_blast_against)
 
         for og2 in ogs_to_try:
+            if og_genomes[og1].intersection(
+                og_genomes[og2]
+            ):  # may no longer be compatible
+                continue
+
             score = engines.hmm_compare_groups(og1, og2)
 
             if score >= MIN_SCORE_TO_MERGE_HMMS:
