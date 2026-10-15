@@ -98,6 +98,7 @@ class OrthologGroup:
             self._fasta.remove_seqs(
                 *ids, remaining_seq.id
             )  # Fasta.remove_seqs will check the ids and delete the file
+            self._delete_associated_files()
             assert not self.path.is_file()
             logger.debug(
                 "%s og was deleted during remove_seqs; seqs removed: %s",
