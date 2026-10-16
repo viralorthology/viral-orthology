@@ -56,13 +56,20 @@ def ensure_files_have_content(*file_paths: Path) -> None:
             raise ValueError(f"{file_path} is empty")
 
 
-def ensure_dirs_exist(*dir_paths: Path) -> None:
+def ensure_dir_has_files(dir_path: Path, file_suffix: str) -> None:
     """
-    Ensure that all specified paths exist and are valid directories.
+    Ensure that a directory contains at least one file with the specified suffix.
+
+    Args:
+        dir_path: Directory to check.
+        file_suffix: File suffix to look for.
 
     Raises:
-        FileNotFoundError: If any path does not exist or is not a directory.
+        FileNotFoundError: If the directory does not exist, is not a directory,
+            or contains no files with the specified suffix.
     """
-    for dir_p in dir_paths:
-        if not dir_p.is_dir():
-            raise FileNotFoundError(f"{dir_p} is not a valid directory")
+    for f in dir_path.iterdir():
+        if f.is_file() and f.suffix == file_suffix:
+            return
+
+    raise FileNotFoundError(f"No {file_suffix} files found in {dir_path}")
