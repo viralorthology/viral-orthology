@@ -25,13 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 def run(ctx: Context) -> None:
-    logger.info("Running pipeline: %s", (" ").join(sys.argv))
-    logger.info("Pipeline parameters:")
-    for tool, params in ctx.args.tool_args.items():
-        logger.info(" %s: %s", tool, params if params else "tool defaults")
-    logger.info(" assume yes: %s", ctx.args.assume_yes)
-
-    ### PRE-RUN ###
+    # PRE-RUN
     utils.check_dependencies(
         "blastn",
         "blastp",
@@ -64,11 +58,16 @@ def run(ctx: Context) -> None:
             f"There are proteomes without their corresponding genome sequence: {proteomes_without_genome}"
         )
 
-    logger.info("Validation completed successfully")
+    # LOG
     dataset_hash = utils.get_dataset_hash(genome_ids)
-    logger.info("Starting pipeline on dataset %s", dataset_hash)
+    logger.info("Running pipeline on dataset %s", dataset_hash)
+    logger.info("Command used: %s", (" ").join(sys.argv))
+    logger.info("Parameters:")
+    for tool, params in ctx.args.tool_args.items():
+        logger.info(" %s: %s", tool, params if params else "tool defaults")
+    logger.info(" assume yes: %s", ctx.args.assume_yes)
 
-    ### RUN ###
+    # RUN
     # redundancy reduction stage
     find_redundant_genomes(ctx)
 
@@ -108,11 +107,11 @@ def run(ctx: Context) -> None:
     rename_og_fastas_by_annotation(ctx)
     merge_by_annotation(ctx)
 
-    ### POST-RUN ###
+    # POST-RUN
     rename_og_fastas_by_annotation(ctx)
     ctx.paths.output_dir.mkdir(exist_ok=True)
     ctx.ui.show("Writing reports...")
     utils.make_og_report(ctx, dataset_hash)
     ctx.paths.predicted_unique_prots_fasta.unlink()
 
-    logger.info("Pipeline ended successfully")
+    logger.info("Pipeline completed succesfully")
