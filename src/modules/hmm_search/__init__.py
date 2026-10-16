@@ -1,5 +1,3 @@
-from config.context import Context
+from .hmm_search import run
 
-
-def run(ctx: Context) -> None:
-    raise NotImplementedError("This module is not yet implemented.")
+__all__ = ["run"]
