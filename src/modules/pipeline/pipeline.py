@@ -1,5 +1,4 @@
 import logging
-import sys
 
 import utils
 from config.context import Context
@@ -60,12 +59,7 @@ def run(ctx: Context) -> None:
 
     # LOG
     dataset_hash = utils.get_dataset_hash(genome_ids)
-    logger.info("Running pipeline on dataset %s", dataset_hash)
-    logger.info("Command used: %s", (" ").join(sys.argv))
-    logger.info("Parameters:")
-    for tool, params in ctx.args.tool_args.items():
-        logger.info(" %s: %s", tool, params if params else "tool defaults")
-    logger.info(" assume yes: %s", ctx.args.assume_yes)
+    utils.module_start_logging(logger, "pipeline", dataset_hash, ctx.args.tool_args)
 
     # RUN
     # redundancy reduction stage

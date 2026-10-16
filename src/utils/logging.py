@@ -1,4 +1,6 @@
 import logging
+import sys
+from logging import Logger
 from pathlib import Path
 
 
@@ -37,3 +39,24 @@ def configure_logging(base_path: Path, dev_level: bool) -> None:
             )
         )
         logger.addHandler(console)
+
+
+def module_start_logging(
+    logger: Logger, module_name: str, dataset_hash: str, tool_args: dict[str, str]
+) -> None:
+    """
+    Log the start of a module execution and its configuration.
+
+    Args:
+        logger: Logger used to record execution information.
+        module_name: Name of the module being executed.
+        dataset_hash: Identifier of the dataset being processed.
+        tool_args: Mapping of tool names to their parameters.
+
+    Logs the module name, dataset identifier, command used, and parameters for each tool. Tools without specified parameters are logged as using their default settings.
+    """
+    logger.info("Running %s on dataset %s", module_name, dataset_hash)
+    logger.info("Command used: %s", (" ").join(sys.argv))
+    logger.info("Parameters:")
+    for tool, params in tool_args.items():
+        logger.info(" %s: %s", tool, params if params else "tool defaults")

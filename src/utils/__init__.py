@@ -11,7 +11,7 @@ from .files import (
     ensure_files_have_content,
     ensure_paths_do_not_exist,
 )
-from .logging import configure_logging
+from .logging import configure_logging, module_start_logging
 from .reports import make_og_report
 
 __all__ = [
@@ -26,5 +26,6 @@ __all__ = [
     "get_ortholog_groups",
     "get_seqs_from_fasta_str",
     "make_og_report",
+    "module_start_logging",
     "run_cmd",
 ]
