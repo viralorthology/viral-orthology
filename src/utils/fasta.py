@@ -10,12 +10,12 @@ from models.seq import Seq, get_seq_from_seqrecord
 
 def get_fastas(dir_path: Path) -> list[Fasta]:
     """Get FASTA files from a directory."""
-
     fastas = [
         Fasta(p) for p in dir_path.iterdir() if p.is_file() and p.suffix == ".fasta"
     ]
 
-    assert fastas
+    if not fastas:
+        raise FileNotFoundError(f"No fastas found in {dir_path}")
 
     return sorted(
         fastas, key=lambda fasta: (-fasta.n_seqs, fasta.path.stem)
@@ -30,14 +30,14 @@ def get_ortholog_groups(dir_path: Path) -> list[OrthologGroup]:
         Ortholog groups sorted by number of sequences in descending order,
         with filename used as the secondary sorting criterion.
     """
-
     ogs = [
         OrthologGroup(p)
         for p in dir_path.iterdir()
         if p.is_file() and p.suffix == ".fasta"
     ]
 
-    assert ogs
+    if not ogs:
+        raise FileNotFoundError(f"No ortholog groups found in {dir_path}")
 
     return sorted(
         ogs, key=lambda og: (-og.n_seqs, og.path.stem)
