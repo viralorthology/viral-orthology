@@ -6,6 +6,7 @@ from .fasta import (
     get_seqs_from_fasta_str,
 )
 from .files import (
+    ensure_dirs_exist,
     ensure_files_exist,
     ensure_files_have_content,
     ensure_paths_do_not_exist,
@@ -16,6 +17,7 @@ from .reports import make_og_report
 __all__ = [
     "check_dependencies",
     "configure_logging",
+    "ensure_dirs_exist",
     "ensure_files_exist",
     "ensure_files_have_content",
     "ensure_paths_do_not_exist",

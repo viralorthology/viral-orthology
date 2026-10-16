@@ -54,3 +54,15 @@ def ensure_files_have_content(*file_paths: Path) -> None:
     for file_path in file_paths:
         if file_path.stat().st_size == 0:
             raise ValueError(f"{file_path} is empty")
+
+
+def ensure_dirs_exist(*dir_paths: Path) -> None:
+    """
+    Ensure that all specified paths exist and are valid directories.
+
+    Raises:
+        FileNotFoundError: If any path does not exist or is not a directory.
+    """
+    for dir_p in dir_paths:
+        if not dir_p.is_dir():
+            raise FileNotFoundError(f"{dir_p} is not a valid directory")
