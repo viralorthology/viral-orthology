@@ -28,6 +28,7 @@ def run(ctx: Context) -> None:
     utils.check_dependencies(
         "blastn",
         "blastp",
+        "makeblastdb",
         "ORFfinder",
         "proteinortho",
         "proteinortho_grab_proteins.pl",
