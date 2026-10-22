@@ -8,7 +8,9 @@ from models.seq import Seq
 
 def make_og_report(ctx: Context, dataset_hash: str) -> None:
     """Generate a CSV report with statistics for each ortholog group."""
-    lines = ["name,n_seqs,min_prot_len,max_prot_len,av_prot_len,st_dev_prot_len"]
+    lines = [
+        "filename,most_common_annotation,n_seqs,min_prot_len,max_prot_len,av_prot_len,st_dev_prot_len"
+    ]
 
     ogs = utils.get_ortholog_groups(ctx.paths.ortholog_groups_dir)
     ogs.sort(key=lambda og: (-og.n_seqs, og.path.stem))
@@ -18,7 +20,7 @@ def make_og_report(ctx: Context, dataset_hash: str) -> None:
             og.seqs
         )
         lines.append(
-            f"{og.path.name},{og.n_seqs},{min_prot_len},{max_prot_len},{av_prot_len},{stdev}"
+            f"{og.path.name},{utils.get_og_most_frequent_annotation(og)},{og.n_seqs},{min_prot_len},{max_prot_len},{av_prot_len},{stdev}"
         )
 
     report_file = ctx.paths.output_dir / f"{dataset_hash}_ortholog_groups_report.csv"

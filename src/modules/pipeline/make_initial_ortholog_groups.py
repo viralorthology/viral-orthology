@@ -51,9 +51,11 @@ def make_initial_ortholog_groups(ctx: Context) -> None:
 
         # move ortholog groups
         ctx.paths.ortholog_groups_dir.mkdir()
-        for og in ortholog_groups:
+        n_figures = len(str(len(ortholog_groups)))
+        for n, og in enumerate(ortholog_groups):
             if og in deleted_ogs:
                 continue
+            og.rename_fasta(f"{n:0{n_figures}d}.fasta")
             og.move_fasta(ctx.paths.ortholog_groups_dir)
 
 

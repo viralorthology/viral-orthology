@@ -16,9 +16,6 @@ from modules.pipeline.merge_by_annotation import merge_by_annotation
 from modules.pipeline.merge_by_hmm import merge_by_hmm
 from modules.pipeline.paralogs_hmm_search import paralogs_hmm_search
 from modules.pipeline.predict_proteomes import predict_proteomes
-from modules.pipeline.rename_og_fastas_by_annotation import (
-    rename_og_fastas_by_annotation,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +67,6 @@ def run(ctx: Context) -> None:
     find_paralogs(ctx, ctx.runtime.active_genome_ids)
     predict_proteomes(ctx, ctx.runtime.active_genome_ids)
     make_initial_ortholog_groups(ctx)
-    rename_og_fastas_by_annotation(ctx)
     clean_ortholog_groups(ctx)
     merge_by_annotation(ctx)
     merge_by_hmm(ctx)
@@ -99,11 +95,9 @@ def run(ctx: Context) -> None:
     # final stage
     merge_by_hmm(ctx)
     paralogs_hmm_search(ctx)
-    rename_og_fastas_by_annotation(ctx)
     merge_by_annotation(ctx)
 
     # POST-RUN
-    rename_og_fastas_by_annotation(ctx)
     ctx.paths.output_dir.mkdir(exist_ok=True)
     ctx.ui.show("Writing reports...")
     utils.make_og_report(ctx, dataset_hash)
