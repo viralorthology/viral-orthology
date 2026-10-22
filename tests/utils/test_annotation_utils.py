@@ -1,5 +1,4 @@
-from modules.pipeline.rename_og_fastas_by_annotation import (
-    _add_number_to_repeated_name,
+from utils.annotation import (
     _filter_annotations,
     _get_most_frequent_annotation,
     _get_seq_annotation,
@@ -87,29 +86,3 @@ def test_get_most_frequent_annotation_breaks_ties_alphabetically():
 
 def test_get_most_frequent_annotation_single_annotation():
     assert _get_most_frequent_annotation(["kinase"]) == ("kinase", 1)
-
-
-def test_add_number_to_repeated_name():
-    used_names = {"kinase"}
-
-    assert _add_number_to_repeated_name("kinase", used_names) == "kinase-1"
-
-
-def test_add_number_to_repeated_name_skips_existing_suffixes():
-    used_names = {
-        "kinase",
-        "kinase-1",
-        "kinase-2",
-    }
-
-    assert _add_number_to_repeated_name("kinase", used_names) == "kinase-3"
-
-
-def test_add_number_to_repeated_name_returns_first_available_suffix():
-    used_names = {
-        "kinase",
-        "kinase-1",
-        "kinase-3",
-    }
-
-    assert _add_number_to_repeated_name("kinase", used_names) == "kinase-2"

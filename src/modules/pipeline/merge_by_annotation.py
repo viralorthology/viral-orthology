@@ -2,9 +2,6 @@ import logging
 
 import utils
 from config.context import Context
-from modules.pipeline.rename_og_fastas_by_annotation import (
-    get_og_most_frequent_annotation,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +20,7 @@ def merge_by_annotation(ctx: Context) -> None:
 
     og_n_seqs = {og: len(_og_genomes_id_list[og]) for og in ogs}
     og_genomes = {og: set(_og_genomes_id_list[og]) for og in ogs}
-    og_annotation = {og: get_og_most_frequent_annotation(og) for og in ogs}
+    og_annotation = {og: utils.get_og_most_frequent_annotation(og) for og in ogs}
     active_genomes_count = len(ctx.runtime.active_genome_ids)
 
     merged_ogs = set()
@@ -54,7 +51,7 @@ def merge_by_annotation(ctx: Context) -> None:
                 )
             ):
                 og1.add_seqs(*og2.seqs)
-                og_annotation[og1] = get_og_most_frequent_annotation(og1)
+                og_annotation[og1] = utils.get_og_most_frequent_annotation(og1)
                 og_n_seqs[og1] = og1.n_seqs
                 og_genomes[og1] = set(og1.genome_ids)
                 og2.delete_fasta()

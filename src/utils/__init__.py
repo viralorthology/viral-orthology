@@ -1,3 +1,4 @@
+from .annotation import get_og_most_frequent_annotation
 from .cmd import check_dependencies, run_cmd
 from .dataset import get_dataset_hash
 from .fasta import (
@@ -23,6 +24,7 @@ __all__ = [
     "ensure_paths_do_not_exist",
     "get_dataset_hash",
     "get_fastas",
+    "get_og_most_frequent_annotation",
     "get_ortholog_groups",
     "get_seqs_from_fasta_str",
     "make_og_report",
