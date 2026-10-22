@@ -25,6 +25,7 @@ DEFAULT_TOOL_PARAMS: dict[str, dict[str, dict[str, str | None]]] = {
     "hmm": {
         "hmm-search": {"--nobias": None}
     },  # None indicates a flag without an argument
+    "synteny": {},
 }
 
 GLOBAL_BOOL_FLAGS = {"assume-yes", "debug"}
