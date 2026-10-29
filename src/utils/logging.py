@@ -55,7 +55,7 @@ def module_start_logging(
 
     Logs the module name, dataset identifier, command used, and parameters for each tool. Tools without specified parameters are logged as using their default settings.
     """
-    logger.info("Running %s on dataset %s", module_name, dataset_hash)
+    logger.info("* Running %s on dataset %s *", module_name, dataset_hash)
     logger.info("Command used: %s", (" ").join(sys.argv))
     logger.info("Parameters:")
     for tool, params in tool_args.items():
