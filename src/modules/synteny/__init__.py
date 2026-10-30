@@ -1,5 +1,3 @@
-from config.context import Context
+from .synteny import run
 
-
-def run(ctx: Context) -> None:
-    raise NotImplementedError("This module is not yet implemented.")
+__all__ = ["run"]
