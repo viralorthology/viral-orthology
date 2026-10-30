@@ -52,6 +52,7 @@ def run(ctx: Context) -> None:
 
     conserved_sws = _get_conserved_sws(complete_sws, len(genome_ids))
     if not conserved_sws or not incomplete_sws:
+        logger.info("No conserved or incomplete synteny window found")
         return
 
     logger.info("Conserved synteny windows found:")
