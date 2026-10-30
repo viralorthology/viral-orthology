@@ -3,6 +3,8 @@ import sys
 from logging import Logger
 from pathlib import Path
 
+from version import __version__
+
 
 def configure_logging(base_path: Path, dev_level: bool) -> None:
     """
@@ -22,7 +24,7 @@ def configure_logging(base_path: Path, dev_level: bool) -> None:
         format = "%(asctime)s - %(message)s"
     formatter = logging.Formatter(
         format,
-        datefmt="%Y-%m-%d %H:%M:%S",
+        datefmt="%y-%m-%d %H:%M",
     )
 
     log_file = logging.FileHandler(base_path / "viralorthology.log")
@@ -56,6 +58,7 @@ def module_start_logging(
     Logs the module name, dataset identifier, command used, and parameters for each tool. Tools without specified parameters are logged as using their default settings.
     """
     logger.info("* Running %s on dataset %s *", module_name, dataset_hash)
+    logger.info("ViralOrthology version: %s", __version__)
     logger.info("Command used: %s", (" ").join(sys.argv))
     logger.info("Parameters:")
     for tool, params in tool_args.items():
